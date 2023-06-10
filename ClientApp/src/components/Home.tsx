@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import Connections from './Connections';
 import Calenderweb from './calenderweb';
 import DemoApp from './demo';
+import ReactApp from './reactbigcalendar'
 interface RouteParams {
     id: string;
 }
@@ -20,6 +21,9 @@ function Home() {
     }
     function connect() {
         history.push(`/Connections/${id}`);
+    }
+    function reactdemo() {
+        history.push(`/ReactApp/${id}`);
     }
 
     return (
@@ -53,6 +57,11 @@ function Home() {
             <div>
                 <button className="btn btn-primary mt-4" onClick={demo}>
                     demo Page
+                </button>
+            </div>
+            <div>
+                <button className="btn btn-primary mt-4" onClick={reactdemo}>
+                    React Demo Page
                 </button>
             </div>
            

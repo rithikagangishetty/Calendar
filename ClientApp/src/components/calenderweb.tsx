@@ -21,7 +21,7 @@ type Event = {
     Connections: Array<string>;
     StartDate: Date;
     EndDate: Date;
-    EmailId: string;
+
 };
 
 type Connection = {

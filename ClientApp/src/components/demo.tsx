@@ -11,6 +11,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { INITIAL_EVENTS, createEventId } from './event-utils'
+import { NowTimer } from '@fullcalendar/core/internal'
 
 interface DemoAppState {
     weekendsVisible: boolean
@@ -37,6 +38,7 @@ export default class DemoApp extends React.Component<{}, DemoAppState> {
                             right: 'dayGridMonth,timeGridWeek,timeGridDay'
                         }}
                         initialView='dayGridMonth'
+                       // validRange={ }
                         editable={true}
                         selectable={true}
                         selectMirror={true}

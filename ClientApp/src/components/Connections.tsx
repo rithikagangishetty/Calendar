@@ -24,9 +24,22 @@ function Connections() {
 
 
    
-   
-        
-       
+    async function Get(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault();
+        axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
+            console.log(response.data);
+            setConnections(response.data);
+        }).catch((error) => { alert(error) });
+        return (
+            <div>
+                {connections.map((item) => (
+                    <div>
+                        <p>{item}</p>
+
+                    </div>
+                ))}
+            </div>);
+    }
     
 
     async function Update(event: React.MouseEvent<HTMLButtonElement>)
@@ -91,7 +104,7 @@ function Connections() {
                         }}
                     />
                 </div>
-              
+               
           
 
              
@@ -100,8 +113,13 @@ function Connections() {
 
             <div>
             <button className="btn btn-primary mt-4" onClick={Update}>
-                Update
+                Add Connection
             </button>
+            </div>
+            <div>
+                <button className="btn btn-primary mt-4" onClick={Get}>
+                    Connections
+                </button>
             </div>
 
 

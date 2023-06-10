@@ -38,7 +38,9 @@
     <None Remove="ClientApp\src\components\Connections.tsx" />
     <None Remove="ClientApp\src\components\demo.tsx" />
     <None Remove="ClientApp\src\components\event-utils.tsx" />
+    <None Remove="ClientApp\src\components\file.tsx" />
     <None Remove="ClientApp\src\components\login.tsx" />
+    <None Remove="ClientApp\src\components\reactbigcalendar.tsx" />
   </ItemGroup>
 
   <ItemGroup>

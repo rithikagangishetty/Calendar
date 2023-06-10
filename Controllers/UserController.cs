@@ -38,7 +38,6 @@ namespace Calenderwebapp.Controllers
 
             return user;
         }
-       
 
         [HttpPost]
         public async Task<IActionResult> Post(UserDetails newUser)

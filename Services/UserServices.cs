@@ -34,6 +34,7 @@ namespace Calenderwebapp.Services
         public async Task CreateAsync(UserDetails newUser) =>
             await _UsersCollection.InsertOneAsync(newUser);
 
+
         public async Task UpdateAsync( UserDetails updatedUser) =>
             await _UsersCollection.ReplaceOneAsync(x => x._id == updatedUser._id, updatedUser);
 

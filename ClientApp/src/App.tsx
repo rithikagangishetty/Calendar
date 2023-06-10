@@ -12,24 +12,30 @@ import Connections from './components/Connections';
 import Calenderweb from './components/calenderweb';
 import Login from './components/login';
 import DemoApp from './components/demo';
+import ReactApp from './components/reactbigcalendar'
+
 function App() {
 
     return (
         
-        //    <Layout>
-        //        <Router>
-        //            <Switch>
-        //                <Route exact path="/" component={Login} />
-        //                <Route path="/Calenderweb/:id" component={Calenderweb} />
-        //                <Route path="/Connections/:id" component={Connections} />
-        //                <Route path="/Home/:id" component={Home} />
-        //                <Route path="/DemoApp" component={DemoApp} />
+            <Layout>
+                <Router>
+                    <Switch>
+                        <Route exact path="/" component={Login} />
+                        <Route path="/Calenderweb/:id" component={Calenderweb} />
+                        <Route path="/Connections/:id" component={Connections} />
+                        <Route path="/Home/:id" component={Home} />
+                    <Route path="/ReactApp/:id" component={ReactApp} />
 
-        //            </Switch>
+                    </Switch>
 
-        //        </Router>
-        //</Layout> 
-        <DemoApp />
+                </Router>
+        </Layout> 
+    
+
+   // ReactDOM.render(<ReactApp />, document.getElementById('root'))
+
+        //<DemoApp />
         
            
         
