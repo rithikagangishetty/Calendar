@@ -24,11 +24,11 @@ namespace Calenderwebapp.Services
                 UserSettings.Value.UsersCollectionName);
         }
 
-        public async Task<List<UserDetails>> GetAsync() =>
+        public async Task<List<UserDetails>> Get() =>
             await _UsersCollection.Find(_ => true).ToListAsync();
 
-        public async Task<UserDetails> GetAsync(string Id) =>
-            await _UsersCollection.Find(x => x._id == Id).FirstOrDefaultAsync();
+        public async Task<List<UserDetails>> GetAsync(string Id) =>
+            await _UsersCollection.Find(x => x.UserId == Id).ToListAsync();
         
 
         public async Task CreateAsync(UserDetails newUser) =>

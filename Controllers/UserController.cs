@@ -1,8 +1,10 @@
 ﻿using Calenderwebapp.Models;
 using Calenderwebapp.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Calenderwebapp.Controllers
@@ -22,21 +24,28 @@ namespace Calenderwebapp.Controllers
 
         [HttpGet]
         public async Task<List<UserDetails>> Get() =>
-            await _usersService.GetAsync();
+            await _usersService.Get();
 
-        [HttpGet("{id:length(24)}")]
-        public async Task<ActionResult<UserDetails>> Get(string id)
+        [HttpGet]
+        [Route("getevents")]
+        public async Task<List<LoginClass>>Get(string id)
         {
-            var Id = new ObjectId(id);
            
-            var user = await _usersService.GetAsync(id);
+           
+            var users = await _usersService.GetAsync(id);
 
-            if (user is null)
+            //if (users is null)
+            //{
+            //    return NotFound();
+            //}
+            var formattedEvents = users.Select(e => new
             {
-                return NotFound();
-            }
+                Title = e.EventName,
+                Start = e.StartDate,
+                End = e.EndDate,
+            });
 
-            return user;
+            return (List<LoginClass>)formattedEvents;
         }
 
         [HttpPost]

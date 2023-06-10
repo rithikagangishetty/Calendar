@@ -8,7 +8,7 @@ import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
 import addHours from 'date-fns/addHours'
 import startOfHour from 'date-fns/startOfHour'
-import { getEvents, createEvent, post } from './file';
+import { getEvents,get, post } from './file';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import React from 'react'
@@ -26,18 +26,29 @@ type Events = {
 
 };
 const ReactApp: FC = () => {
+    
     const [events, setEvents] = useState<Event[]>([
        
     ])
     useEffect(() => {
-       // fetchEvents();
+        fetchEvents();
     }, []);
     const [connections, setConnections] = useState<Array<string>>([""]);
     const { id } = useParams<RouteParams>();
     const fetchEvents = async () => {
-        const data = await getEvents();
-        setEvents(data);
+        const data = await getEvents(id);
+
+        // Format events for react-big-calendar
+        const formattedEvents = data.map((event: { start: string | number | Date; end: string | number | Date }) => ({
+            ...event,
+            start: new Date(event.start),
+            end: new Date(event.end)
+        }));
+
+        setEvents(formattedEvents);
     };
+
+   
 
     const onEventResize: withDragAndDropProps['onEventResize'] = data => {
         const { start, end } = data
@@ -73,9 +84,11 @@ const ReactApp: FC = () => {
             };
 
             setEvents([...events, newEvent]);
-           // createEvent(details);
+            console.log(id);
+            // getEvents(id);
+            //console.log(users);
             post(details);
-          // fetchEvents();
+           //fetchEvents();
             
         }
     };
@@ -105,6 +118,7 @@ const ReactApp: FC = () => {
             endAccessor="end"
             onSelectSlot={handleSelect}
             style={{ height: '100vh' }}
+            step={15 }
         />
     )
 }
