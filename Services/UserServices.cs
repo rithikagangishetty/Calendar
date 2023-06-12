@@ -29,7 +29,8 @@ namespace Calenderwebapp.Services
 
         public async Task<List<UserDetails>> GetAsync(string Id) =>
             await _UsersCollection.Find(x => x.UserId == Id).ToListAsync();
-        
+        public async Task<UserDetails> GetObjectAsync(string Id) =>
+           await _UsersCollection.Find(x => x._id == Id).FirstOrDefaultAsync();
 
         public async Task CreateAsync(UserDetails newUser) =>
             await _UsersCollection.InsertOneAsync(newUser);

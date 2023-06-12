@@ -36,8 +36,6 @@
     <None Remove="ClientApp\src\components\calendarweb.ts" />
     <None Remove="ClientApp\src\components\calenderweb.tsx" />
     <None Remove="ClientApp\src\components\Connections.tsx" />
-    <None Remove="ClientApp\src\components\demo.tsx" />
-    <None Remove="ClientApp\src\components\event-utils.tsx" />
     <None Remove="ClientApp\src\components\file.tsx" />
     <None Remove="ClientApp\src\components\login.tsx" />
     <None Remove="ClientApp\src\components\reactbigcalendar.tsx" />

@@ -28,24 +28,27 @@ namespace Calenderwebapp.Controllers
 
         [HttpGet]
         [Route("getevents")]
-        public async Task<List<LoginClass>>Get(string id)
+        public async Task<List<UserDetails>>GetEvents(string _id)
         {
            
            
-            var users = await _usersService.GetAsync(id);
+            var users = await _usersService.GetAsync(_id);
 
             //if (users is null)
             //{
             //    return NotFound();
             //}
-            var formattedEvents = users.Select(e => new
-            {
-                Title = e.EventName,
-                Start = e.StartDate,
-                End = e.EndDate,
-            });
+            //var formattedEvents = new List<LoginClass>();
+            //foreach (var user in users)
+            //{
+            //  var formattedEvent=new LoginClass();
+            //    formattedEvent.end = user.EndDate;
+            //    formattedEvent.title = user.EventName;
+            //    formattedEvent.start= user.StartDate;
+            //    formattedEvents.Add(formattedEvent);
+            //}
 
-            return (List<LoginClass>)formattedEvents;
+            return users;
         }
 
         [HttpPost]
@@ -56,14 +59,7 @@ namespace Calenderwebapp.Controllers
             return CreatedAtAction(nameof(Get), new { id = newUser._id }, newUser);
 
         }
-        //[HttpPost]
-        //public async Task<IActionResult> Edit(UserDetails newUser)
-        //{
-        //    await _usersService.CreateAsync(newUser);
-
-        //    return CreatedAtAction(nameof(Get), new { id = newUser._id }, newUser);
-
-        //}
+        
 
         [HttpPut]
         [Route("update")]
@@ -82,18 +78,19 @@ namespace Calenderwebapp.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:length(24)}")]
-        public async Task<IActionResult> Delete(string id)
+        [HttpDelete]
+        
+        public async Task<IActionResult> Delete(string _id)
         {
-            var Id = new ObjectId(id);
-            var user = await _usersService.GetAsync(id);
+            var Id = new ObjectId(_id);
+            var user = await _usersService.GetObjectAsync(_id);
 
             if (user is null)
             {
                 return NotFound();
             }
 
-            await _usersService.RemoveAsync(id);
+            await _usersService.RemoveAsync(_id);
 
             return NoContent();
         }

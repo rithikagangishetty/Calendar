@@ -11,7 +11,7 @@ import './custom.css'
 import Connections from './components/Connections';
 import Calenderweb from './components/calenderweb';
 import Login from './components/login';
-import DemoApp from './components/demo';
+
 import ReactApp from './components/reactbigcalendar'
 
 function App() {
@@ -35,7 +35,7 @@ function App() {
 
    // ReactDOM.render(<ReactApp />, document.getElementById('root'))
 
-        //<DemoApp />
+       
         
            
         

@@ -11,15 +11,12 @@ export const getEvents = async (id:string) => {
     const response = await axios.get('https://localhost:44373/User/getevents', { params: { _id: id } });
     return response.data;
 }
-export const createEvent = async (event:any) => {
-    const response = await axios.post(API_URL, event);
+
+
+export const deleteEvent = async (id:string) => {
+    const response = await axios.delete('https://localhost:44373/User/', { params: { _id: id } });
     return response.data;
 };
-
-//export const deleteEvent = async (id) => {
-//    const response = await axios.delete(`${API_URL}/${id}`);
-//    return response.data;
-//};
 
 export const post=async function Post(event: any) {
     
