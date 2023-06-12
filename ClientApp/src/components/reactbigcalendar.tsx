@@ -4,25 +4,15 @@ import withDragAndDrop, { withDragAndDropProps } from 'react-big-calendar/lib/ad
 import moment from 'moment';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { get, deleteEvent } from './file';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios';
+/*import EditEvent from './edit';*/
 interface RouteParams {
     id: string;
 }
-type Events = {
-    _id: string;
-    UserId: string;
-    EventName: string;
-    Connections: Array<string>;
-    StartDate: Date;
-    EndDate: Date;
-
-};
-
 
 const ReactApp: FC = () => {
 
@@ -32,18 +22,31 @@ const ReactApp: FC = () => {
 
     useEffect(() => {
        
-        getEvents();
+      //  getEvents();
     }, [DeleteEvent,Post]);
-   
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+    // Function to handle event update
+    const handleEventUpdate = (updatedEvent: Event) => {
+        setEvents(prevState =>
+            prevState.map(event => (event._id === updatedEvent._id ? updatedEvent : event))
+        );
+        setSelectedEvent(null); // Close the edit form
+    };
+
+    // Function to handle canceling event edit
+    const handleEventCancel = () => {
+        setSelectedEvent(null); // Close the edit form
+    };
+
+    // Function to open the edit form
+    const handleEventSelect = (event: Event) => {
+        setSelectedEvent(event);
+    };
    
 
     const getEvents = async () => {
         axios.get('https://localhost:44373/User/getevents', { params: { _id: id } }).then((response) => {
-
-
-           
-
-            console.log(response.data);
             const event = response.data.map((training:any) => {
                 return {
                     _id: training._id,
@@ -56,7 +59,7 @@ const ReactApp: FC = () => {
                 }
             })
             setEvents(event);
-            console.log(event);
+          //  console.log(event);
             
 
         }).catch((err) => {
@@ -64,7 +67,7 @@ const ReactApp: FC = () => {
         });
         
     }
-     function Post(event: any) {
+function Post(event: any) {
 
         axios.get('https://localhost:44373/Connection/get/', { params: { _id: event.UserId } }).then((response) => {
            
@@ -75,7 +78,7 @@ const ReactApp: FC = () => {
                 StartDate: event.start,
                 EndDate: event.end,
                 Connections: response.data.connection,
-            }).then((response) => {
+            }).then(() => {
               
                 alert("Event Created Succesfully");
             }).catch((error) => { alert("error in post " + error) });
@@ -85,7 +88,22 @@ const ReactApp: FC = () => {
         axios.delete('https://localhost:44373/User/', { params: { _id: id } }).then((response) => { alert("event deleted") }).catch((error) => { alert(error); });
        
     };
+    function EditEvent(event: any) {
+        axios.put('https://localhost:44373/User/update',
+            {
+                _id: event._id,
+                UserId: event.UserId,
+                EventName: event.title,
+                StartDate: event.start,
+                EndDate: event.end,
+                Connections: event.connection,
 
+            }).then((response) => {
+                console.log(response.data);
+                alert("event edited")
+            }).catch((error) => { alert(error); });
+
+    };
     const handleSelectSlot = (event: any) => {
         const selectedDate = moment(event.start).startOf('day');
         const currentDate = moment().startOf('day');
@@ -107,10 +125,8 @@ const ReactApp: FC = () => {
                 };
                 
                 setEvents([...events, newEvent]);
-              
-
                 Post(newEvent);
-                getEvents();
+              
               
             };
         };
@@ -126,6 +142,19 @@ const ReactApp: FC = () => {
             console.log("reached here");
         }
        
+    };
+
+    const handleEdit = (event: any) => {
+        const confirmEdit = window.confirm('Are you sure you want to edit this event?');
+        if (confirmEdit) {
+            EditEvent(event._id);
+            console.log(event._id);
+
+        }
+        else {
+            console.log("reached here");
+        }
+
     };
     const localizer: DateLocalizer = momentLocalizer(moment);
     const minDate = new Date();
@@ -148,16 +177,18 @@ const ReactApp: FC = () => {
                 defaultView='week'
                 events={events}
                 localizer={localizer}
-                // min={minDate}
-                // getNow={getNow}
                 startAccessor="start"
                 endAccessor="end"
                 titleAccessor="title"
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}
-                style={{ height: '100vh' }}
+                style={{ height: '80vh' }}
                 step={15}
+                // min={minDate}
+                // getNow={getNow}
+               
             />
+  
         </div >
     );
 };export default ReactApp

@@ -2,8 +2,6 @@ import * as React from 'react';
 
 import Layout from './components/Layout';
 import Home from './components/Home';
-import Counter from './components/Counter';
-import FetchData from './components/FetchData';
 import { useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';

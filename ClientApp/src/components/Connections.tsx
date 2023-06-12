@@ -16,31 +16,30 @@ interface RouteParams {
 function Connections() {
     const [connection, setConnection] = useState<string>("");
     const [connections, setConnections] = useState<Array<string>>([]);
+    const [emailIds, setEmailIds] = useState<Array<string>>([]);
     const { id } = useParams<RouteParams>();
 
     useEffect(() => {
-     
+        Get();
     }, [Update]);
 
 
-   
-    async function Get(event: React.MouseEvent<HTMLButtonElement>) {
-        event.preventDefault();
+    var events: any;
+    var events_2: any;
+    async function Get() {
+      
+
         axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
             console.log(response.data);
-            setConnections(response.data);
-        }).catch((error) => { alert(error) });
-        return (
-            <div>
-                {connections.map((item) => (
-                    <div>
-                        <p>{item}</p>
+            events = response.data;
+            setEmailIds(events)
+            console.log(emailIds);
+           
 
-                    </div>
-                ))}
-            </div>);
+
+        }).catch((error) => { alert(error) });
     }
-    
+         
 
     async function Update(event: React.MouseEvent<HTMLButtonElement>)
     {
@@ -74,8 +73,9 @@ function Connections() {
                        }).catch((error) => {
                            alert("error in update "+error);
                        });
-            setConnections(newconnections);
-
+             setConnections(newconnections);
+           
+            console.log(connections);
                }).catch((error) => {
                    alert("error in getting the _id  "+error);
                    
@@ -86,44 +86,55 @@ function Connections() {
     }
 
     return (
-        <div>
+        <><div>
             <form>
-              
 
-              
+
+
                 <div>
-                    <label>Connections</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="emailid"
-                        placeholder={"connections"}
-                        onChange={(event) => {
-                            setConnection(event.target.value);
 
-                        }}
-                    />
+                    <div>
+                        <label>Add a New Connection</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="emailid"
+                            placeholder={"Add EmailId of the required connection"}
+                            onChange={(event) => {
+                                setConnection(event.target.value);
+
+                            } } />
+                    </div>
+
+
                 </div>
-               
-          
 
-             
-            
-        </form >
+
+
+
+
+            </form>
 
             <div>
-            <button className="btn btn-primary mt-4" onClick={Update}>
-                Add Connection
-            </button>
-            </div>
-            <div>
-                <button className="btn btn-primary mt-4" onClick={Get}>
-                    Connections
+                <button className="btn btn-primary mt-4" onClick={Update}>
+                    Add Connection
                 </button>
             </div>
+          
 
 
-                    </div >
+        </div>
+
+            <div>
+                <div> <label>Your Connections:</label></div>
+
+                {emailIds.map((item: any) => (
+                    <div>
+                        <p>{item}</p>
+
+                    </div>
+                ))}
+            </div></>
         
         
         );
