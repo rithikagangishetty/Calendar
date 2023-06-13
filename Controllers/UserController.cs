@@ -3,6 +3,8 @@ using Calenderwebapp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
+using MongoDB.Driver.Core.Operations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,9 +40,53 @@ namespace Calenderwebapp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(UserDetails newUser)
         {
-            await _usersService.CreateAsync(newUser);
+            var users = new List<UserDetails>();
+            for (int i = 0; i < newUser.Connections.Count; i = i + 1)
+            {
+                var user = new UserDetails();
+                user.UserId = newUser.Connections[i];
+                user.EndDate = newUser.EndDate;
+                user.StartDate = newUser.StartDate;
+                user.EventName = newUser.EventName;
+               
+                var events = await _usersService.GetAsync(user.UserId);
+                if (events == null)
+                {
+                    users.Add(user);
+                }
 
-            return CreatedAtAction(nameof(Get), new { id = newUser._id }, newUser);
+
+                else
+                {
+                    var count = 0;
+                    foreach (var j in events)
+                    {
+                        if
+                        ((
+                            (DateTime.Parse(user.StartDate) >= DateTime.Parse(j.StartDate) && DateTime.Parse(user.StartDate) < DateTime.Parse(j.EndDate)) ||
+                            (DateTime.Parse(user.EndDate) > DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) <= DateTime.Parse(j.EndDate)) ||
+                            (DateTime.Parse(user.StartDate) <= DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) >= DateTime.Parse(j.EndDate))
+                        ))
+                        {
+                            count = count + 1;   
+                        }
+                        
+                    }
+                    if(count==0)
+                    {
+                        users.Add(user);
+                    }
+
+                }
+
+            }
+
+
+
+        
+            users.Add(newUser);
+                await _usersService.CreateAsync(users);
+                return CreatedAtAction(nameof(Get), new { id = newUser._id }, newUser);
 
         }
         
@@ -80,3 +126,29 @@ namespace Calenderwebapp.Controllers
         }
     }
 }
+
+
+// var events = await _usersService.GetAsync(user.UserId);
+//if (events == null)
+//{
+//    users.Add(user);
+//}
+
+
+//else
+//{
+//    foreach (var j in events)
+//    {
+//        if
+//    (!(
+//        (DateTime.Parse(user.StartDate) >= DateTime.Parse(j.StartDate)&& DateTime.Parse(user.StartDate) < DateTime.Parse(j.EndDate)) ||
+//        (DateTime.Parse(user.EndDate) > DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) <= DateTime.Parse(j.EndDate)) ||
+//        (DateTime.Parse(user.StartDate) <= DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) >= DateTime.Parse(j.EndDate))
+//    ))
+
+
+// }
+
+//  }
+
+//        }

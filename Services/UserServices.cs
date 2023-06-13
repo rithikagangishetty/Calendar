@@ -31,16 +31,22 @@ namespace Calenderwebapp.Services
             await _UsersCollection.Find(x => x.UserId == Id).ToListAsync();
         public async Task<UserDetails> GetObjectAsync(string Id) =>
            await _UsersCollection.Find(x => x._id == Id).FirstOrDefaultAsync();
+        public async Task UpdateAsync(UserDetails updatedUser) =>
+          await _UsersCollection.ReplaceOneAsync(x => x._id == updatedUser._id, updatedUser);
 
-        public async Task CreateAsync(UserDetails newUser) =>
-            await _UsersCollection.InsertOneAsync(newUser);
-
-
-        public async Task UpdateAsync( UserDetails updatedUser) =>
-            await _UsersCollection.ReplaceOneAsync(x => x._id == updatedUser._id, updatedUser);
-
-        public async Task RemoveAsync(  string id) =>
+        public async Task RemoveAsync(string id) =>
             await _UsersCollection.DeleteOneAsync(x => x._id == id);
+        public async Task CreateAsync(List<UserDetails> newUser) 
+        {
+            for(int i=0;i<newUser.Count;i++)
+            {
+                var user = newUser[i];
+                await _UsersCollection.InsertOneAsync(user);
+            }
+          
+        }
+            
+      
     }
 }
 

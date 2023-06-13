@@ -25,11 +25,12 @@ function Connections() {
 
 
     var events: any;
-    var events_2: any;
+
     async function Get() {
       
 
         axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
+
             console.log(response.data);
             events = response.data;
             setEmailIds(events)
@@ -37,7 +38,8 @@ function Connections() {
            
 
 
-        }).catch((error) => { alert(error) });
+        }).catch((error) => { //alert(error)
+        });
     }
          
 

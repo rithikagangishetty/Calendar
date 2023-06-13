@@ -9,18 +9,16 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios';
-/*import EditEvent from './edit';*/
 interface RouteParams {
     id: string;
 }
 
 const ReactApp: FC = () => {
-
+    const localizer: DateLocalizer = momentLocalizer(moment);
     const [events, setEvents] = useState<Event[]>([]);
     const [connections, setConnections] = useState<Array<string>>([""]);
     const { id } = useParams<RouteParams>();
     const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
-
     useEffect(() => {
        
        getEvents();
@@ -36,7 +34,7 @@ const ReactApp: FC = () => {
                     title: training.eventName,
                     start: new Date(training.startDate),
                     end: new Date(training.endDate),
-                   // allDay: false,
+                    allDay: false,
                     UserId: training.userId,
                     Connections: training.connections
                 }
@@ -48,7 +46,7 @@ const ReactApp: FC = () => {
         return event;
         
     }
-function Post(event: any) {
+    function Post(event: any) {
 
         axios.get('https://localhost:44373/Connection/get/', { params: { _id: event.UserId } }).then((response) => {
            
@@ -69,7 +67,7 @@ function Post(event: any) {
         axios.delete('https://localhost:44373/User/', { params: { _id: id } }).then((response) => { alert("event deleted") }).catch((error) => { alert(error); });
        
     };
-    const handleselectSlot = (slotInfo: any) => {
+    const overlap = (slotInfo: any) => {
         // Check if there are any events within the selected slot
         const eventsInSlot = events.filter
         (
@@ -86,10 +84,10 @@ function Post(event: any) {
     
 
         // Prevent selection if events are present
-        if (eventsInSlot.length > 0)
-        {
+        if (eventsInSlot.length > 0) {
             return true;
         }
+        
 
         setSelectedSlot(slotInfo.start);
     };
@@ -97,7 +95,7 @@ function Post(event: any) {
         const selectedDate = moment(event.start).startOf('day');
         const currentDate = moment().startOf('day');
        
-        if (handleselectSlot(event)) {
+        if (overlap(event)) {
             toast.error('Event creation is not allowed');
             return;
         }
@@ -137,12 +135,7 @@ function Post(event: any) {
         }
        
     };
-    const localizer: DateLocalizer = momentLocalizer(moment);
-    const minDate = new Date();
-    const getNow = () => {
-        return new Date();
-    };
-    //  const DnDCalendar = withDragAndDrop(Calendar)
+
     return (
         <div>
             <ToastContainer />
@@ -167,8 +160,6 @@ function Post(event: any) {
               //  onDoubleClickEvent={handleEdit}
                 style={{ height: '80vh' }}
                 step={15}
-                // min={minDate}
-                // getNow={getNow}
                
             />
   
