@@ -18,28 +18,36 @@ function Connections() {
     const [connections, setConnections] = useState<Array<string>>([]);
     const [emailIds, setEmailIds] = useState<Array<string>>([]);
     const { id } = useParams<RouteParams>();
+    const [showContent, setShowContent] = useState(false);
 
     useEffect(() => {
-        Get();
+        
     }, [Update]);
 
 
     var events: any;
 
-    async function Get() {
-      
-
+     function Get(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault();
+         setShowContent(true);
         axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
 
             console.log(response.data);
             events = response.data;
-            setEmailIds(events)
-            console.log(emailIds);
+            if (events.length> 0) {
+                setEmailIds(events)
+                
+            }
+           
+            if (events.length==0) {
+                alert("No Connections");
+            }
            
 
 
-        }).catch((error) => { //alert(error)
+        }).catch((error) => { alert(error)
         });
+        
     }
          
 
@@ -122,24 +130,33 @@ function Connections() {
                     Add Connection
                 </button>
             </div>
+            <div>
+                <button className="btn btn-primary mt-4" onClick={Get}>
+                    View Connections
+                </button>
+                {showContent && <div>
+                    {emailIds.length > 0 && (
+                        <div>
+                            <div> <label>Your Connections:</label></div>
+
+                            {emailIds.map((item: any) => (
+                                <div>
+                                    <p>{item}</p>
+
+                                </div>
+                            ))}
+                        </div>)}
+                </div> }
+
+            </div>
           
 
 
         </div>
 
-            <div>
-                <div> <label>Your Connections:</label></div>
-
-                {emailIds.map((item: any) => (
-                    <div>
-                        <p>{item}</p>
-
-                    </div>
-                ))}
-            </div></>
+        </>
         
         
         );
 }
 export default Connections;
-

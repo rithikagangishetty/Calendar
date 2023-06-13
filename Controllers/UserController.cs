@@ -62,13 +62,17 @@ namespace Calenderwebapp.Controllers
                     foreach (var j in events)
                     {
                         if
-                        ((
+                        (
                             (DateTime.Parse(user.StartDate) >= DateTime.Parse(j.StartDate) && DateTime.Parse(user.StartDate) < DateTime.Parse(j.EndDate)) ||
                             (DateTime.Parse(user.EndDate) > DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) <= DateTime.Parse(j.EndDate)) ||
                             (DateTime.Parse(user.StartDate) <= DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) >= DateTime.Parse(j.EndDate))
-                        ))
+                        )
                         {
                             count = count + 1;   
+                        }
+                       if(count>0)
+                        {
+                            break;
                         }
                         
                     }

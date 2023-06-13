@@ -45,15 +45,17 @@ namespace Calenderwebapp.Controllers
         {
             var connections = await _connectionServices.GetAsync(_id);
             var NewConnections = new List<string>();
-            foreach (var connection in connections.Connection)
+            if (connections.Connection != null)
             {
-                var user = await _connectionServices.GetAsync(connection);
-                if (user!= null)
+                foreach (var connection in connections.Connection)
                 {
-                    NewConnections.Add(user.EmailId);
+                    var user = await _connectionServices.GetAsync(connection);
+                    if (user != null)
+                    {
+                        NewConnections.Add(user.EmailId);
+                    }
                 }
             }
-
             return NewConnections;
         }
 
