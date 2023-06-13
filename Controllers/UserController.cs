@@ -30,24 +30,8 @@ namespace Calenderwebapp.Controllers
         [Route("getevents")]
         public async Task<List<UserDetails>>GetEvents(string _id)
         {
-           
-           
+
             var users = await _usersService.GetAsync(_id);
-
-            //if (users is null)
-            //{
-            //    return NotFound();
-            //}
-            //var formattedEvents = new List<LoginClass>();
-            //foreach (var user in users)
-            //{
-            //  var formattedEvent=new LoginClass();
-            //    formattedEvent.end = user.EndDate;
-            //    formattedEvent.title = user.EventName;
-            //    formattedEvent.start= user.StartDate;
-            //    formattedEvents.Add(formattedEvent);
-            //}
-
             return users;
         }
 
