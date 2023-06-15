@@ -21,77 +21,83 @@ function Connections() {
     const [showContent, setShowContent] = useState(false);
 
     useEffect(() => {
-        
-    }, [Update]);
+
+    }, [Update, Delete]);
 
 
     var events: any;
 
-     function Get(event: React.MouseEvent<HTMLButtonElement>) {
+    function Get(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
-         setShowContent(true);
+        setShowContent(true);
         axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
 
             console.log(response.data);
             events = response.data;
-            if (events.length> 0) {
+            if (events.length > 0) {
                 setEmailIds(events)
-                
+
             }
-           
-            if (events.length==0) {
+
+            if (events.length == 0) {
                 alert("No Connections");
+
             }
-           
 
 
-        }).catch((error) => { alert(error)
+
+        }).catch((error) => {
+            alert(error)
         });
-        
-    }
-         
 
-    async function Update(event: React.MouseEvent<HTMLButtonElement>)
-    {
+    }
+
+    async function Delete(emailId: string) {
+
+        axios.delete('https://localhost:44373/Connection/delete/', { params: { emailId: emailId, _id: id } }).then((response) => {
+            console.log(response.data);
+            alert("Connection Deleted");
+            setShowContent(false);
+        }).catch((error) => { alert(error); })
+    }
+    async function Update(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
-        axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) =>
-    
-               {
+        axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
             console.log(response.data);
             setConnections(response.data.connection);
-                       var newconnections = response.data.connection;
-                       if (response.data.connection != null) {
-                           newconnections = [...newconnections, connection];
-                       }
-                       if (response.data.connection == null) {
-                           newconnections = [connection];
-                       }
-          
-                axios.put("https://localhost:44373/Connection/update",
-                       {
+            var newconnections = response.data.connection;
+            if (response.data.connection != null) {
+                newconnections = [...newconnections, connection];
+            }
+            if (response.data.connection == null) {
+                newconnections = [connection];
+            }
 
-                           _id: response.data._id,
-                           EmailId: response.data.emailId,
-                           Connection: newconnections,
+            axios.put("https://localhost:44373/Connection/update",
+                {
+
+                    _id: response.data._id,
+                    EmailId: response.data.emailId,
+                    Connection: newconnections,
 
 
-                       }).then((response) => {
-                       
-                           console.log(response.data);
-                           alert("Connection Added");
-                     
-                       }).catch((error) => {
-                           alert("error in update "+error);
-                       });
-             setConnections(newconnections);
-           
+                }).then((response) => {
+
+                    console.log(response.data);
+                    alert("Connection Added");
+
+                }).catch((error) => {
+                    alert("error in update " + error);
+                });
+            setConnections(newconnections);
+
             console.log(connections);
-               }).catch((error) => {
-                   alert("error in getting the _id  "+error);
-                   
-              
-               });
-       
+        }).catch((error) => {
+            alert("error in getting the _id  " + error);
+
+
+        });
+
 
     }
 
@@ -113,7 +119,7 @@ function Connections() {
                             onChange={(event) => {
                                 setConnection(event.target.value);
 
-                            } } />
+                            }} />
                     </div>
 
 
@@ -136,27 +142,45 @@ function Connections() {
                 </button>
                 {showContent && <div>
                     {emailIds.length > 0 && (
-                        <div>
-                            <div> <label>Your Connections:</label></div>
+                        <table className="table table-light">
+                            <thead>
+                                <tr>
 
-                            {emailIds.map((item: any) => (
-                                <div>
-                                    <p>{item}</p>
+                                    <th scope="col">Your Connections</th>
+                                </tr>
+                            </thead>
+                            {emailIds.map(function fn(email: any) {
+                                return (
+                                    <tbody>
+                                        <tr>
 
-                                </div>
-                            ))}
-                        </div>)}
-                </div> }
+                                            <td>{email}</td>
+
+                                            <button
+                                                type="button"
+                                                className="btn btn-danger"
+                                                onClick={() => Delete(email)}
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </tr>
+                                    </tbody>
+                                );
+                            })}
+                        </table>
+                    )}
+                </div>}
 
             </div>
-          
+
 
 
         </div>
 
         </>
-        
-        
-        );
+
+
+    );
 }
 export default Connections;
