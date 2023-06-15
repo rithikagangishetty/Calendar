@@ -21,8 +21,10 @@ const ReactApp: FC = () => {
     const [selectedSlot, setSelectedSlot] = useState<Date | null>(null);
     useEffect(() => {
        
-       getEvents();
-    }, [DeleteEvent, Post]);
+        getEvents();
+       // alert("reached here");
+
+    }, [DeleteEvent]);
 
     
    
@@ -43,7 +45,7 @@ const ReactApp: FC = () => {
         }).catch((err) => {
             alert(err)
         });
-        return event;
+       
         
     }
     function Post(event: any) {
@@ -57,7 +59,28 @@ const ReactApp: FC = () => {
                 StartDate: event.start,
                 EndDate: event.end,
                 Connections: response.data.connection,
-            }).then(() => {
+            }).then((response) => {
+                axios.post('https://localhost:44373/User/email',
+                    {
+                        _id: event._id,
+                        UserId: event.UserId,
+                        EventName: event.title,
+                        StartDate: event.start,
+                        EndDate: event.end,
+                        Connections: response.data.connection,
+
+                    } )
+                    //.then((response) => {
+                    //    // Handle the response from the server
+                    //    if (response.data.success) {
+                    //        alert("email sent")
+                    //        // Email sent successfully
+                    //    }
+                    //})
+                    //.catch((error) => {
+                    //    // Handle any network or server-side errors
+                    //    alert('Error:' + error);
+                    //});
               
                 alert("Event Created Succesfully");
             }).catch((error) => { alert("error in post " + error) });
@@ -92,8 +115,9 @@ const ReactApp: FC = () => {
         setSelectedSlot(slotInfo.start);
     };
     const handleSelectSlot = (event: any) => {
-        const selectedDate = moment(event.start).startOf('day');
-        const currentDate = moment().startOf('day');
+        const selectedDate = moment(event.start);
+        const currentDate = moment();
+
        
         if (overlap(event)) {
             toast.error('Event creation is not allowed');
@@ -101,11 +125,12 @@ const ReactApp: FC = () => {
         }
         if (selectedDate.isBefore(currentDate))
         {
-            toast.error('Event creation is not allowed for past days');
+            toast.error('Event creation is not allowed for past days and time');
             return;
         }
         else {
             const title = window.prompt('Enter event title:');
+            const moderator = window.prompt('Enter any moderators for the event:');
             if (title) {
                 const newEvent = {
                    title: title,
@@ -123,7 +148,7 @@ const ReactApp: FC = () => {
             }
         }
     };
-    const handleDelete =  (event:any) => {
+    function handleDelete(event:any) {
         const confirmDelete = window.confirm('Are you sure you want to delete this event?');
         if (confirmDelete) {
             DeleteEvent(event._id);
@@ -135,6 +160,20 @@ const ReactApp: FC = () => {
         }
        
     };
+    //const sendEmail = (event:any) => {
+    //    axios.post('https://localhost:44373/User/email', event)
+    //        .then((response) => {
+    //            // Handle the response from the server
+    //            if (response.data.success) {
+    //                alert("email sent")
+    //                // Email sent successfully
+    //            }
+    //        })
+    //        .catch((error) => {
+    //            // Handle any network or server-side errors
+    //            alert('Error:'+ error);
+    //        });
+    //};
 
     return (
         <div>
