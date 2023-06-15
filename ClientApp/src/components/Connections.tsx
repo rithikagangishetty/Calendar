@@ -85,6 +85,7 @@ function Connections() {
 
                     console.log(response.data);
                     alert("Connection Added");
+                    setShowContent(false);
 
                 }).catch((error) => {
                     alert("error in update " + error);
