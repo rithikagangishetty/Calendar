@@ -7,6 +7,10 @@ using MongoDB.Driver.Core.Operations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using System.Net;
+using System.Net.Mail;
+//using System.Web.Http;
 using System.Threading.Tasks;
 
 namespace Calenderwebapp.Controllers
@@ -93,9 +97,41 @@ namespace Calenderwebapp.Controllers
                 return CreatedAtAction(nameof(Get), new { id = newUser._id }, newUser);
 
         }
-        
 
-        [HttpPut]
+        [HttpPost]
+        [Route("email")]
+        public IActionResult SendEmail(UserDetails eventData)
+        {
+            
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587);
+          
+            var myemail = "batmanandriddler@gmail.com";
+            var mypass = "batmanandriddler1008";
+            smtpClient.Credentials = new NetworkCredential(myemail, mypass);
+            smtpClient.EnableSsl = true;
+
+            MailMessage mailMessage = new MailMessage
+            {
+                From = new MailAddress(myemail)
+            };
+            mailMessage.To.Add(myemail);
+            mailMessage.Subject = "Event Created";
+            mailMessage.Body = $"Your event  has been created.";
+
+            try
+            {
+                smtpClient.Send(mailMessage);
+                // Email sent successfully
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                // Email sending failed, handle the error
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
+    
+    [HttpPut]
         [Route("update")]
         public async Task<IActionResult> Update(UserDetails updatedUser)
         {
@@ -130,29 +166,3 @@ namespace Calenderwebapp.Controllers
         }
     }
 }
-
-
-// var events = await _usersService.GetAsync(user.UserId);
-//if (events == null)
-//{
-//    users.Add(user);
-//}
-
-
-//else
-//{
-//    foreach (var j in events)
-//    {
-//        if
-//    (!(
-//        (DateTime.Parse(user.StartDate) >= DateTime.Parse(j.StartDate)&& DateTime.Parse(user.StartDate) < DateTime.Parse(j.EndDate)) ||
-//        (DateTime.Parse(user.EndDate) > DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) <= DateTime.Parse(j.EndDate)) ||
-//        (DateTime.Parse(user.StartDate) <= DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) >= DateTime.Parse(j.EndDate))
-//    ))
-
-
-// }
-
-//  }
-
-//        }

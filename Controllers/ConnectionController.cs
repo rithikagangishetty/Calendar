@@ -124,17 +124,19 @@ namespace Calenderwebapp.Controllers
 
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(string id)
+        [Route("delete")]
+        public async Task<IActionResult> Delete(string emailId,string _id)
         {
-            var Id = new ObjectId(id);
-            var _connection = await _connectionServices.GetAsync(id);
+            var user =await  _connectionServices.GetAsync(_id); 
+            var connection= await _connectionServices.GetAsyncId(emailId);
+            user.Connection.Remove(connection._id);
+            Console.WriteLine(user.Connection);
+            
+            await _connectionServices.UpdateAsync(user, user.Connection);
 
-            if (_connection is null)
-            {
-                return NotFound();
-            }
 
-            await _connectionServices.RemoveAsync(id);
+
+
 
             return NoContent();
         }

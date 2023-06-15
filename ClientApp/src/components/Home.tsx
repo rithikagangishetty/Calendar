@@ -28,11 +28,11 @@ function Home() {
             <p>Welcome to Home Page</p>
             <br />
            
-            <div>
-            <button className="btn btn-primary mt-4" onClick={calender}>
-                Calendar Page
-            </button>
-        </div >
+        {/*    <div>*/}
+        {/*    <button className="btn btn-primary mt-4" onClick={calender}>*/}
+        {/*        Calendar Page*/}
+        {/*    </button>*/}
+        {/*</div >*/}
             <div>
             <button className="btn btn-primary mt-4" onClick={connect}>
                 Connections Page
@@ -41,7 +41,7 @@ function Home() {
            
             <div>
                 <button className="btn btn-primary mt-4" onClick={reactdemo}>
-                    React Demo Page
+                    Calendar Page
                 </button>
             </div>
            
