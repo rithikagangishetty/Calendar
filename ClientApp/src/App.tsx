@@ -7,9 +7,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './custom.css'
 import Connections from './components/Connections';
-import Calenderweb from './components/calenderweb';
 import Login from './components/login';
-
 import ReactApp from './components/reactbigcalendar'
 
 function App() {
@@ -20,10 +18,9 @@ function App() {
                 <Router>
                     <Switch>
                         <Route exact path="/" component={Login} />
-                        <Route path="/Calenderweb/:id" component={Calenderweb} />
                         <Route path="/Connections/:id" component={Connections} />
                         <Route path="/Home/:id" component={Home} />
-                    <Route path="/ReactApp/:id" component={ReactApp} />
+                        <Route path="/ReactApp/:id" component={ReactApp} />
 
                     </Switch>
 
@@ -31,8 +28,8 @@ function App() {
         </Layout> 
     
 
-   // ReactDOM.render(<ReactApp />, document.getElementById('root'))
-
+  
+ 
        
         
            

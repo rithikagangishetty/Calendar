@@ -62,7 +62,7 @@ namespace Calenderwebapp.Controllers
 
                 else
                 {
-                    var count = 0;
+                    bool count = true;
                     foreach (var j in events)
                     {
                         if
@@ -72,15 +72,15 @@ namespace Calenderwebapp.Controllers
                             (DateTime.Parse(user.StartDate) <= DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) >= DateTime.Parse(j.EndDate))
                         )
                         {
-                            count = count + 1;   
-                        }
-                       if(count>0)
-                        {
+                            count = false;
+                            //count=count+1;
+                            //if(count>0)
+                            //{
                             break;
                         }
-                        
+                        //}
                     }
-                    if(count==0)
+                    if(count)
                     {
                         users.Add(user);
                     }
