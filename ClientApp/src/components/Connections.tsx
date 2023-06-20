@@ -1,7 +1,8 @@
 ﻿import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
+type TaskType =  'connectionadded' | 'connectiondeleted' | 'noconnections' ; // Define the possible task types
+import MyModal from './Modal';
 
 type Connection = {
     _id: string;
@@ -14,6 +15,8 @@ interface RouteParams {
 
 }
 function Connections() {
+    const [showModal, setShowModal] = useState(false);
+    const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [connection, setConnection] = useState<string>("");
     const [connections, setConnections] = useState<Array<string>>([]);
     const [emailIds, setEmailIds] = useState<Array<string>>([]);
@@ -21,9 +24,12 @@ function Connections() {
     const [showContent, setShowContent] = useState(false);
 
     useEffect(() => {
-
+       // Get();
     }, [Update, Delete]);
+    const handleCloseModal = () => {
 
+        setShowModal(false);
+    };
 
     var events: any;
 
@@ -40,11 +46,11 @@ function Connections() {
             }
 
             if (events.length == 0) {
-                alert("No Connections");
-
+                setCurrentTaskType('noconnections');
+                setShowModal(true);
             }
 
-
+          
 
         }).catch((error) => {
             alert(error)
@@ -53,14 +59,16 @@ function Connections() {
     }
 
     async function Delete(emailId: string) {
-
+        setShowContent(false);
         axios.delete('https://localhost:44373/Connection/delete/', { params: { emailId: emailId, _id: id } }).then((response) => {
             console.log(response.data);
-            alert("Connection Deleted");
-            setShowContent(false);
+            // alert("Connection Deleted");
+            setCurrentTaskType('connectiondeleted');
+            setShowModal(true);
         }).catch((error) => { alert(error); })
     }
     async function Update(event: React.MouseEvent<HTMLButtonElement>) {
+        setShowContent(false);
         event.preventDefault();
         axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
             console.log(response.data);
@@ -84,8 +92,9 @@ function Connections() {
                 }).then((response) => {
 
                     console.log(response.data);
-                    alert("Connection Added");
-                    setShowContent(false);
+                    setCurrentTaskType('connectionadded');
+                    setShowModal(true);
+                   
 
                 }).catch((error) => {
                     alert("error in update " + error);
@@ -105,11 +114,6 @@ function Connections() {
     return (
         <><div>
             <form>
-
-
-
-                <div>
-
                     <div>
                         <label>Add a New Connection</label>
                         <input
@@ -122,13 +126,6 @@ function Connections() {
 
                             }} />
                     </div>
-
-
-                </div>
-
-
-
-
 
             </form>
 
@@ -175,7 +172,7 @@ function Connections() {
 
             </div>
 
-
+            {currentTaskType && (<MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />)}
 
         </div>
 
