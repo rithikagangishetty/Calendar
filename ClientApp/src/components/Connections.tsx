@@ -24,7 +24,7 @@ function Connections() {
     const [showContent, setShowContent] = useState(false);
 
     useEffect(() => {
-       // Get();
+      
     }, [Update, Delete]);
     const handleCloseModal = () => {
 

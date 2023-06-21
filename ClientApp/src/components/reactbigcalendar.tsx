@@ -13,7 +13,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' |'past'; // Define the possible task types
 import { Modal, Button, Form } from 'react-bootstrap';
 import MyModal from './Modal';
-//import { Event } from 'react-toastify/dist/core';
+
 interface RouteParams {
     id: string;
 }
@@ -21,7 +21,7 @@ interface RouteParams {
 const ReactApp: FC = () => {
     const localizer: DateLocalizer = momentLocalizer(moment);
     const [events, setEvents] = useState<Event[]>([]);
-    const [connections, setConnections] = useState<Array<string>>([""]);
+    const [connections, setConnections] = useState<Array<string>>([]);
     const { id } = useParams<RouteParams>();
     const [showModal, setShowModal] = useState(false);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
@@ -29,9 +29,12 @@ const ReactApp: FC = () => {
     const [deleteEventId, setDeleteEventId] = useState<string>('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
+    const [moderator, setModerator] = useState('');
     const [startdate, setStart] = useState('')
     const [enddate, setEnd] = useState('');
-
+    const [showEmailModal, setShowEmailModal] = useState(false);
+    const [priv, setPrivate] = useState < boolean>(false);
+    const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
     const handleCloseModal = () => {
        
         setShowModal(false);
@@ -39,7 +42,7 @@ const ReactApp: FC = () => {
     useEffect(() => {
        
         getEvents();
-      
+
 
     }, [handleDelete]);
 
@@ -55,6 +58,7 @@ const ReactApp: FC = () => {
                     end: new Date(training.endDate),
                     allDay: false,
                     UserId: training.userId,
+                    Moderator:training.moderator,
                     Connections: training.connections
                 }
             })
@@ -65,38 +69,57 @@ const ReactApp: FC = () => {
        
         
     }
-   
-    function Post(event: React.MouseEvent<HTMLButtonElement>) {
-        event.preventDefault();
-        setShowCreateModal(false);
+    
+    function Post() {
+       
+     
+        const emailArray = moderator
+            .split(',')
+            .map((email) => email.trim())
+            .filter((email) => email !== '');
         axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
-           
+            
             axios.post("https://localhost:44373/User", {
                 _id: '',
                 UserId: id,
                 EventName: titleInput,
                 StartDate: startdate,
+                Moderator: emailArray,
                 EndDate: enddate,
-                Connections: response.data.connection,
+                Connections: (priv ? selectedConnections : response.data.connection)
             }).then((response) => {
+               
                 axios.post('https://localhost:44373/User/email',
                     {
                         _id:'',
                         UserId: id,
                         EventName: titleInput,
                         StartDate: startdate,
+                        Moderator: emailArray,
                         EndDate: enddate,
-                        Connections: response.data.connection,
+                        Connections: (priv ? (selectedConnections) : response.data.connection)
 
                     })
+                setShowCreateModal(false);
+
+
                 setCurrentTaskType('eventadded');
                 setShowModal(true);
-               
-              
-               /* alert("Event Created Succesfully");*/
             }).catch((error) => { alert("error in post " + error) });
         }).catch((error) => { alert("error in get " + error) });
     };
+
+    function GetConnections() {
+        axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
+            console.log(response.data);
+            setConnections(response.data);
+        }).catch((error) => {
+            alert(error)
+        });
+
+    }
+
+
     function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
         axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId } }).then((response) => {
@@ -154,31 +177,68 @@ const ReactApp: FC = () => {
             setEnd(event.end);
             setShowCreateModal(true);
         
-            console.log("reached here");
-           
+          //  console.log("reached here");
+            if (titleInput.trim() !== '')
+            {
+                const emailArray = moderator
+                    .split(',')
+                    .map((email) => email.trim())
+                    .filter((email) => email !== '');
                 const newEvent = {
                     title: titleInput,
                     start: event.start,
                     end: event.end,
+                    Moderator: emailArray,
                     UserId: id,
                     Connections: connections,
                     _id: "",
                 };
                 setEvents([...events, newEvent]);
-             
-                
+
+            }
               
             
         }
+        
     };
-    
+
+    function handlePost(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault();
+        setPrivate(false);
+        Post();
+    }
+    function handlePrivatePost(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault();
+        GetConnections();
+        setPrivate(true);
+        setShowEmailModal(true);
+   
+    }
     function handleDelete(event:any) {
         setDeleteEventId(event._id);
             setShowDeleteModal(true); };
    
-   
-   
+    const handleConnectionSelection = (connection: string) => {
+        const selected = [...selectedConnections];
 
+        if (selected.includes(connection)) {
+            const index = selected.indexOf(connection);
+            selected.splice(index, 1);
+        } else {
+            selected.push(connection);
+        }
+
+        setSelectedConnections(selected);
+       // Post()
+    };
+   
+    const handleSaveSelectedConnections = () => {
+        // Save the selected email IDs
+       
+        setSelectedConnections([]);
+        setShowEmailModal(false);
+        Post();
+    };
     return (
         <div>
             <ToastContainer />
@@ -241,14 +301,58 @@ const ReactApp: FC = () => {
                             onChange={(e) => setTitleInput(e.target.value) }
                         />
                     </Form.Group>
+                    <Form.Group controlId="eventModerator">
+                        <Form.Label>Moderators</Form.Label>
+                        <small className="ml-2 text-muted">To add more than one moderators separate the emails by comma.</small>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={moderator}
+                            onChange={(e) => setModerator(e.target.value)}
+                        />
+                    </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
                    
-                    <Button variant="success" onClick={Post}>
-                        Create
+                    <Button variant="success" onClick={handlePost}>
+                        Create Public Event
+                    </Button>
+                    <Button variant="success" onClick={handlePrivatePost}>
+                        Create Private Event
                     </Button>
                     <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
                         Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+
+
+            <Modal show={showEmailModal} onHide={()=>setShowEmailModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Select Email IDs</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {connections.map((connection) => (
+                        <Form.Check
+                            key={connection}
+                            type="checkbox"
+                            id={connection}
+                            label={connection}
+                            checked={selectedConnections.includes(connection)}
+                            onChange={() => handleConnectionSelection(connection)}
+                        />
+                    ))}
+                    {/*{connections.map((item, index) => (*/}
+                    {/*    <p key={index}>{item}</p>*/}
+                    {/*))}*/}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={()=>setShowEmailModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleSaveSelectedConnections}>
+                        Save
                     </Button>
                 </Modal.Footer>
             </Modal>

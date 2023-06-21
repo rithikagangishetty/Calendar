@@ -28,9 +28,7 @@ namespace Calenderwebapp.Controllers
         [Route("get")]
         public async Task<ActionResult<Connections>> GetEmailId(string _id)
         {
-            var Id = new ObjectId(_id);
             var _connection = await _connectionServices.GetAsync(_id);
-
             if (_connection is null)
             {
                 return NotFound();

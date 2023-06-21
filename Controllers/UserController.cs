@@ -1,16 +1,11 @@
 ﻿using Calenderwebapp.Models;
 using Calenderwebapp.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using MongoDB.Driver.Core.Operations;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-
 using System.Net;
 using System.Net.Mail;
-//using System.Web.Http;
 using System.Threading.Tasks;
 
 namespace Calenderwebapp.Controllers
@@ -73,12 +68,10 @@ namespace Calenderwebapp.Controllers
                         )
                         {
                             count = false;
-                            //count=count+1;
-                            //if(count>0)
-                            //{
+                           
                             break;
                         }
-                        //}
+                      
                     }
                     if(count)
                     {
@@ -88,10 +81,6 @@ namespace Calenderwebapp.Controllers
                 }
 
             }
-
-
-
-        
             users.Add(newUser);
                 await _usersService.CreateAsync(users);
                 return CreatedAtAction(nameof(Get), new { id = newUser._id }, newUser);
@@ -154,13 +143,19 @@ namespace Calenderwebapp.Controllers
         {
             var Id = new ObjectId(_id);
             var user = await _usersService.GetObjectAsync(_id);
-
             if (user is null)
             {
                 return NotFound();
             }
-
+            
             await _usersService.RemoveAsync(_id);
+            //foreach ( var id in user.Connections)
+            //{
+            //    await _usersService.RemoveAsync(id);
+            //}
+          
+
+           
 
             return NoContent();
         }
