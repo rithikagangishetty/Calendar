@@ -42,8 +42,7 @@ namespace Calenderwebapp.Controllers
            
             var users = new List<string>();
             var res = new List<string>();
-            res.Concat(newUser.Connections);
-            res.Concat(newUser.Moderator);
+           
 
             for (int i = 0; i <newUser.Connections.Count; i = i + 1)
             {
@@ -94,39 +93,7 @@ namespace Calenderwebapp.Controllers
 
         }
 
-        [HttpPost]
-        [Route("email")]
-        public IActionResult SendEmail(UserDetails eventData)
-        {
-            
-            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587);
-          
-            var myemail = "batmanandriddler@gmail.com";
-            var mypass = "batmanandriddler1008";
-            smtpClient.Credentials = new NetworkCredential(myemail, mypass);
-            smtpClient.EnableSsl = true;
-
-            MailMessage mailMessage = new MailMessage
-            {
-                From = new MailAddress(myemail)
-            };
-            mailMessage.To.Add(myemail);
-            mailMessage.Subject = "Event Created";
-            mailMessage.Body = $"Your event  has been created.";
-
-            try
-            {
-                smtpClient.Send(mailMessage);
-                // Email sent successfully
-                return Ok(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                // Email sending failed, handle the error
-                return StatusCode(500, new { success = false, error = ex.Message });
-            }
-        }
-    
+      
     [HttpPut]
         [Route("update")]
         public async Task<IActionResult> Update(UserDetails updatedUser)

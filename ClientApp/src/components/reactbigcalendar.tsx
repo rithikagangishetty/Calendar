@@ -1,12 +1,9 @@
 ﻿import {  FC, useState, useEffect } from 'react'
 import { Calendar,  Event, momentLocalizer, DateLocalizer } from 'react-big-calendar'
-//import moment from 'moment';
+import moment from 'moment';
 import React from 'react';
 import Select from 'react-select';
-import moment from 'moment-timezone';
-import  OptionTypeBase  from 'react-select';
-//import { ToastContainer, toast } from 'react-toastify';
-//import 'react-toastify/dist/ReactToastify.css';
+import 'moment-timezone';`1`
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useParams } from 'react-router-dom'
 import axios from 'axios';
@@ -32,20 +29,12 @@ const ReactApp: FC = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
     const [moderator, setModerator] = useState('');
-    const [startdate, setStart] = useState('')
-    const [enddate, setEnd] = useState('');
+    const [startdate, setStart] = useState<Date>();
+    const [enddate, setEnd] = useState<Date>();
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [priv, setPrivate] = useState < boolean>(false);
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
-    const getCurrentDateTime = (timezone: string) => {
-        return moment().tz(timezone).toDate();
-    };
-    const [selectedTimeZone, setSelectedTimeZone] = useState(moment.tz.guess());
-    const [currentDateTime, setCurrentDateTime] = useState(getCurrentDateTime(selectedTimeZone));
-
-    const handleTimeZoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedTimeZone(event.target.value);
-    };
+   
 
     const handleCloseModal = () => {
        
@@ -54,29 +43,27 @@ const ReactApp: FC = () => {
     useEffect(() => {
        
        getEvents();
-       // setCurrentDateTime(getCurrentDateTime(selectedTimeZone));
+      
       
 
     }, [handleDelete, Post ]);
     
-    //const [selectedTimeZone, setSelectedTimeZone] = useState(moment.tz.guess());
-    const getTimeZones = () => {
-        const timeZones = moment.tz.names();
-        return timeZones.map((tz) => ({
-            value: tz,
-            label: tz,
-        }));
-    };
+    
+    // Set the default timezone to India
+    const timezones = moment.tz.names(); 
+    const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
+    moment.tz.setDefault(selectedTimezone);
 
-    //const handleTimeZoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    //    setSelectedTimeZone(event.target.value);
-    //};
+    // Handle timezone selection change
+    const handleTimezoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedTimezone(event.target.value);
+    };
     function getEmailId(emailids:any)
     {
 
         axios.get('https://localhost:44373/Connection/getconnections', { params: { emails: emailids } }).then((response) => {
             console.log(response.data);
-           // setModerator(response.data);
+           
             return response.data;
 
         }).catch((error) => { alert(error); });
@@ -114,7 +101,7 @@ const ReactApp: FC = () => {
             .split(',')
             .map((email) => email.trim())
             .filter((email) => email !== '');
-    // var emails=   getEmailId(emailArray);
+   
        
         axios.get('https://localhost:44373/Connection/get', { params: { _id: id } }).then((response) => {
             
@@ -128,20 +115,8 @@ const ReactApp: FC = () => {
                 Connections: (priv ? selectedConnections : response.data.connection)
             }).then((response) => {
                
-                axios.post('https://localhost:44373/User/email',
-                    {
-                        _id:'',
-                        UserId: id,
-                        EventName: titleInput,
-                        StartDate: startdate,
-                        Moderator: emailArray,
-                        EndDate: enddate,
-                        Connections: (priv ? (selectedConnections) : response.data.connection)
-
-                    })
+                
                 setShowCreateModal(false);
-
-
                 setCurrentTaskType('eventadded');
                 setShowModal(true);
             }).catch((error) => { alert("error in post " + error) });
@@ -194,7 +169,8 @@ const ReactApp: FC = () => {
     };
     const handleSelectSlot = (event: any) => {
         const selectedDate = moment(event.start);
-        const currentDate = currentDateTime;
+        const currentDate = moment();
+        console.log(currentDate);
         GetConnections();
        
        
@@ -212,6 +188,8 @@ const ReactApp: FC = () => {
             return;
         }
         else {
+            
+            
             setStart(event.start);
             setEnd(event.end);
             setShowCreateModal(true);
@@ -227,7 +205,7 @@ const ReactApp: FC = () => {
           
                 const newEvent = {
                     title: titleInput,
-                    start: event.start,
+                    start: event.start, 
                     end: event.end,
                     Moderator: emailArray,
                     UserId: id,
@@ -295,20 +273,15 @@ const ReactApp: FC = () => {
     };
     return (
         <div>
-            {/*<select value={selectedTimeZone} onChange={handleTimeZoneChange}>*/}
-            {/*    {getTimeZones().map((tz) => (*/}
-            {/*        <option key={tz.value} value={tz.value}>*/}
-            {/*            {tz.label}*/}
-            {/*        </option>*/}
-            {/*    ))}*/}
-            {/*</select>*/}
-            <select value={selectedTimeZone} onChange={handleTimeZoneChange}>
-                {getTimeZones().map((tz) => (
-                    <option key={tz.value} value={tz.value}>
-                        {tz.label}
+            <label>Select Timezone:</label>
+            <select value={selectedTimezone} onChange={handleTimezoneChange}>
+                {timezones.map((timezone) => (
+                    <option key={timezone} value={timezone}>
+                        {timezone}
                     </option>
                 ))}
             </select>
+          
             <div>
             <strong>
                      Click an event to edit/delete,
@@ -323,7 +296,9 @@ const ReactApp: FC = () => {
                 localizer={localizer}
                 startAccessor="start"
                 endAccessor="end"
-                defaultDate={currentDateTime}
+              //  defaultDate={currentDateTime}
+                //timeZone={selectedTimezone}
+
                 titleAccessor="title"
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}
@@ -410,9 +385,7 @@ const ReactApp: FC = () => {
                             onChange={() => handleConnectionSelection(connection)}
                         />
                     ))}
-                    {/*{connections.map((item, index) => (*/}
-                    {/*    <p key={index}>{item}</p>*/}
-                    {/*))}*/}
+                   
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={()=>setShowEmailModal(false)}>
