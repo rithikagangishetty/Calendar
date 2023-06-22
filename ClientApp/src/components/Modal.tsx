@@ -51,7 +51,7 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
             <Modal.Footer>
                 
                 <Button variant="secondary" onClick={onClose}>
-                    Close
+                    Ok
                 </Button>
             </Modal.Footer>
         </Modal>

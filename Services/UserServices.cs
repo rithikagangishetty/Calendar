@@ -24,11 +24,17 @@ namespace Calenderwebapp.Services
                 UserSettings.Value.UsersCollectionName);
         }
 
-        public async Task<List<UserDetails>> Get() =>
-            await _UsersCollection.Find(_ => true).ToListAsync();
+
+
 
         public async Task<List<UserDetails>> GetAsync(string Id) =>
             await _UsersCollection.Find(x => x.UserId == Id).ToListAsync();
+        public async Task<List<UserDetails>> GetAsyncConnections(string Id)
+        {
+            var filter = Builders<UserDetails>.Filter.AnyEq(x => x.Connections, Id);
+            var result = await _UsersCollection.Find(filter).ToListAsync();
+            return result;
+        }
         public async Task<UserDetails> GetObjectAsync(string Id) =>
            await _UsersCollection.Find(x => x._id == Id).FirstOrDefaultAsync();
         public async Task UpdateAsync(UserDetails updatedUser) =>
@@ -36,13 +42,11 @@ namespace Calenderwebapp.Services
 
         public async Task RemoveAsync(string id) =>
             await _UsersCollection.DeleteOneAsync(x => x._id == id);
-        public async Task CreateAsync(List<UserDetails> newUser) 
+        public async Task CreateAsync(UserDetails newUser) 
         {
-            for(int i=0;i<newUser.Count;i++)
-            {
-                var user = newUser[i];
-                await _UsersCollection.InsertOneAsync(user);
-            }
+            
+                await _UsersCollection.InsertOneAsync(newUser);
+            
           
         }
             

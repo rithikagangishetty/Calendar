@@ -94,7 +94,7 @@ function Connections() {
                     console.log(response.data);
                     setCurrentTaskType('connectionadded');
                     setShowModal(true);
-                   
+                    setConnection('');
 
                 }).catch((error) => {
                     alert("error in update " + error);

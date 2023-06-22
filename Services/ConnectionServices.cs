@@ -27,20 +27,14 @@ namespace Calenderwebapp.Services
             }
 
 
-        public async Task<List<Connections>> Getasync() =>
-    await _ConnectionCollection.Find(_ => true).ToListAsync();
+      
         public async Task<Connections> GetAsync(string id) =>
                 await _ConnectionCollection.Find(x => x._id == id).FirstOrDefaultAsync();
         public async Task<Connections> GetAsyncId(string EmailId) =>
            await _ConnectionCollection.Find(x => x.EmailId == EmailId).FirstOrDefaultAsync();
         public async Task CreateAsync(Connections newUser) =>
                 await _ConnectionCollection.InsertOneAsync(newUser);
-        public Connections Login(string EmailId)
-        {
-            var filter = Builders<Connections>.Filter.Eq(u => u.EmailId, EmailId);
-            var user = _ConnectionCollection.Find(filter).FirstOrDefault();
-            return user;
-        }
+       
         public async Task UpdateAsync(Connections connection, List<string> updatedConnection)
         {
             var filter = Builders<Connections>.Filter.Eq(u => u._id, connection._id);

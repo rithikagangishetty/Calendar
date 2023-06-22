@@ -21,8 +21,22 @@ namespace Calenderwebapp.Controllers
 
 
         [HttpGet]
-        public async Task<List<Connections>> Get() =>
-            await _connectionServices.Getasync();
+        [Route("getconnections")]
+        public async Task<ActionResult<List<string>>> GetId(List<string> emails)
+        {
+            var connections = new List<string>();
+            
+            foreach (var email in emails)
+            {
+                var connection =await _connectionServices.GetAsyncId(email);
+                if (connection != null)
+                {
+                    connections.Add(connection._id);
+                }
+            }
+            return connections;
+        }
+
 
         [HttpGet]
         [Route("get")]
@@ -62,41 +76,22 @@ namespace Calenderwebapp.Controllers
         {
             await _connectionServices.CreateAsync(newConnection);
 
-            return CreatedAtAction(nameof(Get), new { id = newConnection._id }, newConnection);
+            return CreatedAtAction(nameof(GetEmailId), new { id = newConnection._id }, newConnection);
 
         }
-        [HttpPost]
-        [Route("login")]
-        public IActionResult Login(Connections userdata)
-        {
-            var user = _connectionServices.Login(userdata.EmailId);
-            if (user != null)
-            { return Ok(user); }
-            else
-            {
-
-
-                return NotFound();
-            }
-        }
+     
         [HttpPut]
-
         [Route("update")]
         public async Task<IActionResult> Update(Connections updatedConnection)
         {
-
-
             var connection = new List<string>();
             var connect = new List<string>();
             var count = updatedConnection.Connection.Count;
-            
-            var response = _connectionServices.Login(updatedConnection.Connection[count - 1]);
-         var exists=   updatedConnection.Connection.Contains(response._id);
+            var response = await _connectionServices.GetAsyncId(updatedConnection.Connection[count - 1]);
+            var exists=   updatedConnection.Connection.Contains(response._id);
             if(exists)
             { return Ok("Connection already exists"); 
             }
-
-
             if (response != null)
             {
                 if (response.Connection != null)
@@ -136,13 +131,7 @@ namespace Calenderwebapp.Controllers
             var connection= await _connectionServices.GetAsyncId(emailId);
             user.Connection.Remove(connection._id);
             Console.WriteLine(user.Connection);
-            
             await _connectionServices.UpdateAsync(user, user.Connection);
-
-
-
-
-
             return NoContent();
         }
     }

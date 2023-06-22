@@ -1,25 +1,27 @@
-﻿import { FC, useState, useEffect } from 'react'
+﻿import {  FC, useState, useEffect } from 'react'
 import { Calendar,  Event, momentLocalizer, DateLocalizer } from 'react-big-calendar'
-import moment from 'moment';
-
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
+//import moment from 'moment';
+import React from 'react';
+import Select from 'react-select';
+import moment from 'moment-timezone';
+import  OptionTypeBase  from 'react-select';
+//import { ToastContainer, toast } from 'react-toastify';
+//import 'react-toastify/dist/ReactToastify.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import React from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' |'past'; // Define the possible task types
 import { Modal, Button, Form } from 'react-bootstrap';
 import MyModal from './Modal';
 
+
+type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past'; // Define the possible task types
 interface RouteParams {
     id: string;
 }
 
 const ReactApp: FC = () => {
-    const localizer: DateLocalizer = momentLocalizer(moment);
+    const localizer = momentLocalizer(moment);
     const [events, setEvents] = useState<Event[]>([]);
     const [connections, setConnections] = useState<Array<string>>([]);
     const { id } = useParams<RouteParams>();
@@ -35,18 +37,53 @@ const ReactApp: FC = () => {
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [priv, setPrivate] = useState < boolean>(false);
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
+    const getCurrentDateTime = (timezone: string) => {
+        return moment().tz(timezone).toDate();
+    };
+    const [selectedTimeZone, setSelectedTimeZone] = useState(moment.tz.guess());
+    const [currentDateTime, setCurrentDateTime] = useState(getCurrentDateTime(selectedTimeZone));
+
+    const handleTimeZoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedTimeZone(event.target.value);
+    };
+
     const handleCloseModal = () => {
        
         setShowModal(false);
     };
     useEffect(() => {
        
-        getEvents();
+       getEvents();
+       // setCurrentDateTime(getCurrentDateTime(selectedTimeZone));
+      
 
-
-    }, [handleDelete]);
-
+    }, [handleDelete, Post ]);
     
+    //const [selectedTimeZone, setSelectedTimeZone] = useState(moment.tz.guess());
+    const getTimeZones = () => {
+        const timeZones = moment.tz.names();
+        return timeZones.map((tz) => ({
+            value: tz,
+            label: tz,
+        }));
+    };
+
+    //const handleTimeZoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    //    setSelectedTimeZone(event.target.value);
+    //};
+    function getEmailId(emailids:any)
+    {
+
+        axios.get('https://localhost:44373/Connection/getconnections', { params: { emails: emailids } }).then((response) => {
+            console.log(response.data);
+           // setModerator(response.data);
+            return response.data;
+
+        }).catch((error) => { alert(error); });
+       
+        
+       
+    }
    
     const getEvents =  () => {
         axios.get('https://localhost:44373/User/getevents', { params: { _id: id } }).then((response) => {
@@ -72,12 +109,14 @@ const ReactApp: FC = () => {
     
     function Post() {
        
-     
+       
         const emailArray = moderator
             .split(',')
             .map((email) => email.trim())
             .filter((email) => email !== '');
-        axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
+    // var emails=   getEmailId(emailArray);
+       
+        axios.get('https://localhost:44373/Connection/get', { params: { _id: id } }).then((response) => {
             
             axios.post("https://localhost:44373/User", {
                 _id: '',
@@ -110,7 +149,7 @@ const ReactApp: FC = () => {
     };
 
     function GetConnections() {
-        axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
+        axios.get('https://localhost:44373/Connection/getemail', { params: { _id: id } }).then((response) => {
             console.log(response.data);
             setConnections(response.data);
         }).catch((error) => {
@@ -122,7 +161,7 @@ const ReactApp: FC = () => {
 
     function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
-        axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId } }).then((response) => {
+        axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: id } }).then((response) => {
             setCurrentTaskType('eventdeleted');
             setShowModal(true);
             setShowDeleteModal(false);
@@ -155,8 +194,8 @@ const ReactApp: FC = () => {
     };
     const handleSelectSlot = (event: any) => {
         const selectedDate = moment(event.start);
-        const currentDate = moment();
-       
+        const currentDate = currentDateTime;
+        GetConnections();
        
        
         if (overlap(event)) {
@@ -177,13 +216,15 @@ const ReactApp: FC = () => {
             setEnd(event.end);
             setShowCreateModal(true);
         
-          //  console.log("reached here");
+          
             if (titleInput.trim() !== '')
             {
                 const emailArray = moderator
                     .split(',')
                     .map((email) => email.trim())
                     .filter((email) => email !== '');
+               
+          
                 const newEvent = {
                     title: titleInput,
                     start: event.start,
@@ -205,12 +246,23 @@ const ReactApp: FC = () => {
     function handlePost(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
         setPrivate(false);
+        const emailArray = moderator
+            .split(',')
+            .map((email) => email.trim())
+            .filter((email) => email !== '');
+
+
         Post();
     }
     function handlePrivatePost(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
-        GetConnections();
+       
         setPrivate(true);
+        const emailArray = moderator
+            .split(',')
+            .map((email) => email.trim())
+            .filter((email) => email !== '');
+       
         setShowEmailModal(true);
    
     }
@@ -229,19 +281,34 @@ const ReactApp: FC = () => {
         }
 
         setSelectedConnections(selected);
-       // Post()
+      
     };
    
     const handleSaveSelectedConnections = () => {
         // Save the selected email IDs
-       
+        
         setSelectedConnections([]);
         setShowEmailModal(false);
+       
+       
         Post();
     };
     return (
         <div>
-            <ToastContainer />
+            {/*<select value={selectedTimeZone} onChange={handleTimeZoneChange}>*/}
+            {/*    {getTimeZones().map((tz) => (*/}
+            {/*        <option key={tz.value} value={tz.value}>*/}
+            {/*            {tz.label}*/}
+            {/*        </option>*/}
+            {/*    ))}*/}
+            {/*</select>*/}
+            <select value={selectedTimeZone} onChange={handleTimeZoneChange}>
+                {getTimeZones().map((tz) => (
+                    <option key={tz.value} value={tz.value}>
+                        {tz.label}
+                    </option>
+                ))}
+            </select>
             <div>
             <strong>
                      Click an event to edit/delete,
@@ -256,7 +323,7 @@ const ReactApp: FC = () => {
                 localizer={localizer}
                 startAccessor="start"
                 endAccessor="end"
-                defaultDate={new Date()}
+                defaultDate={currentDateTime}
                 titleAccessor="title"
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}

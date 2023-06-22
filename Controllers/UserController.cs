@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -23,9 +24,6 @@ namespace Calenderwebapp.Controllers
             _usersService = usersService;
 
 
-        [HttpGet]
-        public async Task<List<UserDetails>> Get() =>
-            await _usersService.Get();
 
         [HttpGet]
         [Route("getevents")]
@@ -33,57 +31,66 @@ namespace Calenderwebapp.Controllers
         {
 
             var users = await _usersService.GetAsync(_id);
-            return users;
+            var events = await _usersService.GetAsyncConnections(_id);
+            List<UserDetails> result = users.Concat(events).ToList();
+            return result;
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(UserDetails newUser)
         {
-            var users = new List<UserDetails>();
-            for (int i = 0; i < newUser.Connections.Count; i = i + 1)
+           
+            var users = new List<string>();
+            var res = new List<string>();
+            res.Concat(newUser.Connections);
+            res.Concat(newUser.Moderator);
+
+            for (int i = 0; i <newUser.Connections.Count; i = i + 1)
             {
-                var user = new UserDetails();
-                user.UserId = newUser.Connections[i];
-                user.EndDate = newUser.EndDate;
-                user.StartDate = newUser.StartDate;
-                user.EventName = newUser.EventName;
-               
-                var events = await _usersService.GetAsync(user.UserId);
+                var user = newUser.Connections[i];
+              
+                
+                var result = await _usersService.GetAsync(user);
+                var calendarevent = await _usersService.GetAsyncConnections(user);
+               List<UserDetails> events = calendarevent.Concat(result).ToList();
+                var count = 0;
                 if (events == null)
                 {
                     users.Add(user);
                 }
 
-
+              
                 else
                 {
-                    bool count = true;
+                   
                     foreach (var j in events)
                     {
                         if
                         (
-                            (DateTime.Parse(user.StartDate) >= DateTime.Parse(j.StartDate) && DateTime.Parse(user.StartDate) < DateTime.Parse(j.EndDate)) ||
-                            (DateTime.Parse(user.EndDate) > DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) <= DateTime.Parse(j.EndDate)) ||
-                            (DateTime.Parse(user.StartDate) <= DateTime.Parse(j.StartDate) && DateTime.Parse(user.EndDate) >= DateTime.Parse(j.EndDate))
+                            (DateTime.Parse(newUser.StartDate) >= DateTime.Parse(j.StartDate) && DateTime.Parse(newUser.StartDate) < DateTime.Parse(j.EndDate)) ||
+                            (DateTime.Parse(newUser.EndDate) > DateTime.Parse(j.StartDate) && DateTime.Parse(newUser.EndDate) <= DateTime.Parse(j.EndDate)) ||
+                            (DateTime.Parse(newUser.StartDate) <= DateTime.Parse(j.StartDate) && DateTime.Parse(newUser.EndDate) >= DateTime.Parse(j.EndDate))
                         )
                         {
-                            count = false;
+                            count = count+1;
+                            continue;
                            
-                            break;
                         }
-                      
+
                     }
-                    if(count)
+                    if (count==0)
                     {
                         users.Add(user);
                     }
 
                 }
-
             }
-            users.Add(newUser);
-                await _usersService.CreateAsync(users);
-                return CreatedAtAction(nameof(Get), new { id = newUser._id }, newUser);
+
+             newUser.Connections.Clear();
+            newUser.Connections.AddRange(users);
+            Console.WriteLine(users);
+                await _usersService.CreateAsync(newUser);
+                return CreatedAtAction(nameof(GetEvents), new { id = newUser._id }, newUser);
 
         }
 
@@ -124,7 +131,7 @@ namespace Calenderwebapp.Controllers
         [Route("update")]
         public async Task<IActionResult> Update(UserDetails updatedUser)
         {
-            var Id = new ObjectId(updatedUser._id);
+           
             var user = await _usersService.GetAsync(updatedUser._id);
 
             if (user is null)
@@ -139,24 +146,24 @@ namespace Calenderwebapp.Controllers
 
         [HttpDelete]
         
-        public async Task<IActionResult> Delete(string _id)
+        public async Task<IActionResult> Delete(string _id,string userId)
         {
-            var Id = new ObjectId(_id);
+            
             var user = await _usersService.GetObjectAsync(_id);
             if (user is null)
             {
                 return NotFound();
             }
-            
-            await _usersService.RemoveAsync(_id);
-            //foreach ( var id in user.Connections)
-            //{
-            //    await _usersService.RemoveAsync(id);
-            //}
-          
-
-           
-
+            if (user.UserId == userId)
+            {
+                await _usersService.RemoveAsync(_id);
+            }
+            else
+            {
+                user.Connections.Remove(userId);
+                user.Moderator.Remove(userId);
+                await _usersService.UpdateAsync(user);
+            }
             return NoContent();
         }
     }
