@@ -25,7 +25,7 @@ function Connections() {
 
     useEffect(() => {
       
-    }, [Update, Delete]);
+    }, [currentTaskType]);
     const handleCloseModal = () => {
 
         setShowModal(false);

@@ -22,8 +22,8 @@ function Login() {
         setShowModal(false);
     };
     useEffect(() => {
-       
-    }, [()=>handleEmailIdChange]);
+
+    }, [currentTaskType]);
     const handleEmailIdChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEmailId(event.target.value);
     }; 

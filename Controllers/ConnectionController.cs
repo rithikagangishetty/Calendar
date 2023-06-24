@@ -21,24 +21,6 @@ namespace Calenderwebapp.Controllers
 
 
         [HttpGet]
-        [Route("getconnections")]
-        public async Task<ActionResult<List<string>>> GetId(List<string> emails)
-        {
-            var connections = new List<string>();
-            
-            foreach (var email in emails)
-            {
-                var connection =await _connectionServices.GetAsyncId(email);
-                if (connection != null)
-                {
-                    connections.Add(connection._id);
-                }
-            }
-            return connections;
-        }
-
-
-        [HttpGet]
         [Route("get")]
         public async Task<ActionResult<Connections>> GetEmailId(string _id)
         {

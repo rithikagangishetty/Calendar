@@ -1,5 +1,5 @@
 ﻿import {  FC, useState, useEffect } from 'react'
-import { Calendar,  Event, momentLocalizer, DateLocalizer } from 'react-big-calendar'
+import { Calendar, Event, momentLocalizer, EventContentProps } from 'react-big-calendar'
 import moment from 'moment';
 import React from 'react';
 import Select from 'react-select';
@@ -28,13 +28,14 @@ const ReactApp: FC = () => {
     const [deleteEventId, setDeleteEventId] = useState<string>('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
-    const [moderator, setModerator] = useState('');
+    const [moderator, setModerator] = useState<string>('');
     const [startdate, setStart] = useState<Date>();
     const [enddate, setEnd] = useState<Date>();
     const [showEmailModal, setShowEmailModal] = useState(false);
-    const [priv, setPrivate] = useState < boolean>(false);
+    const [priv, setPrivate] = useState<bool>();
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
-   
+    const timezones = moment.tz.names();
+    const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
 
     const handleCloseModal = () => {
        
@@ -46,12 +47,11 @@ const ReactApp: FC = () => {
       
       
 
-    }, [handleDelete, Post ]);
+    }, [deleteEventId, showDeleteModal, showCreateModal, selectedTimezone ]);
     
     
-    // Set the default timezone to India
-    const timezones = moment.tz.names(); 
-    const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
+    
+    
     moment.tz.setDefault(selectedTimezone);
 
     // Handle timezone selection change
@@ -83,7 +83,8 @@ const ReactApp: FC = () => {
                     allDay: false,
                     UserId: training.userId,
                     Moderator:training.moderator,
-                    Connections: training.connections
+                    Connections: training.connections,
+                    priv: training.priv
                 }
             })
             setEvents(event);
@@ -95,31 +96,34 @@ const ReactApp: FC = () => {
     }
     
     function Post() {
-       
-       
-        const emailArray = moderator
-            .split(',')
-            .map((email) => email.trim())
-            .filter((email) => email !== '');
-   
-       
+      
+
+
         axios.get('https://localhost:44373/Connection/get', { params: { _id: id } }).then((response) => {
-            
-            axios.post("https://localhost:44373/User", {
-                _id: '',
-                UserId: id,
-                EventName: titleInput,
-                StartDate: startdate,
-                Moderator: emailArray,
-                EndDate: enddate,
-                Connections: (priv ? selectedConnections : response.data.connection)
-            }).then((response) => {
-               
-                
-                setShowCreateModal(false);
-                setCurrentTaskType('eventadded');
-                setShowModal(true);
-            }).catch((error) => { alert("error in post " + error) });
+
+           
+                axios.post("https://localhost:44373/User",
+               {
+                    _id: '',
+                    UserId: id,
+                    EventName: titleInput,
+                   StartDate: startdate,
+                   Moderator: emailArray,
+                   EndDate: enddate,
+                   Connections: (priv ? selectedConnections : response.data.connection),
+                   priv: priv
+                }).then((response) => {
+
+
+                    setShowCreateModal(false);
+                    setCurrentTaskType('eventadded');
+                    setShowModal(true);
+
+                }).catch((error) => {
+                    alert("error in post " + error)
+                });
+          
+           
         }).catch((error) => { alert("error in get " + error) });
     };
 
@@ -136,6 +140,7 @@ const ReactApp: FC = () => {
 
     function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
+
         axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: id } }).then((response) => {
             setCurrentTaskType('eventdeleted');
             setShowModal(true);
@@ -197,10 +202,7 @@ const ReactApp: FC = () => {
           
             if (titleInput.trim() !== '')
             {
-                const emailArray = moderator
-                    .split(',')
-                    .map((email) => email.trim())
-                    .filter((email) => email !== '');
+              
                
           
                 const newEvent = {
@@ -210,6 +212,7 @@ const ReactApp: FC = () => {
                     Moderator: emailArray,
                     UserId: id,
                     Connections: connections,
+                    priv:priv,
                     _id: "",
                 };
                 setEvents([...events, newEvent]);
@@ -220,27 +223,24 @@ const ReactApp: FC = () => {
         }
         
     };
-
+    const CustomEventContent = ({ event }: EventContentProps) => (
+        <div>
+            <div>{event.title}</div>
+            <div>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
+        </div>
+    );
+    const eventFormats = {
+        eventTimeRangeFormat: () => '', // Override the time format to empty string
+    };
     function handlePost(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
         setPrivate(false);
-        const emailArray = moderator
-            .split(',')
-            .map((email) => email.trim())
-            .filter((email) => email !== '');
-
-
         Post();
     }
     function handlePrivatePost(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
        
         setPrivate(true);
-        const emailArray = moderator
-            .split(',')
-            .map((email) => email.trim())
-            .filter((email) => email !== '');
-       
         setShowEmailModal(true);
    
     }
@@ -249,6 +249,7 @@ const ReactApp: FC = () => {
             setShowDeleteModal(true); };
    
     const handleConnectionSelection = (connection: string) => {
+
         const selected = [...selectedConnections];
 
         if (selected.includes(connection)) {
@@ -261,15 +262,32 @@ const ReactApp: FC = () => {
         setSelectedConnections(selected);
       
     };
+    const emailArray = moderator
+            .split(',')
+            .map((email) => email.trim())
+        .filter((email) => email !== '');
+
+    const renderEmailCheckbox = (connection: string) => {
+        const isDisabled = emailArray.includes(connection);
+
+        return (
+            <Form.Check
+                key={connection}
+                type="checkbox"
+                id={connection}
+                label={connection}
+                checked={selectedConnections.includes(connection)}
+                onChange={() => handleConnectionSelection(connection)}
+                disabled={isDisabled}
+            />
+        );
+    };
    
     const handleSaveSelectedConnections = () => {
-        // Save the selected email IDs
-        
+       
         setSelectedConnections([]);
-        setShowEmailModal(false);
-       
-       
-        Post();
+            setShowEmailModal(false);
+            Post();      
     };
     return (
         <div>
@@ -296,14 +314,14 @@ const ReactApp: FC = () => {
                 localizer={localizer}
                 startAccessor="start"
                 endAccessor="end"
-              //  defaultDate={currentDateTime}
-                //timeZone={selectedTimezone}
-
+                formats={eventFormats}
                 titleAccessor="title"
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}
-              //  onDoubleClickEvent={handleEdit}
-                style={{ height: '100vh' }}
+                components={{
+                    event: CustomEventContent,
+                }}
+                style={{ height: '80vh' }}
                 step={15}
                
             />
@@ -375,16 +393,9 @@ const ReactApp: FC = () => {
                     <Modal.Title>Select Email IDs</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {connections.map((connection) => (
-                        <Form.Check
-                            key={connection}
-                            type="checkbox"
-                            id={connection}
-                            label={connection}
-                            checked={selectedConnections.includes(connection)}
-                            onChange={() => handleConnectionSelection(connection)}
-                        />
-                    ))}
+                    <Form>
+                        {connections.map((connection) => renderEmailCheckbox(connection))}
+                    </Form>
                    
                 </Modal.Body>
                 <Modal.Footer>

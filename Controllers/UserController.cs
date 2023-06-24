@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 
 namespace Calenderwebapp.Controllers
@@ -18,11 +19,13 @@ namespace Calenderwebapp.Controllers
     public class UserController : Controller
     {
         private readonly UserServices _usersService;
-       
-       
-        public UserController(UserServices usersService)=>    
-            _usersService = usersService;
 
+        private readonly ConnectionServices _connectionServices;
+        public UserController(UserServices usersService, ConnectionServices connectionService)
+        {
+            _connectionServices = connectionService;
+            _usersService = usersService;
+        }
 
 
         [HttpGet]
@@ -42,7 +45,57 @@ namespace Calenderwebapp.Controllers
            
             var users = new List<string>();
             var res = new List<string>();
-           
+            foreach (var email in newUser.Moderator)
+            {
+                var connection = await _connectionServices.GetAsyncId(email);
+
+
+
+                if (connection != null)
+                {
+                    res.Add(connection._id);
+
+                }
+                
+            }
+            newUser.Moderator.Clear();
+            newUser.Moderator.AddRange(res);
+            if (!newUser.priv)
+            {
+                HashSet<string> moderators = new HashSet<string>(newUser.Moderator);
+                List<string> updatedList = new List<string>();
+
+                foreach (string str in newUser.Connections)
+                {
+                    if (!moderators.Contains(str))
+                    {
+                        updatedList.Add(str);
+                    }
+                }
+                newUser.Connections.Clear();
+                newUser.Connections.AddRange(updatedList);
+            }
+
+            if (newUser.priv)
+            {
+                var connect = new List<string>();
+                foreach (var email in newUser.Connections)
+                {
+                    var connection = await _connectionServices.GetAsyncId(email);
+
+
+
+                    if (connection != null)
+                    {
+                        connect.Add(connection._id);
+
+                    }
+
+                }
+                newUser.Connections.Clear();
+                newUser.Connections.AddRange(connect);
+             
+            }
 
             for (int i = 0; i <newUser.Connections.Count; i = i + 1)
             {
