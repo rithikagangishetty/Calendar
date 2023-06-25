@@ -24,7 +24,7 @@ namespace Calenderwebapp.Controllers
             { return Ok(user); }
             else
             {
-                //var newuser= _loginServices.Signup(username);
+                
 
                 return NotFound();
             }

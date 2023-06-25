@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-type TaskType = 'login' | 'signup' | 'connectionadded' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past';
+type TaskType = 'login' | 'signup' | 'connectionadded' |'valid'| 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past';
 interface MyModalProps {
     show: boolean;
     onClose: () => void;
@@ -13,6 +13,9 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     let message = '';
     if (taskType === 'login') {
         message = 'Account Exists,You are successfully logged in!';
+    }
+    else if (taskType === 'valid') {
+        message = 'Please enter a valid Email';
     }
     else if (taskType === 'signup') {
         message = 'New Account Created!';

@@ -2,9 +2,8 @@
 import axios from 'axios';
 import MyModal from './Modal';
 import { useHistory } from 'react-router-dom';
-import { Button, Modal } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-type TaskType = 'login' | 'signup';
+type TaskType = 'login' | 'signup'|'valid';
 
 function Login() {
    
@@ -15,11 +14,20 @@ function Login() {
 
     const [showModal, setShowModal] = useState(false);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
-
+    const [valid, setValid] = useState<boolean>(false);
    
     const handleCloseModal = () => {
-        history.push(`/Home/${_id}`);
-        setShowModal(false);
+        if (valid) {
+            history.push(`/`);
+           
+            setShowModal(false);
+            setValid(false);
+        }
+        else {
+            history.push(`/Home/${_id}`);
+            setShowModal(false);
+        }
+       
     };
     useEffect(() => {
 
@@ -30,7 +38,14 @@ function Login() {
    
     const handleFormSubmit = (event: FormEvent) => {
         event.preventDefault();
-
+        if (EmailId == "") {
+            setCurrentTaskType('valid');
+            setShowModal(true);
+            setValid(true);
+            return;
+            
+            
+        }
 
          axios.post('https://localhost:44373/Login/login', {
 
@@ -70,12 +85,12 @@ function Login() {
             <div>
                 <h1>Hello, Users!</h1>
                 <p>Welcome to calendar web application</p>
-                <p>SignUp/Login to Enter</p>
+                <p>SignUp/Login your Email to Enter</p>
                 <br />
             <input
                     type="text"
                     className="form-control"
-                placeholder="EmailId"
+                placeholder="Enter your Email"
                 value={EmailId}
                 onChange={handleEmailIdChange}
             />
