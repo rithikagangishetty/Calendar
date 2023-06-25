@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-type TaskType = 'login' | 'signup' | 'connectionadded' | 'valid' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail';
+type TaskType = 'login' | 'signup' | 'connectionadded' | 'valid' |'eventedited'| 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail';
 interface MyModalProps {
     show: boolean;
     onClose: () => void;
@@ -16,6 +16,9 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     }
     else if (taskType === 'valid') {
         message = 'Please enter a valid Email';
+    }
+    else if (taskType === 'eventedited') {
+        message = 'Event Edited Successfully';
     }
     else if (taskType === 'sameemail') {
         message = 'Cannot add your Email as a connection!';

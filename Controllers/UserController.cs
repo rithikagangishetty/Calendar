@@ -46,7 +46,7 @@ namespace Calenderwebapp.Controllers
 
       
     [HttpPut]
-        [Route("update")]
+       
         public async Task<IActionResult> Update(UserDetails updatedUser)
         {
            
