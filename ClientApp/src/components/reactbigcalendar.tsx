@@ -1,8 +1,7 @@
 ﻿import {  FC, useState, useEffect } from 'react'
-import { Calendar, Event, momentLocalizer, EventContentProps } from 'react-big-calendar'
+import { Calendar, Event, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment';
 import React from 'react';
-import Select from 'react-select';
 import 'moment-timezone';`1`
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useParams } from 'react-router-dom'
@@ -28,11 +27,11 @@ const ReactApp: FC = () => {
     const [deleteEventId, setDeleteEventId] = useState<string>('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
-    const [moderator, setModerator] = useState<string>('');
     const [startdate, setStart] = useState<Date>();
     const [enddate, setEnd] = useState<Date>();
     const [showEmailModal, setShowEmailModal] = useState(false);
-    const [priv, setPrivate] = useState<bool>();
+    const [priv, setPrivate] = useState<boolean>();
+    const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
@@ -108,7 +107,7 @@ const ReactApp: FC = () => {
                     UserId: id,
                     EventName: titleInput,
                    StartDate: startdate,
-                   Moderator: emailArray,
+                   Moderator: selectedModerators,
                    EndDate: enddate,
                    Connections: (priv ? selectedConnections : response.data.connection),
                    priv: priv
@@ -209,7 +208,7 @@ const ReactApp: FC = () => {
                     title: titleInput,
                     start: event.start, 
                     end: event.end,
-                    Moderator: emailArray,
+                    Moderator: selectedModerators,
                     UserId: id,
                     Connections: connections,
                     priv:priv,
@@ -223,7 +222,7 @@ const ReactApp: FC = () => {
         }
         
     };
-    const CustomEventContent = ({ event }: EventContentProps) => (
+    const CustomEventContent = ({ event }: any) => (
         <div>
             <div>{event.title}</div>
             <div>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
@@ -262,13 +261,9 @@ const ReactApp: FC = () => {
         setSelectedConnections(selected);
       
     };
-    const emailArray = moderator
-            .split(',')
-            .map((email) => email.trim())
-        .filter((email) => email !== '');
-
+    
     const renderEmailCheckbox = (connection: string) => {
-        const isDisabled = emailArray.includes(connection);
+        const isDisabled = selectedModerators.includes(connection);
 
         return (
             <Form.Check
@@ -282,7 +277,15 @@ const ReactApp: FC = () => {
             />
         );
     };
-   
+    const handleModeratorSelection = (moderator: string) => {
+        if (selectedModerators.includes(moderator)) {
+            setSelectedModerators(selectedModerators.filter((selectedModerator) => selectedModerator !== moderator));
+        } else {
+            setSelectedModerators([...selectedModerators, moderator]);
+        }
+    };
+
+
     const handleSaveSelectedConnections = () => {
        
         setSelectedConnections([]);
@@ -361,16 +364,21 @@ const ReactApp: FC = () => {
                             onChange={(e) => setTitleInput(e.target.value) }
                         />
                     </Form.Group>
-                    <Form.Group controlId="eventModerator">
-                        <Form.Label>Moderators</Form.Label>
-                        <small className="ml-2 text-muted">To add more than one moderators separate the emails by comma.</small>
-                        <Form.Control
-                            as="textarea"
-                            rows={3}
-                            value={moderator}
-                            onChange={(e) => setModerator(e.target.value)}
-                        />
+                    <Form.Group controlId="eventEmails">
+                        <Form.Label>Select the Moderators</Form.Label>
+                        <div>
+                            {connections.map((moderator) => (
+                                <Form.Check
+                                    key={moderator}
+                                    type="checkbox"
+                                    label={moderator}
+                                    checked={selectedModerators.includes(moderator)}
+                                    onChange={() => handleModeratorSelection(moderator)}
+                                />
+                            ))}
+                        </div>
                     </Form.Group>
+
                 </Modal.Body>
                 <Modal.Footer>
                    
