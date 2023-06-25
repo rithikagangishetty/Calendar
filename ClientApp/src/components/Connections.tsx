@@ -144,9 +144,7 @@ function Connections() {
                 </button>
             </div>
             <div>
-                {/*<button className="btn btn-primary mt-4" onClick={Get}>*/}
-                {/*    View Connections*/}
-                {/*</button>*/}
+               
                 {<div>
                     {emailIds.length > 0 && (
                         <table className="table table-light">
