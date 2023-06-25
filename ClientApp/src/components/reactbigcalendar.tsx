@@ -778,11 +778,12 @@ const ReactApp: FC = () => {
                     Are you sure you want to delete/edit this event?
                 </Modal.Body>
                 <Modal.Footer>
+                   
+                    <Button variant="success" onClick={handleEditEvent}>
+                        Edit
+                    </Button>
                     <Button variant="danger" onClick={DeleteEvent}>
                         Delete
-                    </Button>
-                    <Button variant="danger" onClick={handleEditEvent}>
-                        Edit
                     </Button>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                         Cancel

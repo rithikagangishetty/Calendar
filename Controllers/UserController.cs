@@ -52,12 +52,13 @@ namespace Calenderwebapp.Controllers
            
             var user = await _usersService.GetAsync(updatedUser._id);
 
+
             if (user is null)
             {
                 return NotFound();
             }
-
-            await _usersService.UpdateAsync(updatedUser);
+            UserDetails newUser = await Filtering(updatedUser);
+            await _usersService.UpdateAsync(newUser);
 
             return NoContent();
         }
@@ -88,6 +89,7 @@ namespace Calenderwebapp.Controllers
         {
             var users = new List<string>();
             var res = new List<string>();
+            var moderator = new List<string>();
             foreach (var email in newUser.Moderator)
             {
                 var connection = await _connectionServices.GetAsyncId(email);
@@ -125,9 +127,6 @@ namespace Calenderwebapp.Controllers
                 foreach (var email in newUser.Connections)
                 {
                     var connection = await _connectionServices.GetAsyncId(email);
-
-
-
                     if (connection != null)
                     {
                         connect.Add(connection._id);
@@ -140,9 +139,18 @@ namespace Calenderwebapp.Controllers
 
             }
 
-            for (int i = 0; i < newUser.Connections.Count; i = i + 1)
+            for (int i = 0; i < newUser.Connections.Count+newUser.Moderator.Count; i = i + 1)
             {
-                var user = newUser.Connections[i];
+
+                var user = "";
+                if (i < newUser.Connections.Count)
+                {
+                    user = newUser.Connections[i];
+                }
+                if (i >= newUser.Connections.Count)
+                {
+                    user = newUser.Moderator[i- newUser.Connections.Count];
+                }
 
 
                 var result = await _usersService.GetAsync(user);
@@ -151,7 +159,14 @@ namespace Calenderwebapp.Controllers
                 var count = 0;
                 if (events == null)
                 {
-                    users.Add(user);
+                    if (i < newUser.Connections.Count)
+                    {
+                        users.Add(user);
+                    }
+                    else
+                    {
+                        moderator.Add(user);
+                    }
                 }
 
 
@@ -175,13 +190,25 @@ namespace Calenderwebapp.Controllers
                     }
                     if (count == 0)
                     {
-                        users.Add(user);
+                        if (i < newUser.Connections.Count)
+                        {
+                            users.Add(user);
+                        }
+                        else
+                        {
+                            moderator.Add(user);
+                        }
                     }
 
                 }
             }
+            
+
+
 
             newUser.Connections.Clear();
+            newUser.Moderator.Clear();
+            newUser.Moderator.AddRange(moderator);
             newUser.Connections.AddRange(users);
             return newUser;
         }
