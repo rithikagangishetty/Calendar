@@ -1,7 +1,7 @@
 ﻿import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-type TaskType =  'connectionadded' | 'connectiondeleted' | 'noconnections' ; // Define the possible task types
+type TaskType = 'connectionadded' | 'connectiondeleted' | 'noconnections' | 'connectionexist' |'sameemail'; // Define the possible task types
 import MyModal from './Modal';
 
 type Connection = {
@@ -18,34 +18,34 @@ function Connections() {
     const [showModal, setShowModal] = useState(false);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [connection, setConnection] = useState<string>("");
-    const [connections, setConnections] = useState<Array<string>>([]);
     const [emailIds, setEmailIds] = useState<Array<string>>([]);
+    const [userEmail, setUserEmail] = useState<string>('');
     const { id } = useParams<RouteParams>();
-    const [showContent, setShowContent] = useState(false);
-
+    
     useEffect(() => {
-      
+        Get();
     }, [currentTaskType]);
     const handleCloseModal = () => {
 
         setShowModal(false);
     };
 
-    var events: any;
-
-    function Get(event: React.MouseEvent<HTMLButtonElement>) {
-        event.preventDefault();
-        setShowContent(true);
+    var emails: any;
+   
+    function Get() {
+        
+       
         axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
 
             console.log(response.data);
-            events = response.data;
-            if (events.length > 0) {
-                setEmailIds(events)
+            emails = response.data.connection;
+            setUserEmail(response.data.emailId);
+            if (emails.length > 0) {
+                setEmailIds(emails)
 
             }
 
-            if (events.length == 0) {
+            if (emails.length == 0) {
                 setCurrentTaskType('noconnections');
                 setShowModal(true);
             }
@@ -57,22 +57,33 @@ function Connections() {
         });
 
     }
-
+   
     async function Delete(emailId: string) {
-        setShowContent(false);
+       
         axios.delete('https://localhost:44373/Connection/delete/', { params: { emailId: emailId, _id: id } }).then((response) => {
             console.log(response.data);
-            // alert("Connection Deleted");
             setCurrentTaskType('connectiondeleted');
             setShowModal(true);
         }).catch((error) => { alert(error); })
     }
     async function Update(event: React.MouseEvent<HTMLButtonElement>) {
-        setShowContent(false);
+       
         event.preventDefault();
+        const exists = emailIds.includes(connection);
+        if (exists) {
+            setCurrentTaskType('connectionexist');
+            setShowModal(true);
+            return;
+        }
+        if (connection == userEmail) {
+            setCurrentTaskType("sameemail");
+            setShowModal(true);
+            return;
+        }
+       
         axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
             console.log(response.data);
-            setConnections(response.data.connection);
+           
             var newconnections = response.data.connection;
             if (response.data.connection != null) {
                 newconnections = [...newconnections, connection];
@@ -99,15 +110,13 @@ function Connections() {
                 }).catch((error) => {
                     alert("error in update " + error);
                 });
-            setConnections(newconnections);
-
-            console.log(connections);
+          
         }).catch((error) => {
             alert("error in getting the _id  " + error);
 
 
         });
-
+        setConnection('');
 
     }
 
@@ -120,7 +129,7 @@ function Connections() {
                             type="text"
                             className="form-control"
                             id="emailid"
-                            placeholder={"Add EmailId of the required connection"}
+                            placeholder={"Add Email of the required connection"}
                             onChange={(event) => {
                                 setConnection(event.target.value);
 
@@ -135,10 +144,10 @@ function Connections() {
                 </button>
             </div>
             <div>
-                <button className="btn btn-primary mt-4" onClick={Get}>
-                    View Connections
-                </button>
-                {showContent && <div>
+                {/*<button className="btn btn-primary mt-4" onClick={Get}>*/}
+                {/*    View Connections*/}
+                {/*</button>*/}
+                {<div>
                     {emailIds.length > 0 && (
                         <table className="table table-light">
                             <thead>

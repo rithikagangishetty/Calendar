@@ -35,10 +35,12 @@ namespace Calenderwebapp.Controllers
 
         [HttpGet]
         [Route("getemail")]
-        public async Task<ActionResult<List<string>>> GetEmail(string _id)
+        public async Task<ActionResult<Connections>> GetEmail(string _id)
         {
             var connections = await _connectionServices.GetAsync(_id);
             var NewConnections = new List<string>();
+            var newUser = new Connections();
+            newUser._id = _id;
             if (connections.Connection != null)
             {
                 foreach (var connection in connections.Connection)
@@ -50,7 +52,9 @@ namespace Calenderwebapp.Controllers
                     }
                 }
             }
-            return NewConnections;
+            newUser.EmailId = connections.EmailId;
+            newUser.Connection = NewConnections;
+            return newUser;
         }
 
         [HttpPost]
