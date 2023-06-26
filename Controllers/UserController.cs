@@ -31,7 +31,24 @@ namespace Calenderwebapp.Controllers
 
             var users = await _usersService.GetAsync(_id);
             var events = await _usersService.GetAsyncConnections(_id);
+
             List<UserDetails> result = users.Concat(events).ToList();
+            return result;
+        }
+        [HttpGet]
+        [Route("getconnectionevents")]
+        public async Task<List<UserDetails>> GetViewEvents(string _id,string connectionId)
+        {
+            var result=new List<UserDetails>();
+            var users = await _usersService.GetAsync(_id);
+            foreach(var user in users)
+            {
+                if(user.priv==false || user.Moderator.Contains(connectionId)||user.Connections.Contains(connectionId))
+                    result.Add(user);
+
+            }
+           
+            
             return result;
         }
 

@@ -31,7 +31,10 @@ namespace Calenderwebapp.Services
         public async Task<List<UserDetails>> GetAsyncConnections(string Id)
         {
             var filter = Builders<UserDetails>.Filter.AnyEq(x => x.Connections, Id);
+            var filter2 = Builders<UserDetails>.Filter.AnyEq(x => x.Moderator, Id);
+            var response= await _UsersCollection.Find(filter2).ToListAsync();
             var result = await _UsersCollection.Find(filter).ToListAsync();
+            result.AddRange(response);
             return result;
         }
         public async Task<UserDetails> GetObjectAsync(string Id) =>

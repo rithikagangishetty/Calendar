@@ -1,8 +1,9 @@
 ﻿import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-type TaskType = 'connectionadded' | 'connectiondeleted' | 'noconnections' | 'connectionexist' |'sameemail'; // Define the possible task types
+import { useParams, useHistory } from "react-router-dom";
+type TaskType = 'connectionadded' | 'connectiondeleted' | 'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
 import MyModal from './Modal';
+import ViewCalendar from "./ViewCalendar";
 
 type Connection = {
     _id: string;
@@ -22,6 +23,15 @@ function Connections() {
     const [userEmail, setUserEmail] = useState<string>('');
     const { id } = useParams<RouteParams>();
     
+    const history = useHistory();
+   
+
+    const handleViewCalendar=(email:string) =>{
+       
+       history.push(`/calendar/${id}/${email}`);
+    };
+
+
     useEffect(() => {
         Get();
     }, [currentTaskType]);
@@ -31,10 +41,10 @@ function Connections() {
     };
 
     var emails: any;
-   
+
     function Get() {
-        
-       
+
+
         axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
 
             console.log(response.data);
@@ -50,16 +60,16 @@ function Connections() {
                 setShowModal(true);
             }
 
-          
+
 
         }).catch((error) => {
             alert(error)
         });
 
     }
-   
+
     async function Delete(emailId: string) {
-       
+
         axios.delete('https://localhost:44373/Connection/delete/', { params: { emailId: emailId, _id: id } }).then((response) => {
             console.log(response.data);
             setCurrentTaskType('connectiondeleted');
@@ -67,7 +77,7 @@ function Connections() {
         }).catch((error) => { alert(error); })
     }
     async function Update(event: React.MouseEvent<HTMLButtonElement>) {
-       
+
         event.preventDefault();
         const exists = emailIds.includes(connection);
         if (exists) {
@@ -80,10 +90,10 @@ function Connections() {
             setShowModal(true);
             return;
         }
-       
+
         axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
             console.log(response.data);
-           
+
             var newconnections = response.data.connection;
             if (response.data.connection != null) {
                 newconnections = [...newconnections, connection];
@@ -110,7 +120,7 @@ function Connections() {
                 }).catch((error) => {
                     alert("error in update " + error);
                 });
-          
+
         }).catch((error) => {
             alert("error in getting the _id  " + error);
 
@@ -123,18 +133,18 @@ function Connections() {
     return (
         <><div>
             <form>
-                    <div>
-                        <label>Add a New Connection</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="emailid"
-                            placeholder={"Add Email of the required connection"}
-                            onChange={(event) => {
-                                setConnection(event.target.value);
+                <div>
+                    <label>Add a New Connection</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="emailid"
+                        placeholder={"Add Email of the required connection"}
+                        onChange={(event) => {
+                            setConnection(event.target.value);
 
-                            }} />
-                    </div>
+                        }} />
+                </div>
 
             </form>
 
@@ -144,7 +154,7 @@ function Connections() {
                 </button>
             </div>
             <div>
-               
+
                 {<div>
                     {emailIds.length > 0 && (
                         <table className="table table-light">
@@ -163,11 +173,26 @@ function Connections() {
 
                                             <button
                                                 type="button"
+                                                className="btn btn-success"
+                                                onClick={() => handleViewCalendar(email)}
+                                            >
+                                                View Calendar
+                                            </button>
+                                            
+                                            {/*{showCalendar && (*/}
+                                            {/*    <ViewCalendar id={id} email={email} />*/}
+                                            {/*)}     */}
+                                          
+                                            
+                                            <button
+                                                type="button"
                                                 className="btn btn-danger"
                                                 onClick={() => Delete(email)}
                                             >
                                                 Delete
                                             </button>
+                                           
+                                            
 
                                         </tr>
                                     </tbody>
@@ -178,7 +203,7 @@ function Connections() {
                 </div>}
 
             </div>
-
+           
             {currentTaskType && (<MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />)}
 
         </div>

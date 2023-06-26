@@ -32,6 +32,18 @@ namespace Calenderwebapp.Controllers
 
             return _connection;
         }
+        [HttpGet]
+        [Route("getid")]
+        public async Task<ActionResult<Connections>> GetId(string email)
+        {
+            var _connection = await _connectionServices.GetAsyncId(email);
+            if (_connection is null)
+            {
+                return NotFound();
+            }
+
+            return _connection;
+        }
 
         [HttpGet]
         [Route("getemail")]
