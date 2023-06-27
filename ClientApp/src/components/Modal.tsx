@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState} from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-type TaskType = 'login' | 'signup' | 'connectionadded' | 'valid' | 'eventedited' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+type TaskType = 'login' | 'signup' | 'connectionadded' | 'eventclash'|'valid' | 'eventedited' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
 interface MyModalProps {
     show: boolean;
     onClose: () => void;
@@ -65,6 +66,9 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     }
     else if (taskType === 'valid') {
         message = 'Please enter a valid Email';
+    }
+    else if (taskType === 'eventclash') {
+        message = 'The event cannot be edited to the selected time as it clashes with other events';
     }
     else if (taskType === 'editpast') {
         message = 'Deleting/Editing the past events is not allowed!';
@@ -144,6 +148,15 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     //        handleModeratorSelection(moderator);
     //    }
     //}
+    const endTime = (date: Date) => {
+        const isPastTime = startDate.getTime() > date.getTime();
+        return !isPastTime;
+    };
+    const startTime = (date: Date) => {
+        const isPastTime = new Date().getTime() > date.getTime();
+        return !isPastTime;
+    };
+
     return (
         <Modal show={show} onHide={onClose}>
             <Modal.Header closeButton>
@@ -165,24 +178,30 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 </Form.Group>
                 <Form.Group controlId="eventStart">
                     <Form.Label>Start Date/Time of the Event</Form.Label>
-                    <Form.Control
-                        type="datetime-local"
-                        value={start.toISOString().slice(0, -8)}
-                        onChange={(e) => setStart(new Date(e.target.value))}
-                     //   defaultValue={eventEdit.start.toISOString().slice(0, -8)}
-                      
+                    <DatePicker
+                        showTimeSelect
+                        selected={start}
+                        onChange={setStart}
+                        dateFormat="MM/dd/yyyy h:mm aa"
+                        filterTime={startTime}
+                        timeIntervals={15}
+                        timeInputLabel="Time:"
 
                     />
                 </Form.Group>
                 <Form.Group controlId="eventEnd">
                     <Form.Label>End Date/Time of the Event</Form.Label>
-                    <Form.Control
-                        type="datetime-local"
-                        value={end.toISOString().slice(0, -8)}
-                        onChange={(e) => setEnd(new Date(e.target.value))}
-                       // defaultValue={eventEdit.end.toISOString().slice(0, -8)}
+                    <DatePicker
 
-                          />
+                        selected={end}
+                        onChange={setEnd}
+                        minDate={new Date()}
+                        timeInputLabel="Time:"
+                        dateFormat="MM/dd/yyyy h:mm aa"
+                        showTimeSelect
+                        timeIntervals={15}
+                        filterTime={endTime}
+                    />
                 </Form.Group>
                 <Form.Group controlId="eventEmails">
                     <Form.Label>Select the Moderators</Form.Label>

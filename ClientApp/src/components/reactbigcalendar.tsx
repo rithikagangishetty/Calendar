@@ -12,7 +12,7 @@ import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModa
 
 
 
-type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' |'editpast'; // Define the possible task types
+type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' |'editpast'|'eventclash'; // Define the possible task types
 interface RouteParams {
     id: string;
 }
@@ -143,7 +143,23 @@ const ReactApp: FC = () => {
 
     };
     function EditEvent() {
-
+        for (var _event of events) {
+            // Check if the event overlaps with any existing event
+            if (_event.start !== undefined && _event.end !== undefined ) {
+                if (_event._id != deleteEventId) {
+                    if (
+                        (startdate >= _event.start && startdate < _event.end) ||
+                        (enddate > _event.start && enddate <= _event.end) ||
+                        (startdate <= _event.start && enddate >= _event.end)
+                    ) {
+                        setCurrentTaskType('eventclash');
+                        setShowModal(true);
+                        return; // Clash found
+                       
+                        }
+                }
+            }
+        }
 
         axios.put('https://localhost:44373/User/', {
             _id: deleteEventId,
@@ -274,7 +290,9 @@ const ReactApp: FC = () => {
             setValidationError('');
             setPrivate(false);
             if (Edit) {
-                EditEvent();
+               
+                    EditEvent();
+                
             }
             else {
                 Post();
@@ -295,7 +313,7 @@ const ReactApp: FC = () => {
             setShowEmailModal(true);
         }
     }
-    var eventEdit;
+   
     function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
 
        
@@ -315,8 +333,8 @@ const ReactApp: FC = () => {
             setShowModal(true);
             return;
         }
-        //setEventEdit(event);
-        eventEdit = event;
+       
+     
         setDeleteEventId(event._id);
         setShowDeleteModal(true);
     };
