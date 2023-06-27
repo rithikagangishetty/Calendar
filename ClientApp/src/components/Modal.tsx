@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -21,6 +21,7 @@ interface SelectEmailModalProps {
     validationError: string;
     connections: string[];
     renderEmailCheckbox: (connection: string) => JSX.Element;
+   
 }
 
 
@@ -43,7 +44,7 @@ interface EditEventModalProps {
     onPost: (event: any) => void;
     onPrivatePost: (event: any) => void;
     validationError: string;
-    start: Date ;
+    start: Date  ;
     end: Date;
     setStart: (value: any) => void;
     setEnd: (value: any) => void;
@@ -52,6 +53,9 @@ interface EditEventModalProps {
     connections: string[];
     selectedModerators: string[];
     handleModeratorSelection: (moderator: string) => void;
+   // eventEdit:any
+   
+   
 }
 
 const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
@@ -132,7 +136,14 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     connections,
     selectedModerators,
     handleModeratorSelection,
+   // eventEdit
+    
 }) => {
+    //if (eventEdit.moderator != null) {
+    //    for (var moderator in eventEdit.Moderator) {
+    //        handleModeratorSelection(moderator);
+    //    }
+    //}
     return (
         <Modal show={show} onHide={onClose}>
             <Modal.Header closeButton>
@@ -146,24 +157,32 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         value={titleInput}
                         onChange={(e) => onTitleInputChange(e.target.value)}
                         isInvalid={validationError !== ''}
+                     //   defaultValue={eventEdit.title} 
+
+                       
                     />
                     <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group controlId="eventStart">
-                    <Form.Label>Start</Form.Label>
+                    <Form.Label>Start Date/Time of the Event</Form.Label>
                     <Form.Control
                         type="datetime-local"
                         value={start.toISOString().slice(0, -8)}
                         onChange={(e) => setStart(new Date(e.target.value))}
+                     //   defaultValue={eventEdit.start.toISOString().slice(0, -8)}
+                      
+
                     />
                 </Form.Group>
                 <Form.Group controlId="eventEnd">
-                    <Form.Label>End</Form.Label>
+                    <Form.Label>End Date/Time of the Event</Form.Label>
                     <Form.Control
                         type="datetime-local"
                         value={end.toISOString().slice(0, -8)}
                         onChange={(e) => setEnd(new Date(e.target.value))}
-                    />
+                       // defaultValue={eventEdit.end.toISOString().slice(0, -8)}
+
+                          />
                 </Form.Group>
                 <Form.Group controlId="eventEmails">
                     <Form.Label>Select the Moderators</Form.Label>
@@ -274,7 +293,10 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
     validationError,
     connections,
     renderEmailCheckbox,
+    
+    
 }) => {
+    
     return (
         <Modal show={show} onHide={onClose}>
             <Modal.Header closeButton>

@@ -40,20 +40,7 @@ const ReactApp: FC = () => {
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
-    const handleOpenEditModal = () => {
-        setShowEditModal(true);
-    };
-
-    const handleCloseEditModal = () => {
-        setShowEditModal(false);
-    };
-
-    const handleSaveEvent = (start: Date, end: Date) => {
-        setStart(start);
-        setEnd(end);
-
-        setShowEditModal(false);
-    };
+   
     const handleCloseModal = () => {
 
         setShowModal(false);
@@ -308,9 +295,10 @@ const ReactApp: FC = () => {
             setShowEmailModal(true);
         }
     }
+    var eventEdit;
     function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
-       
 
+       
         setEdit(true);
         setShowEditModal(true);
        
@@ -327,7 +315,8 @@ const ReactApp: FC = () => {
             setShowModal(true);
             return;
         }
-
+        //setEventEdit(event);
+        eventEdit = event;
         setDeleteEventId(event._id);
         setShowDeleteModal(true);
     };
@@ -369,7 +358,6 @@ const ReactApp: FC = () => {
             setSelectedModerators([...selectedModerators, moderator]);
         }
     };
-
 
     const handleSaveSelectedConnections = () => {
         if (selectedModerators.length === 0 && selectedConnections.length === 0) {
@@ -462,7 +450,9 @@ const ReactApp: FC = () => {
                 connections={connections}
                 selectedModerators={selectedModerators}
                 handleModeratorSelection={handleModeratorSelection}
-            />
+              //  eventEdit={eventEdit }
+               
+                />
 
             <SelectEmailModal
                 show={showEmailModal}
@@ -471,6 +461,7 @@ const ReactApp: FC = () => {
                 validationError={validationError}
                 connections={connections}
                 renderEmailCheckbox={renderEmailCheckbox}
+               
             />
            
         </div >
