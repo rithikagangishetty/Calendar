@@ -1,11 +1,16 @@
 ﻿using Calenderwebapp.Models;
 using Calenderwebapp.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
-
+//using MailKit.Net.Smtp;
+//using MailKit.Security;
+//using MimeKit;
 namespace Calenderwebapp.Controllers
 {
 
@@ -61,8 +66,35 @@ namespace Calenderwebapp.Controllers
 
         }
 
-      
-    [HttpPut]
+        [HttpPost]
+        [Route("sendemail")]
+        public IActionResult SendEmail(UserDetails eventData)
+        {
+            // Create a new MailMessage
+            var message = new MailMessage();
+            var username = "batmanandriddler@gmail.com";
+            var password="batmanandriddler1008";
+            message.From = new MailAddress("batmanandriddler@gmail.com");
+            message.To.Add(new MailAddress("121901013@smail.iitpkd.ac.in"));
+            message.Subject = "New Event Created";
+            message.Body = $"An event titled '{eventData.EventName}' has been created.";
+
+            // Configure the SMTP client
+            using (var client = new SmtpClient("smtp.gmail.com", 587))
+            {
+                client.EnableSsl = true;
+                client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential(username,password);
+
+                // Send the email
+                client.Send(message);
+            }
+
+            return Ok();
+        }
+
+
+        [HttpPut]
        
         public async Task<IActionResult> Update(UserDetails updatedUser)
         {

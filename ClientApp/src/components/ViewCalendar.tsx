@@ -26,6 +26,11 @@ const ViewCalendar: React.FC<ViewCalendarProps> = ({ id, email }) => {
 
     const localizer = momentLocalizer(moment);
     const [events, setEvents] = useState<Event[]>([]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteEventId, setDeleteEventId] = useState<string>('');
+    const [Edit, setEdit] = useState<boolean>(false);
+    const [connectionId, setConnectionId] = useState<string>("");
+    const [showCreateModal, setShowCreateModal] = useState(false);
     useEffect(() => {
 
         getEvents();
@@ -45,7 +50,7 @@ const ViewCalendar: React.FC<ViewCalendarProps> = ({ id, email }) => {
     const getEvents = () => {
         axios.get('https://localhost:44373/Connection/getid/', { params: { email: email } }).then((response) => {
 
-       
+            setConnectionId(response.data._id);
             axios.get('https://localhost:44373/User/getconnectionevents', { params: { _id: id, connectionId:response.data._id } }).then((response) => {
             const event = response.data.map((training: any) => {
                 return {
@@ -70,11 +75,31 @@ const ViewCalendar: React.FC<ViewCalendarProps> = ({ id, email }) => {
 
 
     }
-    function handleDelete(event: any) {
-       
+    function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
+        setEdit(true);
+        setShowCreateModal(true);
+
+
+    }
+    
+    function handleDelete(event: any)
+    {
+       // if (event.Moderator.Contains(connectionId))
+       // {
+       //     alert("can edit/delete the event");
+       // }
+       //else
+       // {
+       //     alert("Cannot edit/delete the event");
+       // }
     };
     return (
-
+        <div>
+            <div>
+                <strong>
+                   Welcome to your connections Calendar!
+                </strong>
+            </div>
         <Calendar
             
             defaultView='week'
@@ -93,6 +118,29 @@ const ViewCalendar: React.FC<ViewCalendarProps> = ({ id, email }) => {
             step={15}
 
         />
+         {/*<Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>*/}
+         {/*       <Modal.Header closeButton>*/}
+         {/*           <Modal.Title>Delete Event</Modal.Title>*/}
+         {/*       </Modal.Header>*/}
+         {/*       <Modal.Body>*/}
+         {/*           Are you sure you want to delete/edit this event?*/}
+         {/*       </Modal.Body>*/}
+         {/*       <Modal.Footer>*/}
+                   
+         {/*           <Button variant="success" onClick={handleEditEvent}>*/}
+         {/*               Edit*/}
+         {/*           </Button>*/}
+         {/*           <Button variant="danger" onClick={DeleteEvent}>*/}
+         {/*               Delete*/}
+         {/*           </Button>*/}
+         {/*           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>*/}
+         {/*               Cancel*/}
+         {/*           </Button>*/}
+
+         {/*       </Modal.Footer>*/}
+         {/*   </Modal>*/}
+
+            </div>
     );
 };
 const CalendarPage: React.FC = () => {
