@@ -8,7 +8,8 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
-import MyModal from './Modal';
+import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModal } from './Modal';
+
 
 
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' |'editpast'; // Define the possible task types
@@ -28,8 +29,8 @@ const ReactApp: FC = () => {
     const [deleteEventId, setDeleteEventId] = useState<string>('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
-    const [startdate, setStart] = useState<Date>();
-    const [enddate, setEnd] = useState<Date>();
+    const [startdate, setStart] = useState<Date>(new Date());
+    const [enddate, setEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [priv, setPrivate] = useState<boolean>();
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
@@ -37,7 +38,22 @@ const ReactApp: FC = () => {
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
     const [validationError, setValidationError] = useState('');
+    const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
+    const handleOpenEditModal = () => {
+        setShowEditModal(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+    };
+
+    const handleSaveEvent = (start: Date, end: Date) => {
+        setStart(start);
+        setEnd(end);
+
+        setShowEditModal(false);
+    };
     const handleCloseModal = () => {
 
         setShowModal(false);
@@ -156,7 +172,7 @@ const ReactApp: FC = () => {
             
             setCurrentTaskType('eventedited');
             setShowModal(true);
-            setShowCreateModal(false);
+            setShowEditModal(false);
             setShowDeleteModal(false);
             setEdit(false);
         }).catch((error) => { alert(error); });
@@ -259,15 +275,14 @@ const ReactApp: FC = () => {
     const eventFormats = {
         eventTimeRangeFormat: () => '', // Override the time format to empty string
     };
-    function handlePost(event: React.MouseEvent<HTMLButtonElement>) {
+    function handlePost(event: React.MouseEvent<HTMLButtonElement>):void {
         event.preventDefault();
+        
         if (titleInput.trim() == '') {
             setValidationError('Please enter a valid title.');
             return;
         }
-        //else if (selectedModerators.length === 0 && selectedConnections.length === 0) {
-        //    setValidationError('Please select at least one moderator or connection.');
-        //}
+       
         else {
             setValidationError('');
             setPrivate(false);
@@ -279,7 +294,7 @@ const ReactApp: FC = () => {
             }
         }
     }
-    function handlePrivatePost(event: React.MouseEvent<HTMLButtonElement>) {
+    function handlePrivatePost(event: React.MouseEvent<HTMLButtonElement>):void {
         event.preventDefault();
         if (titleInput.trim() == '') {
             setValidationError('Please enter a valid title.');
@@ -297,7 +312,7 @@ const ReactApp: FC = () => {
        
 
         setEdit(true);
-        setShowCreateModal(true);
+        setShowEditModal(true);
        
 
     }
@@ -413,102 +428,56 @@ const ReactApp: FC = () => {
             {currentTaskType && (
                 <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
             )}
+            <DeleteModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                onEdit={handleEditEvent}
+                onDelete={DeleteEvent}
+            />
+           
+            <CreateEventModal
+                show={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onPost={handlePost}
+                onPrivatePost={handlePrivatePost}
+                validationError={validationError}
+                titleInput={titleInput}
+                onTitleInputChange={setTitleInput}
+                connections={connections}
+                selectedModerators={selectedModerators}
+                handleModeratorSelection={handleModeratorSelection}
+            />
+            <EditEventModal
+                show={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                onPost={handlePost}
+                onPrivatePost={handlePrivatePost}
+                validationError={validationError}
+                titleInput={titleInput}
+                onTitleInputChange={setTitleInput}
+                setEnd={setEnd}
+                setStart={setStart}
+                start={startdate}
+                end={enddate}
+                connections={connections}
+                selectedModerators={selectedModerators}
+                handleModeratorSelection={handleModeratorSelection}
+            />
 
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Delete Event</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Are you sure you want to delete/edit this event?
-                </Modal.Body>
-                <Modal.Footer>
-                   
-                    <Button variant="success" onClick={handleEditEvent}>
-                        Edit
-                    </Button>
-                    <Button variant="danger" onClick={DeleteEvent}>
-                        Delete
-                    </Button>
-                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        Cancel
-                    </Button>
-
-                </Modal.Footer>
-            </Modal>
-
-
-            <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Create Event</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form.Group controlId="eventTitle">
-                        <Form.Label>Title</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={titleInput}
-                            onChange={(e) => setTitleInput(e.target.value)}
-                            isInvalid={validationError !== ''}
-                        />
-                        <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
-
-                    </Form.Group>
-                    <Form.Group controlId="eventEmails">
-                        <Form.Label>Select the Moderators</Form.Label>
-                        <div>
-                            {connections.length > 0 && connections.map((moderator) => (
-                                <Form.Check
-                                    key={moderator}
-                                    type="checkbox"
-                                    label={moderator}
-                                    checked={selectedModerators.includes(moderator)}
-                                    onChange={() => handleModeratorSelection(moderator)}
-                                />
-                            ))}
-                        </div>
-                    </Form.Group>
-
-                </Modal.Body>
-                <Modal.Footer>
-
-                    <Button variant="success" onClick={handlePost}>
-                        Create Public Event
-                    </Button>
-                    <Button variant="success" onClick={handlePrivatePost}>
-                        Create Private Event
-                    </Button>
-                    <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
-                        Cancel
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-
-
-
-
-            <Modal show={showEmailModal} onHide={() => setShowEmailModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Select Email IDs</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        {connections.length > 0 && connections.map((connection) => renderEmailCheckbox(connection))}
-                    </Form>
-                    {validationError && (
-                        <div className="text-danger">{validationError}</div>
-                    )}
-
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowEmailModal(false)}>
-                        Cancel
-                    </Button>
-                    <Button variant="primary" onClick={handleSaveSelectedConnections}>
-                        Save
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-
+            <SelectEmailModal
+                show={showEmailModal}
+                onClose={() => setShowEmailModal(false)}
+                onSaveSelectedConnections={handleSaveSelectedConnections}
+                validationError={validationError}
+                connections={connections}
+                renderEmailCheckbox={renderEmailCheckbox}
+            />
+           
         </div >
     );
 }; export default ReactApp
+
+
+
+
+

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 type TaskType = 'login' | 'signup' | 'connectionadded' | 'valid' | 'eventedited' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
@@ -7,6 +7,51 @@ interface MyModalProps {
     show: boolean;
     onClose: () => void;
     taskType: TaskType; 
+}
+interface DeleteModalProps {
+    show: boolean;
+    onHide: () => void;
+    onEdit: (event:any) => void;
+    onDelete: (event:any) => void;
+}
+interface SelectEmailModalProps {
+    show: boolean;
+    onClose: () => void;
+    onSaveSelectedConnections: () => void;
+    validationError: string;
+    connections: string[];
+    renderEmailCheckbox: (connection: string) => JSX.Element;
+}
+
+
+interface CreateEventModalProps {
+    show: boolean;
+    onClose: () => void;
+    onPost: (event: any) => void;
+    onPrivatePost: (event: any) => void;
+    validationError: string;
+    titleInput: string;
+    onTitleInputChange: (value: string) => void;
+    connections: string[];
+    selectedModerators: string[];
+    handleModeratorSelection: (moderator: string) => void;
+}
+
+interface EditEventModalProps {
+    show: boolean;
+    onClose: () => void;
+    onPost: (event: any) => void;
+    onPrivatePost: (event: any) => void;
+    validationError: string;
+    start: Date ;
+    end: Date;
+    setStart: (value: any) => void;
+    setEnd: (value: any) => void;
+    titleInput: string;
+    onTitleInputChange: (value: string) => void;
+    connections: string[];
+    selectedModerators: string[];
+    handleModeratorSelection: (moderator: string) => void;
 }
 
 const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
@@ -72,4 +117,212 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
         </Modal>
     );
 }; export default MyModal;
+export const EditEventModal: React.FC<EditEventModalProps> = ({
+    show,
+    onClose,
+    onPost,
+    onPrivatePost,
+    validationError,
+    titleInput,
+    start,
+    end,
+    setStart,
+    setEnd,
+    onTitleInputChange,
+    connections,
+    selectedModerators,
+    handleModeratorSelection,
+}) => {
+    return (
+        <Modal show={show} onHide={onClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Edit Event</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form.Group controlId="eventTitle">
+                    <Form.Label>Title</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={titleInput}
+                        onChange={(e) => onTitleInputChange(e.target.value)}
+                        isInvalid={validationError !== ''}
+                    />
+                    <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group controlId="eventStart">
+                    <Form.Label>Start</Form.Label>
+                    <Form.Control
+                        type="datetime-local"
+                        value={start.toISOString().slice(0, -8)}
+                        onChange={(e) => setStart(new Date(e.target.value))}
+                    />
+                </Form.Group>
+                <Form.Group controlId="eventEnd">
+                    <Form.Label>End</Form.Label>
+                    <Form.Control
+                        type="datetime-local"
+                        value={end.toISOString().slice(0, -8)}
+                        onChange={(e) => setEnd(new Date(e.target.value))}
+                    />
+                </Form.Group>
+                <Form.Group controlId="eventEmails">
+                    <Form.Label>Select the Moderators</Form.Label>
+                    <div>
+                        {connections.length > 0 &&
+                            connections.map((moderator) => (
+                                <Form.Check
+                                    key={moderator}
+                                    type="checkbox"
+                                    label={moderator}
+                                    checked={selectedModerators.includes(moderator)}
+                                    onChange={() => handleModeratorSelection(moderator)}
+                                />
+                            ))}
+                    </div>
+                </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="success" onClick={onPost}>
+                    Create Public Event
+                </Button>
+                <Button variant="success" onClick={onPrivatePost}>
+                    Create Private Event
+                </Button>
+                <Button variant="secondary" onClick={onClose}>
+                    Cancel
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
+};
+
+
+
+
+
+
+
+
+export const CreateEventModal: React.FC<CreateEventModalProps> = ({
+    show,
+    onClose,
+    onPost,
+    onPrivatePost,
+    validationError,
+    titleInput,
+    onTitleInputChange,
+    connections,
+    selectedModerators,
+    handleModeratorSelection,
+}) => {
+    return (
+        <Modal show={show} onHide={onClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Create Event</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form.Group controlId="eventTitle">
+                    <Form.Label>Title</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={titleInput}
+                        onChange={(e) => onTitleInputChange(e.target.value)}
+                        isInvalid={validationError !== ''}
+                    />
+                    <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group controlId="eventEmails">
+                    <Form.Label>Select the Moderators</Form.Label>
+                    <div>
+                        {connections.length > 0 &&
+                            connections.map((moderator) => (
+                                <Form.Check
+                                    key={moderator}
+                                    type="checkbox"
+                                    label={moderator}
+                                    checked={selectedModerators.includes(moderator)}
+                                    onChange={() => handleModeratorSelection(moderator)}
+                                />
+                            ))}
+                    </div>
+                </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="success" onClick={onPost}>
+                    Create Public Event
+                </Button>
+                <Button variant="success" onClick={onPrivatePost}>
+                    Create Private Event
+                </Button>
+                <Button variant="secondary" onClick={onClose}>
+                    Cancel
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
+};
+
+
+
+
+
+export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
+    show,
+    onClose,
+    onSaveSelectedConnections,
+    validationError,
+    connections,
+    renderEmailCheckbox,
+}) => {
+    return (
+        <Modal show={show} onHide={onClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Select Email IDs</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form>
+                    {connections.length > 0 && connections.map((connection) => renderEmailCheckbox(connection))}
+                </Form>
+                {validationError && <div className="text-danger">{validationError}</div>}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onClose}>
+                    Cancel
+                </Button>
+                <Button variant="primary" onClick={onSaveSelectedConnections}>
+                    Save
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
+};
+
+
+
+
+export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, onDelete }) => {
+    return (
+        <Modal show={show} onHide={onHide}>
+            <Modal.Header closeButton>
+                <Modal.Title>Delete Event</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Are you sure you want to delete/edit this event?</Modal.Body>
+            <Modal.Footer>
+                <Button variant="success" onClick={onEdit}>
+                    Edit
+                </Button>
+                <Button variant="danger" onClick={onDelete}>
+                    Delete
+                </Button>
+                <Button variant="secondary" onClick={onHide}>
+                    Cancel
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
+};
+
+
+
 
