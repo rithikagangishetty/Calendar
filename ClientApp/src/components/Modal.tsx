@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-type TaskType = 'login' | 'signup' | 'connectionadded' | 'valid' |'eventedited'| 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail';
+type TaskType = 'login' | 'signup' | 'connectionadded' | 'valid' | 'eventedited' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
 interface MyModalProps {
     show: boolean;
     onClose: () => void;
@@ -16,6 +16,9 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     }
     else if (taskType === 'valid') {
         message = 'Please enter a valid Email';
+    }
+    else if (taskType === 'editpast') {
+        message = 'Deleting/Editing the past events is not allowed!';
     }
     else if (taskType === 'eventedited') {
         message = 'Event Edited Successfully';
