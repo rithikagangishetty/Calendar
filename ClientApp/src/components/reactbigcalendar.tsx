@@ -11,7 +11,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import MyModal from './Modal';
 
 
-type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited'; // Define the possible task types
+type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' |'editpast'; // Define the possible task types
 interface RouteParams {
     id: string;
 }
@@ -36,7 +36,8 @@ const ReactApp: FC = () => {
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
-
+    const [validationError, setValidationError] = useState('');
+    const currentDate = moment();
     const handleCloseModal = () => {
 
         setShowModal(false);
@@ -46,7 +47,7 @@ const ReactApp: FC = () => {
         getEvents();
         GetConnections();
 
-
+        moment.tz.setDefault();
     }, [deleteEventId, showDeleteModal, showCreateModal, selectedTimezone]);
 
 
@@ -104,6 +105,7 @@ const ReactApp: FC = () => {
 
 
                     setShowCreateModal(false);
+                 
                     setCurrentTaskType('eventadded');
                     setShowModal(true);
 
@@ -149,7 +151,7 @@ const ReactApp: FC = () => {
             EndDate: enddate,
             Connections: (priv ? selectedConnections : connections),
             priv: priv
-        }).then((response) => {
+        }).then(() => {
            
             
             setCurrentTaskType('eventedited');
@@ -186,51 +188,66 @@ const ReactApp: FC = () => {
     };
     const handleSelectSlot = (event: any) => {
         const selectedDate = moment(event.start);
-        const currentDate = moment();
-        console.log(currentDate);
        
 
+        const isPastEvent = selectedDate.isBefore(currentDate);
 
-        if (overlap(event)) {
-
-            setCurrentTaskType('overlap');
-            setShowModal(true);
+        if (isPastEvent) {
+            // Event is in the past, disable edit and delete options
             return;
         }
-        if (selectedDate.isBefore(currentDate)) {
+        console.log(currentDate);
+        setValidationError('');
 
-            setCurrentTaskType('past');
-            setShowModal(true);
-            return;
-        }
-        else {
+       
+        
+            if (overlap(event))
+            {
 
+                setCurrentTaskType('overlap');
+                setShowModal(true);
+                return;
+            }
+            if (selectedDate.isBefore(currentDate))
+            {
 
-            setStart(event.start);
-            setEnd(event.end);
-            setShowCreateModal(true);
-
-
-            if (titleInput.trim() !== '') {
-
-
-
-                const newEvent = {
-                    title: titleInput,
-                    start: event.start,
-                    end: event.end,
-                    Moderator: selectedModerators,
-                    UserId: id,
-                    Connections: connections,
-                    priv: priv,
-                    _id: "",
-                };
-                setEvents([...events, newEvent]);
-
+                setCurrentTaskType('past');
+                setShowModal(true);
+                return;
             }
 
+            else
+            {
 
-        }
+
+                setStart(event.start);
+                setEnd(event.end);
+                setShowCreateModal(true);
+
+
+                if (titleInput.trim() !== '')
+                {
+
+
+
+                    const newEvent = {
+                        title: titleInput,
+                        start: event.start,
+                        end: event.end,
+                        Moderator: selectedModerators,
+                        UserId: id,
+                        Connections: connections,
+                        priv: priv,
+                        _id: "",
+                    };
+                    setEvents([...events, newEvent]);
+
+                }
+              
+
+
+            }
+        
 
     };
     const CustomEventContent = ({ event }: any) => (
@@ -244,28 +261,58 @@ const ReactApp: FC = () => {
     };
     function handlePost(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
-        setPrivate(false);
-        if (Edit) {
-            EditEvent();
+        if (titleInput.trim() == '') {
+            setValidationError('Please enter a valid title.');
+            return;
         }
+        //else if (selectedModerators.length === 0 && selectedConnections.length === 0) {
+        //    setValidationError('Please select at least one moderator or connection.');
+        //}
         else {
-            Post();
+            setValidationError('');
+            setPrivate(false);
+            if (Edit) {
+                EditEvent();
+            }
+            else {
+                Post();
+            }
         }
     }
     function handlePrivatePost(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
+        if (titleInput.trim() == '') {
+            setValidationError('Please enter a valid title.');
+            return;
 
-        setPrivate(true);
-        setShowEmailModal(true);
-
+        }
+       
+        else {
+            setValidationError('');
+            setPrivate(true);
+            setShowEmailModal(true);
+        }
     }
     function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
+       
+
         setEdit(true);
         setShowCreateModal(true);
        
 
     }
     function handleDelete(event: any) {
+        const eventStart = moment(event.start);
+
+        const isPastEvent = eventStart.isBefore(currentDate);
+
+        if (isPastEvent) {
+            // Event is in the past, disable edit and delete options
+            setCurrentTaskType('editpast');
+            setShowModal(true);
+            return;
+        }
+
         setDeleteEventId(event._id);
         setShowDeleteModal(true);
     };
@@ -310,21 +357,28 @@ const ReactApp: FC = () => {
 
 
     const handleSaveSelectedConnections = () => {
-
-        setSelectedConnections([]);
-        setShowEmailModal(false);
-        if (Edit) {
-            EditEvent();
+        if (selectedModerators.length === 0 && selectedConnections.length === 0) {
+            setValidationError('Please select at least one moderator or connection.');
         }
         else {
-            Post();
+            setValidationError('');
+            setSelectedConnections([]);
+            setShowEmailModal(false);
+            if (Edit) {
+                EditEvent();
+            }
+            else {
+                Post();
+            }
         }
     };
     return (
         <div>
             <label>Select Timezone:</label>
             <select value={selectedTimezone} onChange={handleTimezoneChange}>
+                <option value="">System Default</option>
                 {timezones.map((timezone) => (
+
                     <option key={timezone} value={timezone}>
                         {timezone}
                     </option>
@@ -394,7 +448,10 @@ const ReactApp: FC = () => {
                             type="text"
                             value={titleInput}
                             onChange={(e) => setTitleInput(e.target.value)}
+                            isInvalid={validationError !== ''}
                         />
+                        <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
+
                     </Form.Group>
                     <Form.Group controlId="eventEmails">
                         <Form.Label>Select the Moderators</Form.Label>
@@ -428,6 +485,7 @@ const ReactApp: FC = () => {
 
 
 
+
             <Modal show={showEmailModal} onHide={() => setShowEmailModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Select Email IDs</Modal.Title>
@@ -436,6 +494,9 @@ const ReactApp: FC = () => {
                     <Form>
                         {connections.length > 0 && connections.map((connection) => renderEmailCheckbox(connection))}
                     </Form>
+                    {validationError && (
+                        <div className="text-danger">{validationError}</div>
+                    )}
 
                 </Modal.Body>
                 <Modal.Footer>
