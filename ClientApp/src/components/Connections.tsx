@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 type TaskType = 'connectionadded' | 'connectiondeleted' | 'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
 import MyModal from './Modal';
-import ViewCalendar from "./ViewCalendar";
+
 
 type Connection = {
     _id: string;
@@ -13,6 +13,7 @@ type Connection = {
 };
 interface RouteParams {
     id: string;
+
 
 }
 function Connections() {
@@ -26,19 +27,26 @@ function Connections() {
     const history = useHistory();
    
 
-    const handleViewCalendar=(email:string) =>{
-        axios.get('https://localhost:44373/Connection/getid/', { params: { email: email } }).then((response) => {
-
+    const handleViewCalendar = (email: string) =>
+    {
+        var connectionId:string;
+        axios.get('https://localhost:44373/Connection/getid/', { params: { email: email } }).then((response) =>
+        {
+            connectionId = response.data._id;
+            history.push(`/calendar/${id}/${connectionId}`);
            
-            history.push(`/calendar/${id}/${response.data._id}`);
-        }).catch((error) => { alert(error) });
-     
+
+        }).catch((error) => {
+            alert(error)
+            return;
+        });
+      
     };
 
 
     useEffect(() => {
         Get();
-    }, [currentTaskType]);
+    }, [showModal]);
     const handleCloseModal = () => {
 
         setShowModal(false);

@@ -21,7 +21,7 @@ function App() {
                         <Route path="/Connections/:id" component={Connections} />
                         <Route path="/Home/:id" component={Home} />
                         <Route path="/ReactApp/:id" component={ReactApp} />
-                    <Route path="/calendar/:id/:email" component={CalendarPage} />
+                    <Route path="/calendar/:id/:connectionId" component={CalendarPage} />
                     </Switch>
 
                 </Router>

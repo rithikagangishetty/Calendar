@@ -51,7 +51,7 @@ const ReactApp: FC = () => {
         GetConnections();
 
         moment.tz.setDefault();
-    }, [deleteEventId, showDeleteModal, showCreateModal, selectedTimezone]);
+    }, [deleteEventId, showDeleteModal, showCreateModal, showEditModal, selectedTimezone]);
 
 
 
@@ -143,9 +143,11 @@ const ReactApp: FC = () => {
 
     };
     function EditEvent() {
+        
+                
         for (var _event of events) {
             // Check if the event overlaps with any existing event
-            if (_event.start !== undefined && _event.end !== undefined ) {
+            if (_event.start !== undefined && _event.end !== undefined) {
                 if (_event._id != deleteEventId) {
                     if (
                         (startdate >= _event.start && startdate < _event.end) ||
@@ -155,12 +157,27 @@ const ReactApp: FC = () => {
                         setCurrentTaskType('eventclash');
                         setShowModal(true);
                         return; // Clash found
-                       
-                        }
+
+                    }
+                }
+            }
+        }for (var _event of events) {
+            // Check if the event overlaps with any existing event
+            if (_event.start !== undefined && _event.end !== undefined) {
+                if (_event._id != deleteEventId) {
+                    if (
+                        (startdate >= _event.start && startdate < _event.end) ||
+                        (enddate > _event.start && enddate <= _event.end) ||
+                        (startdate <= _event.start && enddate >= _event.end)
+                    ) {
+                        setCurrentTaskType('eventclash');
+                        setShowModal(true);
+                        return; // Clash found
+
+                    }
                 }
             }
         }
-
         axios.put('https://localhost:44373/User/', {
             _id: deleteEventId,
             UserId: id,
@@ -468,7 +485,7 @@ const ReactApp: FC = () => {
                 connections={connections}
                 selectedModerators={selectedModerators}
                 handleModeratorSelection={handleModeratorSelection}
-              //  eventEdit={eventEdit }
+             
                
                 />
 
