@@ -15,21 +15,20 @@ import MyModal from './Modal';
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited'; // Define the possible task types
 type ViewCalendarProps = {
     id: string;
-    email: string;
+    connectionId: string;
 };
 interface RouteParams {
     id: string;
-    email:string,
+    connectionId:string,
 }
 
-const ViewCalendar: React.FC<ViewCalendarProps> = ({ id, email }) => {
+const ViewCalendar: React.FC<ViewCalendarProps> = ({ id, connectionId }) => {
 
     const localizer = momentLocalizer(moment);
     const [events, setEvents] = useState<Event[]>([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteEventId, setDeleteEventId] = useState<string>('');
     const [Edit, setEdit] = useState<boolean>(false);
-    const [connectionId, setConnectionId] = useState<string>("");
     const [showCreateModal, setShowCreateModal] = useState(false);
     useEffect(() => {
 
@@ -48,10 +47,10 @@ const ViewCalendar: React.FC<ViewCalendarProps> = ({ id, email }) => {
         </div>
     );
     const getEvents = () => {
-        axios.get('https://localhost:44373/Connection/getid/', { params: { email: email } }).then((response) => {
+       
 
-            setConnectionId(response.data._id);
-            axios.get('https://localhost:44373/User/getconnectionevents', { params: { _id: id, connectionId:response.data._id } }).then((response) => {
+           
+        axios.get('https://localhost:44373/User/getconnectionevents', { params: { _id: id, connectionId: connectionId } }).then((response) => {
             const event = response.data.map((training: any) => {
                 return {
                     _id: training._id,
@@ -69,9 +68,7 @@ const ViewCalendar: React.FC<ViewCalendarProps> = ({ id, email }) => {
         }).catch((err) => {
             alert(err)
         });
-        }).catch((err) => {
-            alert(err)
-        });
+        
 
 
     }
@@ -118,40 +115,21 @@ const ViewCalendar: React.FC<ViewCalendarProps> = ({ id, email }) => {
             step={15}
 
         />
-         {/*<Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>*/}
-         {/*       <Modal.Header closeButton>*/}
-         {/*           <Modal.Title>Delete Event</Modal.Title>*/}
-         {/*       </Modal.Header>*/}
-         {/*       <Modal.Body>*/}
-         {/*           Are you sure you want to delete/edit this event?*/}
-         {/*       </Modal.Body>*/}
-         {/*       <Modal.Footer>*/}
-                   
-         {/*           <Button variant="success" onClick={handleEditEvent}>*/}
-         {/*               Edit*/}
-         {/*           </Button>*/}
-         {/*           <Button variant="danger" onClick={DeleteEvent}>*/}
-         {/*               Delete*/}
-         {/*           </Button>*/}
-         {/*           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>*/}
-         {/*               Cancel*/}
-         {/*           </Button>*/}
-
-         {/*       </Modal.Footer>*/}
-         {/*   </Modal>*/}
+       
 
             </div>
     );
 };
 const CalendarPage: React.FC = () => {
 
-    const { id, email } = useParams<RouteParams>();
+    const { id, connectionId } = useParams<RouteParams>();
 
 
     return (
         <div>
            
-            <ViewCalendar id={id} email={email} />
+            <ViewCalendar id={id} connectionId={connectionId} />
+
         </div>
     );
 };

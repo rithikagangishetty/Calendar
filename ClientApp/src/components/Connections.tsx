@@ -27,8 +27,12 @@ function Connections() {
    
 
     const handleViewCalendar=(email:string) =>{
-       
-       history.push(`/calendar/${id}/${email}`);
+        axios.get('https://localhost:44373/Connection/getid/', { params: { email: email } }).then((response) => {
+
+           
+            history.push(`/calendar/${id}/${response.data._id}`);
+        }).catch((error) => { alert(error) });
+     
     };
 
 
@@ -179,9 +183,7 @@ function Connections() {
                                                 View Calendar
                                             </button>
                                             
-                                            {/*{showCalendar && (*/}
-                                            {/*    <ViewCalendar id={id} email={email} />*/}
-                                            {/*)}     */}
+                                          
                                           
                                             
                                             <button

@@ -149,7 +149,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     //    }
     //}
     const endTime = (date: Date) => {
-        const isPastTime = startDate.getTime() > date.getTime();
+        const isPastTime = start.getTime() > date.getTime();
         return !isPastTime;
     };
     const startTime = (date: Date) => {
@@ -170,7 +170,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         value={titleInput}
                         onChange={(e) => onTitleInputChange(e.target.value)}
                         isInvalid={validationError !== ''}
-                     //   defaultValue={eventEdit.title} 
+                    
 
                        
                     />
