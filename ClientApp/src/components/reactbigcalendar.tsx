@@ -290,8 +290,8 @@ const ReactApp: FC = () => {
     };
     const CustomEventContent = ({ event }: any) => (
         <div>
-            <div>{event.title}</div>
-            <div>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
+            <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{event.title}</div>
+            <div style={{ fontSize: '13px' }}>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
         </div>
     );
     const eventFormats = {
