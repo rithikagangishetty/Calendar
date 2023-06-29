@@ -1,16 +1,16 @@
 ﻿using Calenderwebapp.Models;
 using Calenderwebapp.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
+using MailKit.Security;
+using MailKit.Net.Smtp;
+using MimeKit;
+using MimeKit.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
-//using MailKit.Net.Smtp;
-//using MailKit.Security;
-//using MimeKit;
+
+
 namespace Calenderwebapp.Controllers
 {
 
@@ -22,16 +22,18 @@ namespace Calenderwebapp.Controllers
         private readonly UserServices _usersService;
 
         private readonly ConnectionServices _connectionServices;
+
         public UserController(UserServices usersService, ConnectionServices connectionService)
         {
             _connectionServices = connectionService;
             _usersService = usersService;
+
         }
 
 
         [HttpGet]
         [Route("getevents")]
-        public async Task<List<UserDetails>>GetEvents(string _id)
+        public async Task<List<UserDetails>> GetEvents(string _id)
         {
 
             var users = await _usersService.GetAsync(_id);
@@ -42,57 +44,36 @@ namespace Calenderwebapp.Controllers
         }
         [HttpGet]
         [Route("getconnectionevents")]
-        public async Task<List<UserDetails>> GetViewEvents(string _id,string connectionId)
+        public async Task<List<UserDetails>> GetViewEvents(string _id, string connectionId)
         {
-            var result=new List<UserDetails>();
+            var result = new List<UserDetails>();
             var users = await _usersService.GetAsync(_id);
-            foreach(var user in users)
+            foreach (var user in users)
             {
-                if(user.priv==false || user.Moderator.Contains(connectionId)||user.Connections.Contains(connectionId))
+                if (user.priv == false || user.Moderator.Contains(connectionId) || user.Connections.Contains(connectionId))
                     result.Add(user);
 
             }
-           
-            
+
+
             return result;
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(UserDetails newUser)
         {
-            UserDetails user = await  Filtering(newUser);
-                await _usersService.CreateAsync(user);
-                return CreatedAtAction(nameof(GetEvents), new { id = user._id }, user);
+
+
+            UserDetails user = await Filtering(newUser);
+
+            UserDetails emailUser = await Email(user);
+            await _usersService.CreateAsync(user);
+            _usersService.SendEmailAsync(emailUser);
+
+            return CreatedAtAction(nameof(GetEvents), new { id = user._id }, user);
 
         }
-
-        [HttpPost]
-        [Route("sendemail")]
-        public IActionResult SendEmail(UserDetails eventData)
-        {
-            // Create a new MailMessage
-            var message = new MailMessage();
-            var username = "batmanandriddler@gmail.com";
-            var password="batmanandriddler1008";
-            message.From = new MailAddress("batmanandriddler@gmail.com");
-            message.To.Add(new MailAddress("121901013@smail.iitpkd.ac.in"));
-            message.Subject = "New Event Created";
-            message.Body = $"An event titled '{eventData.EventName}' has been created.";
-
-            // Configure the SMTP client
-            using (var client = new SmtpClient("smtp.gmail.com", 587))
-            {
-                client.EnableSsl = true;
-                client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(username,password);
-
-                // Send the email
-                client.Send(message);
-            }
-
-            return Ok();
-        }
-
+       
 
         [HttpPut]
        
@@ -260,6 +241,34 @@ namespace Calenderwebapp.Controllers
             newUser.Moderator.AddRange(moderator);
             newUser.Connections.AddRange(users);
             return newUser;
+        }
+
+
+        public async Task<UserDetails> Email(UserDetails user)
+        {
+            
+            var moderators = new List<string>();
+            var connections = new List<string>();
+            var userEmail = await _connectionServices.GetAsync(user.UserId);
+
+            foreach (var connection in user.Connections)
+            {
+                var response = await _connectionServices.GetAsync(connection);
+                connections.Add(response.EmailId);
+            }
+            foreach (var moderator in user.Moderator)
+            {
+                var response = await _connectionServices.GetAsync(moderator);
+                moderators.Add(response.EmailId);
+            }
+            user.UserId = userEmail.EmailId;
+            user.Connections.Clear();
+            user.Connections.AddRange(connections);
+            user.Moderator.Clear();
+            user.Moderator.AddRange(moderators);
+
+            return user;
+
         }
     }
 }

@@ -44,6 +44,7 @@ const ReactApp: FC = () => {
     const handleCloseModal = () => {
 
         setShowModal(false);
+        
     };
     useEffect(() => {
 
@@ -93,7 +94,7 @@ const ReactApp: FC = () => {
 
         axios.get('https://localhost:44373/Connection/get', { params: { _id: id } }).then((response) => {
 
-
+           
             axios.post("https://localhost:44373/User",
                 {
                     _id: '',
@@ -104,13 +105,14 @@ const ReactApp: FC = () => {
                     EndDate: enddate,
                     Connections: (priv ? selectedConnections : response.data.connection),
                     priv: priv
-                }).then((response) => {
-
-
+                }).then(() => {
+                   
                     setShowCreateModal(false);
-                 
                     setCurrentTaskType('eventadded');
                     setShowModal(true);
+                   
+                   
+                  
 
                 }).catch((error) => {
                     alert("error in post " + error)
