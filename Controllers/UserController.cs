@@ -1,10 +1,6 @@
 ﻿using Calenderwebapp.Models;
 using Calenderwebapp.Services;
 using Microsoft.AspNetCore.Mvc;
-using MailKit.Security;
-using MailKit.Net.Smtp;
-using MimeKit;
-using MimeKit.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
