@@ -13,7 +13,8 @@ interface DeleteModalProps {
     show: boolean;
     onHide: () => void;
     onEdit: (event:any) => void;
-    onDelete: (event:any) => void;
+    onDelete: (event: any) => void;
+    isPast: boolean;
 }
 interface SelectEmailModalProps {
     show: boolean;
@@ -71,7 +72,7 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
         message = 'The event cannot be edited to the selected time as it clashes with other events';
     }
     else if (taskType === 'editpast') {
-        message = 'Deleting/Editing the past events is not allowed!';
+        message = 'Editing the past events is not allowed!';
     }
     else if (taskType === 'noedit') {
         message = 'You can not Delete/Edit this event';
@@ -128,6 +129,7 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
         </Modal>
     );
 }; export default MyModal;
+
 export const EditEventModal: React.FC<EditEventModalProps> = ({
     show,
     onClose,
@@ -345,7 +347,7 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
 
 
 
-export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, onDelete }) => {
+export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, onDelete, isPast }) => {
     return (
         <Modal show={show} onHide={onHide}>
             <Modal.Header closeButton>
@@ -353,7 +355,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, 
             </Modal.Header>
             <Modal.Body>Are you sure you want to delete/edit this event?</Modal.Body>
             <Modal.Footer>
-                <Button variant="success" onClick={onEdit}>
+                <Button variant="success" onClick={onEdit} disabled={isPast} >
                     Edit
                 </Button>
                 <Button variant="danger" onClick={onDelete}>

@@ -20,6 +20,7 @@ interface RouteParams {
 const ReactApp: FC = () => {
     const localizer = momentLocalizer(moment);
     const [Edit, setEdit] = useState<boolean>(false);
+    const [isPast, setIsPast] = useState<boolean>(false);
     const [events, setEvents] = useState<Event[]>([]);
     const [connections, setConnections] = useState<Array<string>>([]);
     const { id } = useParams<RouteParams>();
@@ -335,23 +336,32 @@ const ReactApp: FC = () => {
    
  function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
 
-       
+     //const eventstart = moment(eventStart);
+     //const isPastEvent = eventstart.isBefore(currentDate);
+
+     //if (isPastEvent) {
+     //    // Event is in the past, disable edit and delete options
+     //    setCurrentTaskType('editpast');
+     //    setShowModal(true);
+     //    return;
+     //}
         setEdit(true);
         setShowEditModal(true);
        
 
     }
+ 
     function handleDelete(event: any) {
+         //setEventStart (event.start);
         const eventStart = moment(event.start);
-
         const isPastEvent = eventStart.isBefore(currentDate);
-
-        if (isPastEvent) {
-            // Event is in the past, disable edit and delete options
-            setCurrentTaskType('editpast');
-            setShowModal(true);
-            return;
-        }
+        setIsPast(isPastEvent);
+        //if (isPastEvent) {
+        //    // Event is in the past, disable edit and delete options
+        //    setCurrentTaskType('editpast');
+        //    setShowModal(true);
+        //    return;
+        //}
        
      
         setDeleteEventId(event._id);
@@ -463,6 +473,7 @@ const ReactApp: FC = () => {
                 onHide={() => setShowDeleteModal(false)}
                 onEdit={handleEditEvent}
                 onDelete={DeleteEvent}
+                isPast={isPast}
             />
            
             <CreateEventModal
