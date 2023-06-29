@@ -124,7 +124,7 @@ const ReactApp: FC = () => {
 
     function GetConnections() {
         axios.get('https://localhost:44373/Connection/getemail', { params: { _id: id } }).then((response) => {
-            console.log(response.data);
+            
             setConnections(response.data.connection);
         }).catch((error) => {
             alert(error)
@@ -234,7 +234,7 @@ const ReactApp: FC = () => {
             // Event is in the past, disable edit and delete options
             return;
         }
-        console.log(currentDate);
+       
         setValidationError('');
 
        
@@ -372,6 +372,10 @@ const ReactApp: FC = () => {
         setSelectedConnections(selected);
 
     };
+    const tooltipAccessor = (event: any) => {
+        return `Title: ${event.title}\nStart: ${event.start.toLocaleString()}\nEnd: ${event.end.toLocaleString()}`;
+
+    };
 
     const renderEmailCheckbox = (connection: string) => {
         const isDisabled = selectedModerators.includes(connection);
@@ -443,6 +447,7 @@ const ReactApp: FC = () => {
                 titleAccessor="title"
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}
+                tooltipAccessor={tooltipAccessor}
                 components={{
                     event: CustomEventContent,
                 }}

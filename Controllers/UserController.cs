@@ -92,6 +92,7 @@ namespace Calenderwebapp.Controllers
             emailUser.Subject = "Event is Edited";
             await _usersService.UpdateAsync(newUser);
             _usersService.SendEmailAsync(emailUser);
+           // _usersService.ScheduleEmailAsync(emailUser);
 
             return NoContent();
         }
@@ -261,7 +262,8 @@ namespace Calenderwebapp.Controllers
             var emailDetails = new EmailDetails();
             emailDetails.StartDate = user.StartDate;
             emailDetails.EndDate = user.EndDate;
-
+            emailDetails._id=user._id;
+            emailDetails.EventName= user.EventName;
             var userEmail = await _connectionServices.GetAsync(user.UserId);
 
             foreach (var connection in user.Connections)

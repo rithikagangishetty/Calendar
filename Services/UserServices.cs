@@ -9,6 +9,8 @@ using MimeKit.Text;
 using System.Threading.Tasks;
 using System;
 using Microsoft.Extensions.Configuration;
+using System.Threading;
+using Org.BouncyCastle.Tls;
 
 namespace Calenderwebapp.Services
 {
@@ -33,12 +35,7 @@ namespace Calenderwebapp.Services
                 UserSettings.Value.UsersCollectionName);
            
         }
-
-
-
-
-
-
+       
         public void SendEmailAsync(EmailDetails user)
         {
             string senderEmail = _configuration["EmailSettings:SenderEmail"];
@@ -65,8 +62,35 @@ namespace Calenderwebapp.Services
             Smtp.Authenticate(senderEmail, password);
             Smtp.Send(email);
             Smtp.Disconnect(true);
+            DateTime scheduledTime = new DateTime(2023, 6, 30, 9, 0, 0); // Replace with your desired scheduled time
+
+
+
+
+            ScheduleEmailAsync(user);
 
         }
+        public void ScheduleEmailAsync( EmailDetails user)
+        {
+            var currentTime = DateTime.Now;
+            DateTime startDate = DateTime.Parse(user.StartDate);
+            DateTime scheduledTime = startDate.AddMinutes(-10);
+
+            var timeUntilScheduled = scheduledTime - currentTime;
+
+            if (timeUntilScheduled.TotalMilliseconds < 0)
+            {
+                Console.WriteLine("Scheduled time has already passed.");
+                return;
+            }
+
+            var timer = new Timer(state =>
+            {
+                SendEmailAsync(user);
+                Console.WriteLine("Email sent!");
+            }, null, (int)timeUntilScheduled.TotalMilliseconds, Timeout.Infinite);
+        }
+
 
         public async Task<List<UserDetails>> GetAsync(string Id) =>
             await _UsersCollection.Find(x => x.UserId == Id).ToListAsync();

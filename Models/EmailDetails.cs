@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+using System.Collections.Generic;
 
 namespace Calenderwebapp.Models
 {
     public class EmailDetails
     {
+        [BsonId, BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
 
         public string Body { get; set; }
+        public string _id { get; set; }
         public string UserEmail { get; set; }
         public string EventName { get; set; }
         public List<string> Moderator { get; set; }
