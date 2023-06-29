@@ -8,7 +8,7 @@ using MimeKit;
 using MimeKit.Text;
 using System.Threading.Tasks;
 using System;
-
+using Microsoft.Extensions.Configuration;
 
 namespace Calenderwebapp.Services
 {
@@ -16,11 +16,13 @@ namespace Calenderwebapp.Services
   
     {
         private readonly IMongoCollection<UserDetails> _UsersCollection;
-      
+        private readonly IConfiguration _configuration;
         public UserServices(
-            IOptions<UserSettings> UserSettings)
+            IOptions<UserSettings> UserSettings, IConfiguration configuration)
+
+       
         {
-            
+            _configuration = configuration;
             var mongoClient = new MongoClient(
                 UserSettings.Value.ConnectionString);
 
@@ -37,13 +39,17 @@ namespace Calenderwebapp.Services
 
 
 
-        public void SendEmailAsync(UserDetails user)
+        public void SendEmailAsync(EmailDetails user)
         {
-            var email = new MimeMessage();
-            var body = $"An event titled '{user.EventName}' has been created.\nThe start time of the event is '{DateTime.Parse(user.StartDate)}' and ends at '{DateTime.Parse(user.EndDate)}'.\n";
+            string senderEmail = _configuration["EmailSettings:SenderEmail"];
+            string smtpServer = _configuration["EmailSettings:SmtpServer"];
+            int port = int.Parse(_configuration["EmailSettings:Port"]);
+            string password = _configuration["EmailSettings:Password"];
 
-            email.From.Add(MailboxAddress.Parse("fordummy744@gmail.com"));
-            email.To.Add(MailboxAddress.Parse(user.UserId));
+            var email = new MimeMessage();
+            var body = user.Body;
+            email.From.Add(MailboxAddress.Parse(senderEmail));
+            email.To.Add(MailboxAddress.Parse(user.UserEmail));
             foreach (var moderator in user.Moderator)
             {
                 email.Bcc.Add(MailboxAddress.Parse(moderator));
@@ -52,11 +58,11 @@ namespace Calenderwebapp.Services
             {
                 email.Cc.Add(MailboxAddress.Parse(connection));
             }
-            email.Subject = "Event is Created";
+            email.Subject = user.Subject;
             email.Body = new TextPart(TextFormat.Text) { Text = body };
             using var Smtp = new SmtpClient();
-            Smtp.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-            Smtp.Authenticate("fordummy744@gmail.com", "unxvnyhmexnckxjm");
+            Smtp.Connect(smtpServer, port, SecureSocketOptions.StartTls);
+            Smtp.Authenticate(senderEmail, password);
             Smtp.Send(email);
             Smtp.Disconnect(true);
 

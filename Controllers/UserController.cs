@@ -65,11 +65,13 @@ namespace Calenderwebapp.Controllers
 
 
             UserDetails user = await Filtering(newUser);
+            
+            EmailDetails emailUser = await Email(user);
 
-            UserDetails emailUser = await Email(user);
+            emailUser.Body = $"An event titled '{emailUser.EventName}' has been created.\nThe start time of the event is '{DateTime.Parse(emailUser.StartDate)}' and ends at '{DateTime.Parse(emailUser.EndDate)}'.\n";
+            emailUser.Subject = "Event is Created";
             await _usersService.CreateAsync(user);
             _usersService.SendEmailAsync(emailUser);
-
             return CreatedAtAction(nameof(GetEvents), new { id = user._id }, user);
 
         }
@@ -88,7 +90,12 @@ namespace Calenderwebapp.Controllers
                 return NotFound();
             }
             UserDetails newUser = await Filtering(updatedUser);
+            EmailDetails emailUser = await Email(updatedUser);
+
+            emailUser.Body = $"An event titled '{emailUser.EventName}' has been Created.\nThe start time of the event is '{DateTime.Parse(emailUser.StartDate)}' and ends at '{DateTime.Parse(emailUser.EndDate)}'.\n";
+            emailUser.Subject = "Event is Edited";
             await _usersService.UpdateAsync(newUser);
+            _usersService.SendEmailAsync(emailUser);
 
             return NoContent();
         }
@@ -103,9 +110,14 @@ namespace Calenderwebapp.Controllers
             {
                 return NotFound();
             }
+            EmailDetails emailUser = await Email(user);
+
+            emailUser.Body = $"An event titled '{emailUser.EventName}' is Deleted.\n";
+            emailUser.Subject = "Event is Deleted";
             if (user.UserId == userId)
             {
                 await _usersService.RemoveAsync(_id);
+                _usersService.SendEmailAsync(emailUser);
             }
             else
             {
@@ -244,11 +256,16 @@ namespace Calenderwebapp.Controllers
         }
 
 
-        public async Task<UserDetails> Email(UserDetails user)
+        public async Task<EmailDetails> Email(UserDetails user)
         {
             
+
             var moderators = new List<string>();
             var connections = new List<string>();
+            var emailDetails = new EmailDetails();
+            emailDetails.StartDate = user.StartDate;
+            emailDetails.EndDate = user.EndDate;
+
             var userEmail = await _connectionServices.GetAsync(user.UserId);
 
             foreach (var connection in user.Connections)
@@ -261,13 +278,14 @@ namespace Calenderwebapp.Controllers
                 var response = await _connectionServices.GetAsync(moderator);
                 moderators.Add(response.EmailId);
             }
-            user.UserId = userEmail.EmailId;
-            user.Connections.Clear();
-            user.Connections.AddRange(connections);
-            user.Moderator.Clear();
-            user.Moderator.AddRange(moderators);
-
-            return user;
+            
+            
+            
+            
+            emailDetails.Connections =connections;
+            emailDetails.Moderator = moderators;
+            emailDetails.UserEmail = userEmail.EmailId;
+            return emailDetails;
 
         }
     }
