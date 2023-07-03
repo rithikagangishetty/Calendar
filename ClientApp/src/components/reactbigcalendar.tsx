@@ -39,7 +39,7 @@ const ReactApp: FC = () => {
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
-    const [email, setEmail] = React.useState<string>('');
+   
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
@@ -501,7 +501,7 @@ const ReactApp: FC = () => {
                                 <ul>
                                     { deleteEvent.Connections.map((connection: string, index: any) => (
                                      
-                                        <li key={index}>{email}</li>
+                                        <li key={index}>{connection}</li>
                                     ))}
                                 </ul>
                             </div>

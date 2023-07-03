@@ -45,9 +45,16 @@ namespace Calenderwebapp.Controllers
         {
             var result = new List<UserDetails>();
             var users = await _usersService.GetAsync(_id);
+            var response= await _usersService.GetAsync(connectionId);
             foreach (var user in users)
             {
                 if (user.priv == false || user.Moderator.Contains(connectionId) || user.Connections.Contains(connectionId))
+                    result.Add(user);
+
+            }
+            foreach (var user in response)
+            {
+                if (user.priv == false || user.Moderator.Contains(_id) || user.Connections.Contains(_id))
                     result.Add(user);
 
             }
@@ -73,12 +80,11 @@ namespace Calenderwebapp.Controllers
                         }
                     }
                 
-                  foreach (var connection in events.Connections)
+                  foreach (var connect in events.Connections)
                     {
-                        var _connection = await _connectionServices.GetAsync(connection);
-                        if (_connection != null)
+                if (await _connectionServices.GetAsync(connect) != null)
                         {
-                            connections.Add(_connection.EmailId);
+                            connections.Add((await _connectionServices.GetAsync(connect)).EmailId);
                         }
                     }
                 

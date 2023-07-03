@@ -45,6 +45,7 @@ const CalendarPage: React.FC = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
     const [isPast, setIsPast] = useState<boolean>(false);
+    const [isDelete, setIsDelete] = useState<boolean>(false);
 
     const handleCloseModal = () => {
 
@@ -55,8 +56,10 @@ const CalendarPage: React.FC = () => {
         getEvents();
 
         moment.tz.setDefault();
-    }, [deleteEventId, showDeleteModal, showEditModal, selectedTimezone]);
+    }, [currentTaskType, showDeleteModal, showEditModal, selectedTimezone]);
 
+
+    
     const getEvents = () => {
 
 
@@ -178,8 +181,8 @@ const CalendarPage: React.FC = () => {
    
     const CustomEventContent = ({ event }: any) => (
         <div>
-            <div>{event.title}</div>
-            <div>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
+            <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{event.title}</div>
+            <div style={{ fontSize: '13px' }}>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
         </div>
     );
     const eventFormats = {
@@ -227,22 +230,28 @@ const CalendarPage: React.FC = () => {
 
 
     }
+    const tooltipAccessor = (event: any) => {
+        return `Title: ${event.title}\nStart: ${event.start.toLocaleString()}\nEnd: ${event.end.toLocaleString()}`;
+
+    };
     function handleDelete(event: any) {
 
-        console.log(event.Moderator.includes(connectionId));
+        
 
         const eventStart = moment(event.start);
         const isPastEvent = eventStart.isBefore(currentDate);
         setIsPast(isPastEvent);
     
-            if (!event.Moderator.includes(connectionId))
+            if (!event.Moderator.includes(connectionId)||event.UserId!=id)
             {
-                setCurrentTaskType('noedit');
-                setShowModal(true);
-                return;
+                
+                setIsDelete(true);
+                setIsPast(true);
+            
 
                
-            }
+        }
+        
         setDeleteEventId(event._id);
         showEmails(event);
         setShowDeleteModal(true);
@@ -303,6 +312,14 @@ const CalendarPage: React.FC = () => {
             
         }
     };
+    const closeDeleteModal = () => {
+        setShowDeleteModal(false);
+        setIsDelete(false);
+        setIsPast(false)
+      
+    };
+    const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 
     return (
         <div>
@@ -314,7 +331,7 @@ const CalendarPage: React.FC = () => {
                 </div>
                 <label>Select Timezone:</label>
                 <select value={selectedTimezone} onChange={handleTimezoneChange}>
-                    <option value="">System Default</option>
+                    <option value="">{defaultTimeZone}</option>
                     {timezones.map((timezone) => (
 
                         <option key={timezone} value={timezone}>
@@ -329,6 +346,7 @@ const CalendarPage: React.FC = () => {
                     localizer={localizer}
                     startAccessor="start"
                     endAccessor="end"
+                    tooltipAccessor={tooltipAccessor}
                     formats={eventFormats}
                     titleAccessor="title"
 
@@ -344,7 +362,7 @@ const CalendarPage: React.FC = () => {
 
             </div>
             {deleteEvent && (
-                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                <Modal show={showDeleteModal} onHide={closeDeleteModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Details of the Event</Modal.Title>
                     </Modal.Header>
@@ -380,7 +398,7 @@ const CalendarPage: React.FC = () => {
                             </div>
                         )}
 
-
+                        {isDelete && isPast&&(<p>You cannot delete/edit this event</p>)}
                         <p>Do you want to delete/edit this event?</p>
                     </Modal.Body>
 
@@ -388,10 +406,10 @@ const CalendarPage: React.FC = () => {
                         <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
                             Edit
                         </Button>
-                        <Button variant="danger" onClick={DeleteEvent}>
+                        <Button variant="danger" onClick={DeleteEvent} disabled={isDelete}>
                             Delete
                         </Button>
-                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                        <Button variant="secondary" onClick={closeDeleteModal}>
                             Cancel
                         </Button>
                     </Modal.Footer>
