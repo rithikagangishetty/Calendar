@@ -95,23 +95,25 @@ namespace Calenderwebapp.Controllers
             
             return events;
         }
+        private static readonly object createEventLock = new object();
+
         [HttpPost]
         public async Task<IActionResult> Post(UserDetails newUser)
         {
-
-
             UserDetails user = await Filtering(newUser);
-            
             EmailDetails emailUser = await Email(user);
-
             emailUser.Body = $"An event titled '{emailUser.EventName}' has been created.\nThe start time of the event is '{DateTime.Parse(emailUser.StartDate)}' and ends at '{DateTime.Parse(emailUser.EndDate)}'.\n";
             emailUser.Subject = "Event is Created";
-            await _usersService.CreateAsync(user);
-            _usersService.SendEmailAsync(emailUser);
-            return CreatedAtAction(nameof(GetEvents), new { id = user._id }, user);
-
+            // Lock the critical section using the createEventLock object
+            lock (createEventLock)
+            {
+                _usersService.CreateAsync(user).GetAwaiter().GetResult(); // Use GetResult() to wait synchronously within the lock.
+                _usersService.SendEmailAsync(emailUser);
+                return CreatedAtAction(nameof(GetEvents), new { id = user._id }, user);
+            }
         }
-       
+
+
 
         [HttpPut]
        
@@ -126,16 +128,27 @@ namespace Calenderwebapp.Controllers
                 return NotFound();
             }
             UserDetails newUser = await Filtering(updatedUser);
-            EmailDetails emailUser = await Email(updatedUser);
+            EmailDetails emailUser = await Email(newUser);
 
             emailUser.Body = $"An event titled '{emailUser.EventName}' has been Created.\nThe start time of the event is '{DateTime.Parse(emailUser.StartDate)}' and ends at '{DateTime.Parse(emailUser.EndDate)}'.\n";
             emailUser.Subject = "Event is Edited";
             await _usersService.UpdateAsync(newUser);
             _usersService.SendEmailAsync(emailUser);
-           // _usersService.ScheduleEmailAsync(emailUser);
+          
 
             return NoContent();
         }
+        [HttpPost]
+        [Route("sendmail")]
+        public async Task<IActionResult> SendMailAsync(UserDetails user)
+        {
+            UserDetails newUser = await Filtering(user);
+            EmailDetails emailUser = await Email(newUser);
+             _usersService.SendEmailAsync(emailUser);
+
+            return Ok();
+        }
+
 
         [HttpDelete]
         
