@@ -138,7 +138,7 @@ const ReactApp: FC = () => {
     }
    
     function showEmails(event: any) {
-        console.log(event._id);
+       
         axios
             .get('https://localhost:44373/User/getevent', { params: { _id: event._id } })
             .then((response) => {

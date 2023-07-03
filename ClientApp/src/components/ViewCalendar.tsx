@@ -94,6 +94,31 @@ const CalendarPage: React.FC = () => {
 
 
     
+    function showEmails(event: any) {
+
+        axios
+            .get('https://localhost:44373/User/getevent', { params: { _id: event._id } })
+            .then((response) => {
+                const newEvent = {
+                    title: response.data.eventName,
+                    start: response.data.startDate.toLocaleString(),
+                    end: response.data.endDate.toLocaleString(),
+                    Moderator: response.data.moderator,
+                    UserId: response.data.userId,
+                    Connections: response.data.connections,
+                    priv: response.data.priv,
+                    _id: response.data._id,
+                };
+                setDeleteEvent(newEvent);
+
+            })
+            .catch((error) => {
+                alert(error);
+
+
+            });
+
+    }
 
    
    
@@ -219,7 +244,7 @@ const CalendarPage: React.FC = () => {
                
             }
         setDeleteEventId(event._id);
-        setDeleteEvent(event);
+        showEmails(event);
         setShowDeleteModal(true);
                 
             
@@ -321,7 +346,7 @@ const CalendarPage: React.FC = () => {
             {deleteEvent && (
                 <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Delete Event</Modal.Title>
+                        <Modal.Title>Details of the Event</Modal.Title>
                     </Modal.Header>
 
                     <Modal.Body>
@@ -356,7 +381,7 @@ const CalendarPage: React.FC = () => {
                         )}
 
 
-                        <p>Are you sure you want to delete/edit this event?</p>
+                        <p>Do you want to delete/edit this event?</p>
                     </Modal.Body>
 
                     <Modal.Footer>
