@@ -32,6 +32,7 @@ namespace Calenderwebapp.Controllers
 
             return _connection;
         }
+       
         [HttpGet]
         [Route("getid")]
         public async Task<ActionResult<Connections>> GetId(string email)
@@ -44,6 +45,7 @@ namespace Calenderwebapp.Controllers
 
             return _connection;
         }
+        
 
         [HttpGet]
         [Route("getemail")]

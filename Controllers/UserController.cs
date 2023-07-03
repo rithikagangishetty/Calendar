@@ -1,6 +1,7 @@
 ﻿using Calenderwebapp.Models;
 using Calenderwebapp.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +55,40 @@ namespace Calenderwebapp.Controllers
 
             return result;
         }
-
+        [HttpGet]
+        [Route("getevent")]
+        public async Task<ActionResult<UserDetails>> GetEvent(string _id)
+        {
+            var events = await _usersService.GetObjectAsync(_id);
+            var moderators = new List<string>();
+            var connections = new List<string>();
+           
+                
+                    foreach (var moderator in events.Moderator)
+                    {
+                        var _moderator = await _connectionServices.GetAsync(moderator);
+                        if (_moderator != null)
+                        {
+                            moderators.Add(_moderator.EmailId);
+                        }
+                    }
+                
+                  foreach (var connection in events.Connections)
+                    {
+                        var _connection = await _connectionServices.GetAsync(connection);
+                        if (_connection != null)
+                        {
+                            connections.Add(_connection.EmailId);
+                        }
+                    }
+                
+                events.Connections.Clear();
+                events.Connections.AddRange(connections);
+                events.Moderator.Clear();
+                events.Moderator.AddRange(moderators);
+            
+            return events;
+        }
         [HttpPost]
         public async Task<IActionResult> Post(UserDetails newUser)
         {

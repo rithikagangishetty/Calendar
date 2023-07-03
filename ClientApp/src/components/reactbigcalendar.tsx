@@ -28,6 +28,7 @@ const ReactApp: FC = () => {
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteEventId, setDeleteEventId] = useState<string>('');
+    const [deleteEvent, setDeleteEvent] = useState<Event>();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
     const [startdate, setStart] = useState<Date>(new Date());
@@ -38,6 +39,7 @@ const ReactApp: FC = () => {
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
+    const [email, setEmail] = React.useState<string>('');
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
@@ -53,7 +55,7 @@ const ReactApp: FC = () => {
         GetConnections();
 
         moment.tz.setDefault();
-    }, [deleteEventId, showDeleteModal, showCreateModal, showEditModal, selectedTimezone]);
+    }, [selectedTimezone, showModal]);
 
 
 
@@ -65,7 +67,9 @@ const ReactApp: FC = () => {
         setSelectedTimezone(event.target.value);
     };
 
+    
 
+    const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const getEvents = () => {
         axios.get('https://localhost:44373/User/getevents', { params: { _id: id } }).then((response) => {
             const event = response.data.map((training: any) => {
@@ -132,8 +136,33 @@ const ReactApp: FC = () => {
         });
 
     }
-
-
+   
+    function showEmails(event: any) {
+        console.log(event._id);
+        axios
+            .get('https://localhost:44373/User/getevent', { params: { _id: event._id } })
+            .then((response) => {
+                const newEvent = {
+                    title: response.data.eventName,
+                    start: response.data.startDate.toLocaleString(),
+                    end: response.data.endDate.toLocaleString(),
+                    Moderator: response.data.moderator,
+                    UserId: response.data.userId,
+                    Connections: response.data.connections,
+                    priv: response.data.priv,
+                    _id: response.data._id,
+                };
+                setDeleteEvent(newEvent);
+                  
+                })
+                .catch((error) => {
+                    alert(error);
+                   
+                  
+                });
+       
+    }
+   
     function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
 
@@ -335,36 +364,17 @@ const ReactApp: FC = () => {
     }
    
  function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
-
-     //const eventstart = moment(eventStart);
-     //const isPastEvent = eventstart.isBefore(currentDate);
-
-     //if (isPastEvent) {
-     //    // Event is in the past, disable edit and delete options
-     //    setCurrentTaskType('editpast');
-     //    setShowModal(true);
-     //    return;
-     //}
         setEdit(true);
         setShowEditModal(true);
-       
-
-    }
- 
-    function handleDelete(event: any) {
-         //setEventStart (event.start);
-        const eventStart = moment(event.start);
+       }
+   
+   async function handleDelete(event: any) {
+      
+       const eventStart = moment(event.start);
         const isPastEvent = eventStart.isBefore(currentDate);
         setIsPast(isPastEvent);
-        //if (isPastEvent) {
-        //    // Event is in the past, disable edit and delete options
-        //    setCurrentTaskType('editpast');
-        //    setShowModal(true);
-        //    return;
-        //}
-       
-     
-        setDeleteEventId(event._id);
+       setDeleteEventId(event._id);
+       showEmails(event);
         setShowDeleteModal(true);
     };
 
@@ -430,7 +440,7 @@ const ReactApp: FC = () => {
         <div>
             <label>Select Timezone:</label>
             <select value={selectedTimezone} onChange={handleTimezoneChange}>
-                <option value="">System Default</option>
+                <option value=""> {defaultTimeZone}</option>
                 {timezones.map((timezone) => (
 
                     <option key={timezone} value={timezone}>
@@ -468,13 +478,65 @@ const ReactApp: FC = () => {
             {currentTaskType && (
                 <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
             )}
-            <DeleteModal
-                show={showDeleteModal}
-                onHide={() => setShowDeleteModal(false)}
-                onEdit={handleEditEvent}
-                onDelete={DeleteEvent}
-                isPast={isPast}
-            />
+            
+            {deleteEvent && (
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Details of the Event</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+
+                        <p>Title: {deleteEvent.title}</p>
+                        {deleteEvent.start && (
+                            <p>Start: {deleteEvent.start.toLocaleString()}</p>
+                        )}
+                        {deleteEvent.end && (
+                            <p>End: {deleteEvent.end.toLocaleString()}</p>
+                        )}
+
+                        {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
+                            <div>
+                                <p>Connections:</p>
+                                <ul>
+                                    { deleteEvent.Connections.map((connection: string, index: any) => (
+                                     
+                                        <li key={index}>{email}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {deleteEvent.Moderator && deleteEvent.Moderator.length > 0 && (
+                            <div>
+                                <p>Moderators:</p>
+                                <ul>
+                                    {deleteEvent.Moderator.map((moderator: any, index: any) => 
+                                        
+                                        <li key={index}>{moderator}</li>
+                                    )}
+                                </ul>
+                            </div>
+                        )}
+                        
+                       
+
+                   
+                    <p>Do you want to delete/edit this event?</p>
+                </Modal.Body>
+
+                <Modal.Footer>
+                        <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
+                        Edit
+                    </Button>
+                        <Button variant="danger" onClick={DeleteEvent}>
+                        Delete
+                    </Button>
+                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+
+                </Modal>)}
            
             <CreateEventModal
                 show={showCreateModal}

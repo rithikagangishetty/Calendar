@@ -1,6 +1,7 @@
 import React, { useState} from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {  Event } from 'react-big-calendar'
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 type TaskType = 'login' | 'signup' | 'connectionadded' | 'eventclash'|'valid' | 'eventedited' |'noedit'| 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
@@ -15,6 +16,12 @@ interface DeleteModalProps {
     onEdit: (event:any) => void;
     onDelete: (event: any) => void;
     isPast: boolean;
+    title: any;
+    event:any;
+    start: any;
+    end: any;
+    connections: any;
+    moderator: any;
 }
 interface SelectEmailModalProps {
     show: boolean;
@@ -145,14 +152,9 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     connections,
     selectedModerators,
     handleModeratorSelection,
-   // eventEdit
+  
     
 }) => {
-    //if (eventEdit.moderator != null) {
-    //    for (var moderator in eventEdit.Moderator) {
-    //        handleModeratorSelection(moderator);
-    //    }
-    //}
     const endTime = (date: Date) => {
         const isPastTime = start.getTime() > date.getTime();
         return !isPastTime;
@@ -347,13 +349,47 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
 
 
 
-export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, onDelete, isPast }) => {
+export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, onDelete, isPast, start, end, moderator, title, connections, event }) => {
+    console.log(start);
     return (
+        
         <Modal show={show} onHide={onHide}>
+          
             <Modal.Header closeButton>
                 <Modal.Title>Delete Event</Modal.Title>
             </Modal.Header>
-            <Modal.Body>Are you sure you want to delete/edit this event?</Modal.Body>
+            {event && (
+            <Modal.Body>
+
+                    {title&&(<p>Title: {title}</p>)}
+                    {start && (<p>Start : {start}</p>)}
+                    {end && (<p>End: {end}</p>)}
+
+                {connections && connections.length > 0 && (
+                    <div>
+                        <p>Connections:</p>
+                        <ul>
+                            {connections.map((connection:any, index:any) => (
+                                <li key={index}>{connection}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+                {moderator && moderator.length > 0 && (
+                    <div>
+                        <p>Moderators:</p>
+                        <ul>
+                            {moderator.map((moderator:any, index:any) => (
+                                <li key={index}>{moderator}</li>
+                            ))}
+                        </ul>
+                    </div>
+                    )}
+
+                {/* Add more event details here */}
+                <p>Are you sure you want to delete/edit this event?</p>
+            </Modal.Body>
+            )}
             <Modal.Footer>
                 <Button variant="success" onClick={onEdit} disabled={isPast} >
                     Edit
@@ -364,8 +400,11 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, 
                 <Button variant="secondary" onClick={onHide}>
                     Cancel
                 </Button>
-            </Modal.Footer>
-        </Modal>
+                </Modal.Footer>
+          
+            </Modal>
+
+      
     );
 };
 

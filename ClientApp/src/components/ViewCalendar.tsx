@@ -31,6 +31,7 @@ const CalendarPage: React.FC = () => {
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteEventId, setDeleteEventId] = useState<string>('');
+    const [deleteEvent, setDeleteEvent] = useState<Event>();
     const [titleInput, setTitleInput] = useState<string>('');
     const [startdate, setStart] = useState<Date>(new Date());
     const [enddate, setEnd] = useState<Date>(new Date());
@@ -43,6 +44,7 @@ const CalendarPage: React.FC = () => {
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
+    const [isPast, setIsPast] = useState<boolean>(false);
 
     const handleCloseModal = () => {
 
@@ -201,17 +203,12 @@ const CalendarPage: React.FC = () => {
 
     }
     function handleDelete(event: any) {
-        const eventStart = moment(event.start);
+
         console.log(event.Moderator.includes(connectionId));
 
+        const eventStart = moment(event.start);
         const isPastEvent = eventStart.isBefore(currentDate);
-
-        if (isPastEvent) {
-            // Event is in the past, disable edit and delete options
-            setCurrentTaskType('editpast');
-            setShowModal(true);
-            return;
-        }
+        setIsPast(isPastEvent);
     
             if (!event.Moderator.includes(connectionId))
             {
@@ -222,6 +219,7 @@ const CalendarPage: React.FC = () => {
                
             }
         setDeleteEventId(event._id);
+        setDeleteEvent(event);
         setShowDeleteModal(true);
                 
             
@@ -320,6 +318,61 @@ const CalendarPage: React.FC = () => {
 
 
             </div>
+            {deleteEvent && (
+                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Delete Event</Modal.Title>
+                    </Modal.Header>
+
+                    <Modal.Body>
+
+                        <p>Title: {deleteEvent.title}</p>
+                        {deleteEvent.start && (
+                            <p>Start: {deleteEvent.start.toLocaleString()}</p>
+                        )}
+                        {deleteEvent.end && (
+                            <p>End: {deleteEvent.end.toLocaleString()}</p>
+                        )}
+
+                        {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
+                            <div>
+                                <p>Connections:</p>
+                                <ul>
+                                    {deleteEvent.Connections.map((connection: any, index: any) => (
+                                        <li key={index}>{connection}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        {deleteEvent.Moderator && deleteEvent.Moderator.length > 0 && (
+                            <div>
+                                <p>Moderators:</p>
+                                <ul>
+                                    {deleteEvent.Moderator.map((moderator: any, index: any) => (
+                                        <li key={index}>{moderator}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+
+                        <p>Are you sure you want to delete/edit this event?</p>
+                    </Modal.Body>
+
+                    <Modal.Footer>
+                        <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
+                            Edit
+                        </Button>
+                        <Button variant="danger" onClick={DeleteEvent}>
+                            Delete
+                        </Button>
+                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                            Cancel
+                        </Button>
+                    </Modal.Footer>
+
+                </Modal>)}
+
             {currentTaskType && (
                 <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
             )}
@@ -341,12 +394,7 @@ const CalendarPage: React.FC = () => {
             
 
             />
-            <DeleteModal
-                show={showDeleteModal}
-                onHide={() => setShowDeleteModal(false)}
-                onEdit={handleEditEvent}
-                onDelete={DeleteEvent}
-            />
+            
             <SelectEmailModal
                 show={showEmailModal}
                 onClose={() => setShowEmailModal(false)}
