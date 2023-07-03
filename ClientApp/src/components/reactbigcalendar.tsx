@@ -67,12 +67,13 @@ const ReactApp: FC = () => {
         setSelectedTimezone(event.target.value);
     };
 
-    
+   
 
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const getEvents = () => {
         axios.get('https://localhost:44373/User/getevents', { params: { _id: id } }).then((response) => {
             const event = response.data.map((training: any) => {
+               
                 return {
                     _id: training._id,
                     title: training.eventName,
@@ -82,9 +83,11 @@ const ReactApp: FC = () => {
                     UserId: training.userId,
                     Moderator: training.moderator,
                     Connections: training.connections,
-                    priv: training.priv
+                    priv: training.priv,
+                    TimeZone: training.timeZone
                 }
             })
+           
             setEvents(event);
         }).catch((err) => {
             alert(err)
@@ -109,7 +112,8 @@ const ReactApp: FC = () => {
                     Moderator: selectedModerators,
                     EndDate: enddate,
                     Connections: (priv ? selectedConnections : response.data.connection),
-                    priv: priv
+                    priv: priv,
+                    TimeZone: (selectedTimezone =="") ? defaultTimeZone : selectedTimezone
                 }).then(() => {
                    
                     setShowCreateModal(false);
@@ -144,13 +148,15 @@ const ReactApp: FC = () => {
             .then((response) => {
                 const newEvent = {
                     title: response.data.eventName,
-                    start: response.data.startDate.toLocaleString(),
-                    end: response.data.endDate.toLocaleString(),
+                    start: response.data.startDate,
+                    end: response.data.endDate
+                    ,
                     Moderator: response.data.moderator,
                     UserId: response.data.userId,
                     Connections: response.data.connections,
                     priv: response.data.priv,
                     _id: response.data._id,
+                    TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
                 };
                 setDeleteEvent(newEvent);
                   
@@ -218,7 +224,8 @@ const ReactApp: FC = () => {
             Moderator: selectedModerators,
             EndDate: enddate,
             Connections: (priv ? selectedConnections : connections),
-            priv: priv
+            priv: priv,
+            TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone
         }).then(() => {
            
             
@@ -304,9 +311,10 @@ const ReactApp: FC = () => {
                         end: event.end,
                         Moderator: selectedModerators,
                         UserId: id,
-                        Connections: connections,
+                        Connections: (priv ? selectedConnections : connections),
                         priv: priv,
                         _id: "",
+                        TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone
                     };
                     setEvents([...events, newEvent]);
 
