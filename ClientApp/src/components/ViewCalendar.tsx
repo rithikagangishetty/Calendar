@@ -75,7 +75,8 @@ const CalendarPage: React.FC = () => {
                     UserId: training.userId,
                     Moderator: training.moderator,
                     Connections: training.connections,
-                    priv: training.priv
+                    priv: training.priv,
+                    TimeZone: training.timeZone,
                 }
             })
             setEvents(event);
@@ -111,6 +112,7 @@ const CalendarPage: React.FC = () => {
                     Connections: response.data.connections,
                     priv: response.data.priv,
                     _id: response.data._id,
+                    TimeZone: response.data.timeZone,
                 };
                 setDeleteEvent(newEvent);
 
@@ -165,7 +167,8 @@ const CalendarPage: React.FC = () => {
             Moderator: selectedModerators,
             EndDate: enddate,
             Connections: (priv ? selectedConnections : connections),
-            priv: priv
+            priv: priv,
+            TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
         }).then(() => {
 
 
