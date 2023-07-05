@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ namespace Calenderwebapp.Controllers
 
 
         [HttpGet]
-        [Route("getevents")]
+        [Route("getallevents")]
         public async Task<List<UserDetails>> GetEvents(string _id)
         {
 
@@ -98,21 +99,42 @@ namespace Calenderwebapp.Controllers
         private static readonly object createEventLock = new object();
 
         [HttpPost]
-        public async Task<IActionResult> Post(UserDetails newUser)
+        [Route("post")]
+        public async Task<ActionResult<string>> Post(UserDetails newUser)
         {
             UserDetails user = await Filtering(newUser);
-            EmailDetails emailUser = await Email(user);
-            emailUser.Body = $"An event titled '{emailUser.EventName}' has been created.\nThe start time of the event is '{DateTime.Parse(emailUser.StartDate)}' and ends at '{DateTime.Parse(emailUser.EndDate)}'.\n";
-            emailUser.Subject = "Event is Created";
-            // Lock the critical section using the createEventLock object
+
+
+
             lock (createEventLock)
             {
-                _usersService.CreateAsync(user).GetAwaiter().GetResult(); // Use GetResult() to wait synchronously within the lock.
-                _usersService.SendEmailAsync(emailUser);
-                return CreatedAtAction(nameof(GetEvents), new { id = user._id }, user);
+
+
+                _usersService.CreateAsync(user);
+
+                
+
             }
+
+
+
+            return user._id;
         }
 
+        [HttpPost]
+        [Route("sendmail")]
+        public async Task<ActionResult> SendMailAsync(EmailDetails _id)
+        {
+            var response = await _usersService.GetObjectAsync(_id._id);
+          
+            EmailDetails emailUser = await Email(response);
+
+            emailUser.Body = _id.Body;
+            emailUser.Subject = _id.Subject;
+            _usersService.SendEmailAsync(emailUser);
+
+            return Ok();
+        }
 
 
         [HttpPut]
@@ -128,26 +150,17 @@ namespace Calenderwebapp.Controllers
                 return NotFound();
             }
             UserDetails newUser = await Filtering(updatedUser);
-            EmailDetails emailUser = await Email(newUser);
 
-            emailUser.Body = $"An event titled '{emailUser.EventName}' has been Created.\nThe start time of the event is '{DateTime.Parse(emailUser.StartDate)}' and ends at '{DateTime.Parse(emailUser.EndDate)}'.\n";
-            emailUser.Subject = "Event is Edited";
-            await _usersService.UpdateAsync(newUser);
-            _usersService.SendEmailAsync(emailUser);
+            lock (createEventLock)
+            {
+
+                 _usersService.UpdateAsync(newUser);
+            }
           
 
             return NoContent();
         }
-        [HttpPost]
-        [Route("sendmail")]
-        public async Task<IActionResult> SendMailAsync(UserDetails user)
-        {
-            UserDetails newUser = await Filtering(user);
-            EmailDetails emailUser = await Email(newUser);
-             _usersService.SendEmailAsync(emailUser);
-
-            return Ok();
-        }
+        
 
 
         [HttpDelete]
@@ -160,20 +173,22 @@ namespace Calenderwebapp.Controllers
             {
                 return NotFound();
             }
-            EmailDetails emailUser = await Email(user);
-
-            emailUser.Body = $"An event titled '{emailUser.EventName}' is Deleted.\n";
-            emailUser.Subject = "Event is Deleted";
-            if (user.UserId == userId)
+           
+            if (user.UserId == userId||user.Moderator.Contains(userId))
             {
-                await _usersService.RemoveAsync(_id);
-                _usersService.SendEmailAsync(emailUser);
+                lock (createEventLock)
+                {
+                    _usersService.RemoveAsync(_id);
+                }
             }
             else
             {
-                user.Connections.Remove(userId);
-                user.Moderator.Remove(userId);
-                await _usersService.UpdateAsync(user);
+                lock (createEventLock)
+                {
+                    user.Connections.Remove(userId);
+                    user.Moderator.Remove(userId);
+                    _usersService.UpdateAsync(user);
+                }
             }
             return NoContent();
         }

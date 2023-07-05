@@ -71,7 +71,7 @@ const ReactApp: FC = () => {
 
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const getEvents = () => {
-        axios.get('https://localhost:44373/User/getevents', { params: { _id: id } }).then((response) => {
+        axios.get('https://localhost:44373/User/getallevents', { params: { _id: id } }).then((response) => {
             const event = response.data.map((training: any) => {
                
                 return {
@@ -96,39 +96,52 @@ const ReactApp: FC = () => {
 
     }
 
-    function Post() {
+    async function Post() {
 
 
+        var _connections;
+        var eventId;
+        await axios.get('https://localhost:44373/Connection/get', { params: { _id: id } }).then((response) => {
 
-        axios.get('https://localhost:44373/Connection/get', { params: { _id: id } }).then((response) => {
-
-           
-            axios.post("https://localhost:44373/User",
-                {
-                    _id: '',
-                    UserId: id,
-                    EventName: titleInput,
-                    StartDate: startdate,
-                    Moderator: selectedModerators,
-                    EndDate: enddate,
-                    Connections: (priv ? selectedConnections : response.data.connection),
-                    priv: priv,
-                    TimeZone: (selectedTimezone =="") ? defaultTimeZone : selectedTimezone
-                }).then(() => {
-                   
-                    setShowCreateModal(false);
-                    setCurrentTaskType('eventadded');
-                    setShowModal(true);
-                   
-                   
-                  
-
-                }).catch((error) => {
-                    alert("error in post " + error)
-                });
-
+            _connections = response.data.connection;
 
         }).catch((error) => { alert("error in get " + error) });
+        await axios.post("https://localhost:44373/User/post",
+            {
+                _id: '',
+                UserId: id,
+                EventName: titleInput,
+                StartDate: startdate,
+                Moderator: selectedModerators,
+                EndDate: enddate,
+                Connections: (priv ? selectedConnections : _connections),
+                priv: priv,
+                TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone
+            }).then((response) => {
+                eventId = (response.data);
+                setShowCreateModal(false);
+                setCurrentTaskType('eventadded');
+                setShowModal(true);
+
+
+
+
+            }).catch((error) => {
+                alert("error in post " + error)
+            });
+
+        axios.post("https://localhost:44373/User/sendmail",
+            {
+                _id: eventId,
+                Subject: "Event is Created",
+                Body: `An event titled '${titleInput}' has been created.
+The start time of the event is '${startdate}' and ends at '${enddate}'.`,
+            }).then(() => {
+                alert("email sent");
+            }).catch((error) => {
+                alert("error in mail " + error)
+            });
+
     };
 
     function GetConnections() {
@@ -170,14 +183,25 @@ const ReactApp: FC = () => {
     }
    
     function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
-        event.preventDefault();
+       event.preventDefault();
+       axios.post("https://localhost:44373/User/sendmail",
+           {
+               _id: deleteEventId,
+               Subject: "Event is Deleted",
+               Body: `An event titled '${titleInput}' has been deleted.`,
+           }).then(() => {
+               alert("email sent");
+           }).catch((error) => {
+               alert("error in mail " + error)
+           });
 
-        axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: id } }).then((response) => {
+      axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: id } }).then((response) => {
             setCurrentTaskType('eventdeleted');
             setShowModal(true);
             
             setShowDeleteModal(false);
         }).catch((error) => { alert(error); });
+        
 
     };
     function EditEvent() {
@@ -235,6 +259,17 @@ const ReactApp: FC = () => {
             setShowDeleteModal(false);
             setEdit(false);
         }).catch((error) => { alert(error); });
+
+        axios.post("https://localhost:44373/User/sendmail",
+            {
+                _id: deleteEventId,
+                Subject: "Event is Edited",
+                Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startdate}' and ends at '${enddate}'.`,
+            }).then(() => {
+                alert("email sent");
+            }).catch((error) => {
+                alert("error in mail " + error)
+            });
 
     };
     const overlap = (slotInfo: any) => {

@@ -35,7 +35,34 @@ namespace Calenderwebapp.Services
                 UserSettings.Value.UsersCollectionName);
            
         }
-       
+
+
+
+        public async Task<List<UserDetails>> GetAsync(string Id) =>
+            await _UsersCollection.Find(x => x.UserId == Id).ToListAsync();
+        public async Task<List<UserDetails>> GetAsyncConnections(string Id)
+        {
+            var filter = Builders<UserDetails>.Filter.AnyEq(x => x.Connections, Id);
+            var filter2 = Builders<UserDetails>.Filter.AnyEq(x => x.Moderator, Id);
+            var response= await _UsersCollection.Find(filter2).ToListAsync();
+            var result = await _UsersCollection.Find(filter).ToListAsync();
+            result.AddRange(response);
+            return result;
+        }
+        public async Task<UserDetails> GetObjectAsync(string Id) =>
+           await _UsersCollection.Find(x => x._id == Id).FirstOrDefaultAsync();
+        public void UpdateAsync(UserDetails updatedUser) =>
+           _UsersCollection.ReplaceOneAsync(x => x._id == updatedUser._id, updatedUser);
+
+        public void RemoveAsync(string id) =>
+             _UsersCollection.DeleteOneAsync(x => x._id == id);
+        public  void  CreateAsync(UserDetails newUser) 
+        {
+            
+               _UsersCollection.InsertOneAsync(newUser);
+            
+          
+        }
         public void SendEmailAsync(EmailDetails user)
         {
             string senderEmail = _configuration["EmailSettings:SenderEmail"];
@@ -70,7 +97,7 @@ namespace Calenderwebapp.Services
             ScheduleEmailAsync(user);
 
         }
-        public void ScheduleEmailAsync( EmailDetails user)
+        public void ScheduleEmailAsync(EmailDetails user)
         {
             var currentTime = DateTime.Now;
             DateTime startDate = DateTime.Parse(user.StartDate);
@@ -91,34 +118,6 @@ namespace Calenderwebapp.Services
             }, null, (int)timeUntilScheduled.TotalMilliseconds, Timeout.Infinite);
         }
 
-
-        public async Task<List<UserDetails>> GetAsync(string Id) =>
-            await _UsersCollection.Find(x => x.UserId == Id).ToListAsync();
-        public async Task<List<UserDetails>> GetAsyncConnections(string Id)
-        {
-            var filter = Builders<UserDetails>.Filter.AnyEq(x => x.Connections, Id);
-            var filter2 = Builders<UserDetails>.Filter.AnyEq(x => x.Moderator, Id);
-            var response= await _UsersCollection.Find(filter2).ToListAsync();
-            var result = await _UsersCollection.Find(filter).ToListAsync();
-            result.AddRange(response);
-            return result;
-        }
-        public async Task<UserDetails> GetObjectAsync(string Id) =>
-           await _UsersCollection.Find(x => x._id == Id).FirstOrDefaultAsync();
-        public async Task UpdateAsync(UserDetails updatedUser) =>
-          await _UsersCollection.ReplaceOneAsync(x => x._id == updatedUser._id, updatedUser);
-
-        public async Task RemoveAsync(string id) =>
-            await _UsersCollection.DeleteOneAsync(x => x._id == id);
-        public async Task CreateAsync(UserDetails newUser) 
-        {
-            
-                await _UsersCollection.InsertOneAsync(newUser);
-            
-          
-        }
-            
-      
     }
 }
 

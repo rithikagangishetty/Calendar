@@ -86,12 +86,9 @@ namespace Calenderwebapp.Controllers
         {
             var connection = new List<string>();
             var connect = new List<string>();
-            var count = updatedConnection.Connection.Count;
+            var count = updatedConnection.Connection.Count();
             var response = await _connectionServices.GetAsyncId(updatedConnection.Connection[count - 1]);
-            var exists=   updatedConnection.Connection.Contains(response._id);
-            if(exists)
-            { return Ok("Connection already exists"); 
-            }
+           
             if (response != null)
             {
                 if (response.Connection != null)

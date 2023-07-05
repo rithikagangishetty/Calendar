@@ -131,7 +131,7 @@ const CalendarPage: React.FC = () => {
     function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
 
-        axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: id } }).then((response) => {
+        axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: connectionId } }).then((response) => {
             setCurrentTaskType('eventdeleted');
             setShowModal(true);
 

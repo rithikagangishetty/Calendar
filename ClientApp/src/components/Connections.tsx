@@ -102,11 +102,14 @@ function Connections() {
             setShowModal(true);
             return;
         }
-
-        axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
+        var newconnections;
+        var Id;
+        var Emailid;
+      await  axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
             console.log(response.data);
-
-            var newconnections = response.data.connection;
+            Id = response.data._id;
+            Emailid = response.data.emailId;
+             newconnections = response.data.connection;
             if (response.data.connection != null) {
                 newconnections = [...newconnections, connection];
             }
@@ -114,30 +117,31 @@ function Connections() {
                 newconnections = [connection];
             }
 
-            axios.put("https://localhost:44373/Connection/update",
-                {
-
-                    _id: response.data._id,
-                    EmailId: response.data.emailId,
-                    Connection: newconnections,
-
-
-                }).then((response) => {
-
-                    console.log(response.data);
-                    setCurrentTaskType('connectionadded');
-                    setShowModal(true);
-                    setConnection('');
-
-                }).catch((error) => {
-                    alert("error in update " + error);
-                });
-
+           
         }).catch((error) => {
             alert("error in getting the _id  " + error);
 
 
         });
+        axios.put("https://localhost:44373/Connection/update",
+            {
+
+                _id: Id,
+                EmailId: Emailid,
+                Connection: newconnections,
+
+
+            }).then((response) => {
+
+                console.log(response.data);
+                setCurrentTaskType('connectionadded');
+                setShowModal(true);
+                setConnection('');
+
+            }).catch((error) => {
+                alert("error in update " + error);
+            });
+
         setConnection('');
 
     }
