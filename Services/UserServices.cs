@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.Extensions.Configuration;
 using System.Threading;
-using Org.BouncyCastle.Tls;
+
 
 namespace Calenderwebapp.Services
 {
@@ -19,8 +19,10 @@ namespace Calenderwebapp.Services
     {
         private readonly IMongoCollection<UserDetails> _UsersCollection;
         private readonly IConfiguration _configuration;
+        private Timer _reminderTimer;
+        private readonly ConnectionServices _connectionServices;
         public UserServices(
-            IOptions<UserSettings> UserSettings, IConfiguration configuration)
+            IOptions<UserSettings> UserSettings, IConfiguration configuration, ConnectionServices connectionService)
 
        
         {
@@ -33,7 +35,13 @@ namespace Calenderwebapp.Services
 
             _UsersCollection = mongoDatabase.GetCollection<UserDetails>(
                 UserSettings.Value.UsersCollectionName);
-           
+            _connectionServices = connectionService;
+            StartReminderTimer();
+        }
+        private void StartReminderTimer()
+        {
+            // Set up the reminder timer to run the reminder task every 10 minutes
+            _reminderTimer = new Timer(async state => await RunReminderTask(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
         }
 
 
@@ -89,34 +97,53 @@ namespace Calenderwebapp.Services
             Smtp.Authenticate(senderEmail, password);
             Smtp.Send(email);
             Smtp.Disconnect(true);
-            DateTime scheduledTime = new DateTime(2023, 6, 30, 9, 0, 0); // Replace with your desired scheduled time
-
-
-
-
-            ScheduleEmailAsync(user);
+          
 
         }
-        public void ScheduleEmailAsync(EmailDetails user)
+        public async Task RunReminderTask()
         {
-            var currentTime = DateTime.Now;
-            DateTime startDate = DateTime.Parse(user.StartDate);
-            DateTime scheduledTime = startDate.AddMinutes(-10);
+            var currentDateTimeUtc = DateTime.UtcNow;
+            var reminderThreshold = currentDateTimeUtc.AddMinutes(10);
+            var upcomingEvents = await _UsersCollection
+                   .Find(e => DateTime.Parse(e.StartDate) >= currentDateTimeUtc && DateTime.Parse(e.StartDate) < reminderThreshold && !e.Reminder)
+                   .ToListAsync();
 
-            var timeUntilScheduled = scheduledTime - currentTime;
-
-            if (timeUntilScheduled.TotalMilliseconds < 0)
+            foreach (var ev in upcomingEvents)
             {
-                Console.WriteLine("Scheduled time has already passed.");
-                return;
+                var timeDifference = DateTime.Parse(ev.StartDate) - currentDateTimeUtc;
+                
+                    var moderators = new List<string>();
+                    var connections = new List<string>();
+                    EmailDetails details = new EmailDetails();
+                    var userEmail= await _connectionServices.GetAsync(ev._id);
+                    details.UserEmail = userEmail.EmailId;
+                    details.Subject = "Reminder For the Event";
+                    details.Body = $"The event named {ev.EventName} will start in 10 minutes.";
+                    details.StartDate = ev.StartDate;
+                    details.EndDate = ev.EndDate;
+                    details.EventName = ev.EventName;
+                    details._id = ev._id;
+                    foreach (var connection in ev.Connections)
+                    {
+                        var response = await _connectionServices.GetAsync(connection);
+                        connections.Add(response.EmailId);
+                    }
+                    foreach (var moderator in ev.Moderator)
+                    {
+                        var response = await _connectionServices.GetAsync(moderator);
+                        moderators.Add(response.EmailId);
+                    }
+                    details.Connections = connections;
+                    details.Moderator = (moderators);
+
+                    SendEmailAsync(details);
+                    ev.Reminder = true;
+                    await _UsersCollection.ReplaceOneAsync(e => e._id == ev._id, ev);
+
+                
             }
-
-            var timer = new Timer(state =>
-            {
-                SendEmailAsync(user);
-                Console.WriteLine("Email sent!");
-            }, null, (int)timeUntilScheduled.TotalMilliseconds, Timeout.Infinite);
         }
+
 
     }
 }
