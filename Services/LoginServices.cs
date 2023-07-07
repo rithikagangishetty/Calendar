@@ -26,11 +26,11 @@ namespace Calenderwebapp.Services
             var user = _LoginCollection.Find(filter).FirstOrDefault();
             return user;
         }
-        public Connections Signup(Connections Emailid)
+        public Connections Signup(Connections EmailId)
         {
 
-            _LoginCollection.InsertOne(Emailid);
-            return Emailid;
+            _LoginCollection.InsertOne(EmailId);
+            return EmailId;
         }
     }
 }
