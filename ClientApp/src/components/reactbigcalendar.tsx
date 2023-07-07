@@ -84,7 +84,8 @@ const ReactApp: FC = () => {
                     Moderator: training.moderator,
                     Connections: training.connections,
                     priv: training.priv,
-                    TimeZone: training.timeZone
+                    TimeZone: training.timeZone,
+                    Reminder:training.reminder,
                 }
             })
            
@@ -116,7 +117,8 @@ const ReactApp: FC = () => {
                 EndDate: enddate,
                 Connections: (priv ? selectedConnections : _connections),
                 priv: priv,
-                TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone
+                TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
+                Reminder: false,
             }).then((response) => {
                 eventId = (response.data);
                 setShowCreateModal(false);
@@ -162,14 +164,14 @@ The start time of the event is '${startdate}' and ends at '${enddate}'.`,
                 const newEvent = {
                     title: response.data.eventName,
                     start: response.data.startDate,
-                    end: response.data.endDate
-                    ,
+                    end: response.data.endDate ,
                     Moderator: response.data.moderator,
                     UserId: response.data.userId,
                     Connections: response.data.connections,
                     priv: response.data.priv,
                     _id: response.data._id,
                     TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
+                    Reminder: response.data.reminder,
                 };
                 setDeleteEvent(newEvent);
                   
@@ -249,7 +251,8 @@ The start time of the event is '${startdate}' and ends at '${enddate}'.`,
             EndDate: enddate,
             Connections: (priv ? selectedConnections : connections),
             priv: priv,
-            TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone
+            TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
+            Reminder: false,
         }).then(() => {
            
             
@@ -303,6 +306,8 @@ The start time of the event is '${startdate}' and ends at '${enddate}'.`,
         const isPastEvent = selectedDate.isBefore(currentDate);
 
         if (isPastEvent) {
+            setCurrentTaskType('past');
+            setShowModal(true);
             // Event is in the past, disable edit and delete options
             return;
         }
@@ -318,13 +323,7 @@ The start time of the event is '${startdate}' and ends at '${enddate}'.`,
                 setShowModal(true);
                 return;
             }
-            if (selectedDate.isBefore(currentDate))
-            {
-
-                setCurrentTaskType('past');
-                setShowModal(true);
-                return;
-            }
+           
 
             else
             {
@@ -349,7 +348,8 @@ The start time of the event is '${startdate}' and ends at '${enddate}'.`,
                         Connections: (priv ? selectedConnections : connections),
                         priv: priv,
                         _id: "",
-                        TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone
+                        TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
+                        Reminder: false,
                     };
                     setEvents([...events, newEvent]);
 
