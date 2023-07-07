@@ -2,6 +2,7 @@
 using Calenderwebapp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,13 +19,14 @@ namespace Calenderwebapp.Controllers
     public class UserController : Controller
     {
         private readonly UserServices _usersService;
-
+        private readonly ILogger<UserController> _logger;
         private readonly ConnectionServices _connectionServices;
-
-        public UserController(UserServices usersService, ConnectionServices connectionService)
+        
+        public UserController(UserServices usersService, ConnectionServices connectionService, ILogger<UserController> logger)
         {
             _connectionServices = connectionService;
             _usersService = usersService;
+            _logger = logger;
 
         }
 
@@ -97,28 +99,26 @@ namespace Calenderwebapp.Controllers
             return events;
         }
         private static readonly object createEventLock = new object();
-
+       
         [HttpPost]
         [Route("post")]
         public async Task<ActionResult<string>> Post(UserDetails newUser)
         {
             UserDetails user = await Filtering(newUser);
 
-
-
+            
             lock (createEventLock)
             {
-
-
-                _usersService.CreateAsync(user);
-
-                
-
+               
+                    
+                   
+                _usersService.CreateAsync(newUser);
+               
             }
 
+           
 
-
-            return user._id;
+            return newUser._id;
         }
 
         [HttpPost]
