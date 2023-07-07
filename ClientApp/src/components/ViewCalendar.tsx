@@ -77,6 +77,7 @@ const CalendarPage: React.FC = () => {
                     Connections: training.connections,
                     priv: training.priv,
                     TimeZone: training.timeZone,
+                    Reminder:training.reminder,
                 }
             })
             setEvents(event);
@@ -113,6 +114,7 @@ const CalendarPage: React.FC = () => {
                     priv: response.data.priv,
                     _id: response.data._id,
                     TimeZone: response.data.timeZone,
+                    Reminder:response.data.reminder,
                 };
                 setDeleteEvent(newEvent);
 
@@ -169,6 +171,7 @@ const CalendarPage: React.FC = () => {
             Connections: (priv ? selectedConnections : connections),
             priv: priv,
             TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
+            Reminder:false,
         }).then(() => {
 
 
