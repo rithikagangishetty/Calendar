@@ -22,6 +22,7 @@ namespace Calenderwebapp.Models
         public string StartDate { get; set; }
         public string EndDate { get; set; }
         public bool priv { get; set; }
+        public bool Reminder { get; set; }
        
 }
 }
