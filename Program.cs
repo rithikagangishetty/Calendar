@@ -1,6 +1,5 @@
 using Main.Models;
 using Main.Supervisor;
-using Calenderwebapp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -17,17 +16,17 @@ builder.Services.AddSpaStaticFiles(configuration =>
 });
 
 
-//builder.Services.Configure<UserSettings>(
-//   builder.Configuration.GetSection("UserDatabase"));
-builder.Services.AddSingleton<UserServices>();
+////builder.Services.Configure<UserSettings>(
+////   builder.Configuration.GetSection("UserDatabase"));
+//builder.Services.AddSingleton<UserServices>();
 
-//builder.Services.Configure<ConnectionSettings>(
-//   builder.Configuration.GetSection("ConnectionDb"));
-builder.Services.AddSingleton<ConnectionServices>();
+////builder.Services.Configure<ConnectionSettings>(
+////   builder.Configuration.GetSection("ConnectionDb"));
+//builder.Services.AddSingleton<ConnectionServices>();
 
-//builder.Services.Configure<ConnectionSettings>(
-//   builder.Configuration.GetSection("ConnectionDb"));
-builder.Services.AddSingleton<LoginServices>();
+////builder.Services.Configure<ConnectionSettings>(
+////   builder.Configuration.GetSection("ConnectionDb"));
+//builder.Services.AddSingleton<LoginServices>();
 
 builder.Services.AddScoped<IConnections, Connection>();
 builder.Services.AddSingleton<Connection>();
