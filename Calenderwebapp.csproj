@@ -52,7 +52,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CalendarDb\CalendarDb.csproj" />
     <ProjectReference Include="..\Main\Main.csproj" />
-    <ProjectReference Include="CalendarDb\CalendarDb.csproj" />
     <ProjectReference Include="Main\Main.csproj" />
   </ItemGroup>
 

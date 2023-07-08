@@ -5,14 +5,6 @@ VisualStudioVersion = 17.4.33403.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calenderwebapp", "Calenderwebapp.csproj", "{8F10B75C-AA5A-44EC-A7F6-EA46513C8A47}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{49B390BF-6EFC-4032-8ACD-C1DDCF54F21F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Main", "Main\Main.csproj", "{DFAE56C7-A513-4E78-8AF9-0914B914AB04}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E0492D39-B1BB-4449-8D12-94064E931B8B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendarDb", "CalendarDb\CalendarDb.csproj", "{6FE100A7-DD49-4B3C-A8F9-414A8DC49301}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,21 +15,9 @@ Global
 		{8F10B75C-AA5A-44EC-A7F6-EA46513C8A47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F10B75C-AA5A-44EC-A7F6-EA46513C8A47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F10B75C-AA5A-44EC-A7F6-EA46513C8A47}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DFAE56C7-A513-4E78-8AF9-0914B914AB04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DFAE56C7-A513-4E78-8AF9-0914B914AB04}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DFAE56C7-A513-4E78-8AF9-0914B914AB04}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DFAE56C7-A513-4E78-8AF9-0914B914AB04}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6FE100A7-DD49-4B3C-A8F9-414A8DC49301}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6FE100A7-DD49-4B3C-A8F9-414A8DC49301}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6FE100A7-DD49-4B3C-A8F9-414A8DC49301}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6FE100A7-DD49-4B3C-A8F9-414A8DC49301}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{DFAE56C7-A513-4E78-8AF9-0914B914AB04} = {49B390BF-6EFC-4032-8ACD-C1DDCF54F21F}
-		{6FE100A7-DD49-4B3C-A8F9-414A8DC49301} = {E0492D39-B1BB-4449-8D12-94064E931B8B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {34988D63-6D94-4741-AA04-9A23E05AC08D}
