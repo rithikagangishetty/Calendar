@@ -107,7 +107,7 @@ const ReactApp: FC = () => {
             _connections = response.data.connection;
 
         }).catch((error) => { alert("error in get " + error) });
-        await axios.post("https://localhost:44373/User/post",
+         await axios.post("https://localhost:44373/User/post",
             {
                 _id: '',
                 UserId: id,
@@ -119,8 +119,8 @@ const ReactApp: FC = () => {
                 priv: priv,
                 TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
                 Reminder: false,
-            }).then((response) => {
-                eventId = (response.data);
+           }).then((response) => {
+               eventId = response.data;
                 setShowCreateModal(false);
                 setCurrentTaskType('eventadded');
                 setShowModal(true);
@@ -135,9 +135,16 @@ const ReactApp: FC = () => {
         axios.post("https://localhost:44373/User/sendmail",
             {
                 _id: eventId,
+                UserEmail: id,
+                EventName: titleInput,
+                Moderator: selectedModerators,
+                Connections: (priv ? selectedConnections : _connections),
+                StartDate: startdate,
+                EndDate: enddate,
+                Delete: false,
                 Subject: "Event is Created",
                 Body: `An event titled '${titleInput}' has been created.
-The start time of the event is '${startdate}' and ends at '${enddate}'.`,
+                The start time of the event is '${startdate}' and ends at '${enddate}'.`,
             }).then(() => {
                 alert("email sent");
             }).catch((error) => {
@@ -184,29 +191,48 @@ The start time of the event is '${startdate}' and ends at '${enddate}'.`,
        
     }
    
-    function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
+    async function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
        event.preventDefault();
-       axios.post("https://localhost:44373/User/sendmail",
-           {
-               _id: deleteEventId,
-               Subject: "Event is Deleted",
-               Body: `An event titled '${titleInput}' has been deleted.`,
-           }).then(() => {
-               alert("email sent");
-           }).catch((error) => {
-               alert("error in mail " + error)
-           });
+       
+      
+      var eventName;
+      var Moderator;
+      var Connection;
+      var _start;
+      var _end;
+     await axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: id } }).then((response) => {
 
-      axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: id } }).then((response) => {
-            setCurrentTaskType('eventdeleted');
+        
+         eventName = response.data.eventName;
+         Moderator = response.data.moderator;
+         Connection = response.data.connections;
+         _start = response.data.startDate;
+         _end = response.data.endDate;
+         setCurrentTaskType('eventdeleted');
             setShowModal(true);
-            
+          
             setShowDeleteModal(false);
         }).catch((error) => { alert(error); });
-        
+        axios.post("https://localhost:44373/User/sendmail",
+            {
+                _id: deleteEventId,
+                UserEmail: id,
+                EventName: eventName,
+                Moderator: Moderator,
+                Connections: Connection,
+                StartDate: _start,
+                Delete:true,
+                EndDate: _end,
+                Subject: "Event is Deleted",
+                Body: `An event titled '${eventName}' has been deleted.`,
+            }).then(() => {
+                alert("email sent");
+            }).catch((error) => {
+                alert("error in mail " + error)
+            });
 
     };
-    function EditEvent() {
+    async function EditEvent() {
         
                 
         for (var _event of events) {
@@ -225,24 +251,8 @@ The start time of the event is '${startdate}' and ends at '${enddate}'.`,
                     }
                 }
             }
-        }for (var _event of events) {
-            // Check if the event overlaps with any existing event
-            if (_event.start !== undefined && _event.end !== undefined) {
-                if (_event._id != deleteEventId) {
-                    if (
-                        (startdate >= _event.start && startdate < _event.end) ||
-                        (enddate > _event.start && enddate <= _event.end) ||
-                        (startdate <= _event.start && enddate >= _event.end)
-                    ) {
-                        setCurrentTaskType('eventclash');
-                        setShowModal(true);
-                        return; // Clash found
-
-                    }
-                }
-            }
         }
-        axios.put('https://localhost:44373/User/', {
+      await  axios.put('https://localhost:44373/User/', {
             _id: deleteEventId,
             UserId: id,
             EventName: titleInput,
@@ -266,6 +276,13 @@ The start time of the event is '${startdate}' and ends at '${enddate}'.`,
         axios.post("https://localhost:44373/User/sendmail",
             {
                 _id: deleteEventId,
+                UserEmail: id,
+                EventName: titleInput,
+                Moderator: selectedModerators,
+                Connections: (priv ? selectedConnections : connections),
+                StartDate: startdate,
+                EndDate: enddate,
+                Delete:false,
                 Subject: "Event is Edited",
                 Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startdate}' and ends at '${enddate}'.`,
             }).then(() => {

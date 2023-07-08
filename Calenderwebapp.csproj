@@ -16,12 +16,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.0.3">
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.1.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="MongoDB.Bson" Version="2.19.1" />
-    <PackageReference Include="MongoDB.Driver" Version="2.19.1" />
+    <PackageReference Include="MongoDB.Bson" Version="2.20.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.20.0" />
     <PackageReference Include="Quartz" Version="3.6.3" />
     <PackageReference Include="React.Web" Version="5.2.12" />
     <PackageReference Include="Serilog" Version="3.0.1" />
@@ -47,6 +47,11 @@
 
   <ItemGroup>
     <TypeScriptCompile Remove="clientapp\src\components\Modal.tsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CalendarDb\CalendarDb.csproj" />
+    <ProjectReference Include="..\Main\Main.csproj" />
   </ItemGroup>
 
   <ItemGroup>

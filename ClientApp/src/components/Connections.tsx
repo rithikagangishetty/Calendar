@@ -97,6 +97,7 @@ function Connections() {
             setShowModal(true);
             return;
         }
+        
         if (connection == userEmail) {
             setCurrentTaskType("sameemail");
             setShowModal(true);

@@ -4,13 +4,18 @@ import MyModal from './Modal';
 import { useHistory } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 type TaskType = 'login' | 'signup'|'valid';
+type Connections = {
+    _id: string;
+    emailId: string;
+    Connection: Array<string>;
 
+};
 function Login() {
    
     const [EmailId, setEmailId] = useState<string>('');
     const history = useHistory();
     const [_id, setId] = useState<string>("");
-   
+    const [details, setDetails] = useState<Connections>();
 
     const [showModal, setShowModal] = useState(false);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
@@ -46,10 +51,12 @@ function Login() {
             
             
         }
-
+       
          axios.post('https://localhost:44373/Login/login', {
 
-             EmailId: EmailId
+             _id: "",
+             EmailId: EmailId,
+             Connection:[]
         }).then((response) => {
             console.log(response.data);
             setId(response.data._id);
@@ -62,7 +69,9 @@ function Login() {
             
             axios.post("https://localhost:44373/Login/signup", {
 
+                _id: "",
                 EmailId: EmailId,
+                Connection: []
                 
             }).then((response) => {
                 console.log(response.data);
