@@ -22,6 +22,7 @@ namespace Calenderwebapp.Controllers
         private readonly UserSupervisor _userSupervisor;
         public UserController(UserSupervisor userSupervisor)
         {
+           
             _userSupervisor = userSupervisor;
         }
         [HttpGet]
@@ -37,7 +38,7 @@ namespace Calenderwebapp.Controllers
         public async Task<List<UserDetails>> GetViewEvents(string _id, string connectionId)
         {
             var result = await _userSupervisor.GetViewEvents(_id, connectionId);
-           
+            Console.WriteLine(result);
             return result;
         }
         [HttpGet]
@@ -54,6 +55,7 @@ namespace Calenderwebapp.Controllers
         public async Task<string> Post(UserDetails newUser)
         {
             var id= await _userSupervisor.Post(newUser);
+            Console.WriteLine(id);
             return id;
         }
 
