@@ -7,7 +7,11 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
+using System.IO;
+//using Serilog.Sinks.MongoDB;
 namespace Calenderwebapp
 {
     public class Startup
@@ -27,9 +31,22 @@ namespace Calenderwebapp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string filePath = Path.Combine("C:\\Users\\GANGISHETTY RITHIKA\\Downloads", "log.txt");
+
             services.AddControllersWithViews();
             services.AddControllers();
+      //      var  = new LoggerConfiguration()
+      //.MinimumLevel.Debug()
+      //.WriteTo.File(filePath, rollingInterval: RollingInterval.Day)
+      //.CreateLogger();
+          
+            //       Log.Logger = new LoggerConfiguration()
+            //.MinimumLevel.Debug()
+            //.WriteTo.Console()
+            //.WriteTo.MongoDB("mongodb://localhost:27017/YourDatabase", collectionName: "logging")
+            //.CreateLogger();
 
+           // services.AddLogging(builder => builder.AddSerilog(Log.Logger));
             // Add configuration
             services.AddSingleton(Configuration);
             // In production, the React files will be served from this directory
@@ -40,7 +57,7 @@ namespace Calenderwebapp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -52,7 +69,7 @@ namespace Calenderwebapp
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            //loggerFactory.AddSerilog();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();

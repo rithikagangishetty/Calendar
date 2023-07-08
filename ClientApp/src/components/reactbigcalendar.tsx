@@ -146,7 +146,7 @@ const ReactApp: FC = () => {
                 Body: `An event titled '${titleInput}' has been created.
                 The start time of the event is '${startdate}' and ends at '${enddate}'.`,
             }).then(() => {
-                alert("email sent");
+               // alert("email sent");
             }).catch((error) => {
                 alert("error in mail " + error)
             });
@@ -226,7 +226,7 @@ const ReactApp: FC = () => {
                 Subject: "Event is Deleted",
                 Body: `An event titled '${eventName}' has been deleted.`,
             }).then(() => {
-                alert("email sent");
+              //  alert("email sent");
             }).catch((error) => {
                 alert("error in mail " + error)
             });
@@ -286,7 +286,7 @@ const ReactApp: FC = () => {
                 Subject: "Event is Edited",
                 Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startdate}' and ends at '${enddate}'.`,
             }).then(() => {
-                alert("email sent");
+             //   alert("email sent");
             }).catch((error) => {
                 alert("error in mail " + error)
             });

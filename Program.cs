@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CalendarDb;
+using Serilog;
+using SharpCompress.Common;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,20 +17,13 @@ builder.Services.AddSpaStaticFiles(configuration =>
 {
     configuration.RootPath = "ClientApp/build";
 });
+string filePath = Path.Combine("C:\\Users\\GANGISHETTY RITHIKA\\Downloads", "log.txt");
 
-
-////builder.Services.Configure<UserSettings>(
-////   builder.Configuration.GetSection("UserDatabase"));
-//builder.Services.AddSingleton<UserServices>();
-
-////builder.Services.Configure<ConnectionSettings>(
-////   builder.Configuration.GetSection("ConnectionDb"));
-//builder.Services.AddSingleton<ConnectionServices>();
-
-////builder.Services.Configure<ConnectionSettings>(
-////   builder.Configuration.GetSection("ConnectionDb"));
-//builder.Services.AddSingleton<LoginServices>();
-
+var _logger = new LoggerConfiguration()
+.MinimumLevel.Debug()
+     .WriteTo.File(filePath, rollingInterval: RollingInterval.Day)
+     .CreateLogger();
+builder.Logging.AddSerilog(_logger);
 builder.Services.AddScoped<IConnections, Connection>();
 builder.Services.AddSingleton<Connection>();
 builder.Services.AddScoped<ConnectionSupervisor>();

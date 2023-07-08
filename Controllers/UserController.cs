@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Serilog;
 using System.Threading.Tasks;
 
 
@@ -18,12 +19,15 @@ namespace Calenderwebapp.Controllers
     [Route("[controller]")]
     public class UserController : Controller
     {
-        
+        private readonly ILogger<UserController> _logger;
+
         private readonly UserSupervisor _userSupervisor;
-        public UserController(UserSupervisor userSupervisor)
+        public UserController(UserSupervisor userSupervisor, ILogger<UserController> logger)
         {
-           
+
             _userSupervisor = userSupervisor;
+            _logger = logger;
+            _userSupervisor.SimulateConcurrentRequests().Wait();
         }
         [HttpGet]
         [Route("getallevents")]
@@ -54,6 +58,7 @@ namespace Calenderwebapp.Controllers
         [Route("post")]
         public async Task<string> Post(UserDetails newUser)
         {
+            _logger.LogInformation("This is an information log message.");
             var id= await _userSupervisor.Post(newUser);
             Console.WriteLine(id);
             return id;
