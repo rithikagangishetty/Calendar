@@ -56,5 +56,15 @@ app.UseSpa(spa =>
         spa.UseReactDevelopmentServer(npmScript: "start");
     }
 });
+using (var scope = app.Services.CreateScope())
+{
+    var serviceProvider = scope.ServiceProvider;
+
+    // Retrieve an instance of the User class
+    var user = serviceProvider.GetRequiredService<IUser>();
+
+    // Call the SetReminderTask method
+    user.StartReminderTimer();
+}
 app.Run();
 
