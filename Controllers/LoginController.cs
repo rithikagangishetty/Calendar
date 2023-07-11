@@ -31,11 +31,11 @@ namespace Calenderwebapp.Controllers
         }
         [HttpPost]
         [Route("signup")]
-        public IActionResult Signup(Connections userdata)
+        public Connections Signup(Connections userdata)
         {
-            _loginSupervisor.Signup(userdata);
+           var user= _loginSupervisor.Signup(userdata);
 
-            return Ok();
+            return user;
         }
 
     }

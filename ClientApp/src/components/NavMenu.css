@@ -3,6 +3,10 @@
     text-align: center;
     word-break: break-all;
 }
+.my-heading {
+    margin: 20px 0;
+}
+
 
 html { font-size: 14px; }
 

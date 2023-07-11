@@ -27,7 +27,7 @@ namespace Calenderwebapp.Controllers
 
             _userSupervisor = userSupervisor;
             _logger = logger;
-            _userSupervisor.SimulateConcurrentRequests().Wait();
+           // _userSupervisor.SimulateConcurrentRequests().Wait();
         }
         [HttpGet]
         [Route("getallevents")]

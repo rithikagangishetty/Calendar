@@ -5,12 +5,7 @@ type TaskType = 'connectionadded' | 'connectiondeleted' | 'noconnections' | 'con
 import MyModal from './Modal';
 
 
-type Connection = {
-    _id: string;
-    emailId: string;
-    Connection: Array<string>;
 
-};
 interface RouteParams {
     id: string;
 

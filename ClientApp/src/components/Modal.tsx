@@ -1,7 +1,7 @@
 import React, { useState} from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {  Event } from 'react-big-calendar'
+import { Form } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 type TaskType = 'login' | 'signup' | 'connectionadded' | 'eventclash'|'valid' | 'eventedited' |'noedit'| 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
@@ -121,7 +121,7 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
 
     return (
         <Modal show={show} onHide={onClose}>
-            <Modal.Header closeButton>
+            <Modal.Header >
                 <Modal.Title>Message</Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -166,7 +166,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
     return (
         <Modal show={show} onHide={onClose}>
-            <Modal.Header closeButton>
+            <Modal.Header >
                 <Modal.Title>Edit Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -228,10 +228,10 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="success" onClick={onPost}>
-                    Create Public Event
+                    Update to Public Event
                 </Button>
                 <Button variant="success" onClick={onPrivatePost}>
-                    Create Private Event
+                    Update to Private Event
                 </Button>
                 <Button variant="secondary" onClick={onClose}>
                     Cancel
@@ -262,7 +262,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 }) => {
     return (
         <Modal show={show} onHide={onClose}>
-            <Modal.Header closeButton>
+            <Modal.Header >
                 <Modal.Title>Create Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -325,7 +325,7 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
     
     return (
         <Modal show={show} onHide={onClose}>
-            <Modal.Header closeButton>
+            <Modal.Header >
                 <Modal.Title>Select Email IDs</Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -355,7 +355,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, 
         
         <Modal show={show} onHide={onHide}>
           
-            <Modal.Header closeButton>
+            <Modal.Header >
                 <Modal.Title>Delete Event</Modal.Title>
             </Modal.Header>
             {event && (

@@ -6,8 +6,9 @@ import 'moment-timezone'; `1`
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useParams } from 'react-router-dom'
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModal } from './Modal';
 
 
@@ -472,6 +473,18 @@ const ReactApp: FC = () => {
             />
         );
     };
+    const handleEventPropGetter = (event: any, start: any, end: any, isSelected: any) => {
+        const eventStyle = {
+            backgroundColor: 'lightblue',
+            borderRadius: '3px',
+            border: '1px solid #aaa',
+            cursor: 'pointer',
+        };
+
+        return {
+            style: eventStyle,
+        };
+    };
     const handleModeratorSelection = (moderator: string) => {
         if (selectedModerators.includes(moderator)) {
             setSelectedModerators(selectedModerators.filter((selectedModerator) => selectedModerator !== moderator));
@@ -527,12 +540,17 @@ const ReactApp: FC = () => {
                 titleAccessor="title"
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}
+                
+                
                 tooltipAccessor={tooltipAccessor}
                 components={{
                     event: CustomEventContent,
                 }}
                 style={{ height: '80vh' }}
                 step={15}
+             
+                
+               
 
             />
             {currentTaskType && (
@@ -541,7 +559,7 @@ const ReactApp: FC = () => {
             
             {deleteEvent && (
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
+                <Modal.Header >
                     <Modal.Title>Details of the Event</Modal.Title>
                 </Modal.Header>
 

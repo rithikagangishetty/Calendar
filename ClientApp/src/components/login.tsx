@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect,ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import MyModal from './Modal';
+import './NavMenu.css';
 import { useHistory } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 type TaskType = 'login' | 'signup'|'valid';
@@ -89,34 +90,31 @@ function Login() {
         
     };
     return (
-        <div>
-        <form onSubmit={handleFormSubmit}>
-            <div>
-                <h1>Hello, Users!</h1>
-                <p>Welcome to calendar web application</p>
-                <p>SignUp/Login your Email to Enter</p>
-                <br />
-            <input
-                    type="text"
-                    className="form-control"
-                placeholder="Enter your Email"
-                value={EmailId}
-                onChange={handleEmailIdChange}
-            />
-                    <div>
-                        <button className="btn btn-primary mt-4" type="submit">Sign up / Login</button>
-                        {currentTaskType && (
-                            <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
-                        )}
-            </div>
-           
-           </div>
-        </form>
-            <div>
-               
-               
-            </div>
-            </div>
+        <div className="container">
+            <form className="my-form" onSubmit={handleFormSubmit}>
+                <div className="text-center">
+                    <h1 className="my-heading">Hello, Users!</h1>
+                    <p>Welcome to the calendar web application</p>
+                    <p>Sign up/Login with your Email to Enter</p>
+                </div>
+                <div className="form-group">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter your Email"
+                        value={EmailId}
+                        onChange={handleEmailIdChange}
+                    />
+                </div>
+                <div className="text-center">
+                    <button className="btn btn-primary mt-4" type="submit">Sign up / Login</button>
+                    {currentTaskType && (
+                        <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
+                    )}
+                </div>
+            </form>
+        </div>
+
 
     );
 };

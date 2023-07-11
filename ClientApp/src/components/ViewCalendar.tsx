@@ -369,7 +369,7 @@ const CalendarPage: React.FC = () => {
             </div>
             {deleteEvent && (
                 <Modal show={showDeleteModal} onHide={closeDeleteModal}>
-                    <Modal.Header closeButton>
+                    <Modal.Header >
                         <Modal.Title>Details of the Event</Modal.Title>
                     </Modal.Header>
 

@@ -7,7 +7,6 @@ import { ConnectedRouter } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
 import configureStore from './store/configureStore';
 import App from './App';
-import Calenderweb from './components/calenderweb';
 import registerServiceWorker from './registerServiceWorker';
 
 // Create browser history to use in the Redux store
