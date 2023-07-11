@@ -10,7 +10,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import MyModal, { DeleteModal, EditEventModal, SelectEmailModal } from './Modal';
-
+import styled from 'styled-components';
 
 
 
@@ -46,7 +46,7 @@ const CalendarPage: React.FC = () => {
     const currentDate = moment();
     const [isPast, setIsPast] = useState<boolean>(false);
     const [isDelete, setIsDelete] = useState<boolean>(false);
-
+    const [EmailId, setEmailId] = useState<string>("");
     const handleCloseModal = () => {
 
         setShowModal(false);
@@ -54,11 +54,20 @@ const CalendarPage: React.FC = () => {
     useEffect(() => {
 
         getEvents();
-
+        GetEmail();
         moment.tz.setDefault();
     }, [currentTaskType, showDeleteModal, showEditModal, selectedTimezone]);
 
 
+    function GetEmail() {
+        axios.get('https://localhost:44373/Connection/get/', { params: { _id: connectionId } }).then((response) => {
+
+
+            console.log(response.data);
+            setEmailId(response.data.emailId);
+        });
+
+    }
     
     const getEvents = () => {
 
@@ -280,7 +289,9 @@ const CalendarPage: React.FC = () => {
         setSelectedConnections(selected);
 
     };
-
+    const StyledDiv = styled.div`
+  text-align: center;
+`;
     const renderEmailCheckbox = (connection: string) => {
         const isDisabled = selectedModerators.includes(connection);
 
@@ -318,12 +329,7 @@ const CalendarPage: React.FC = () => {
             
         }
     };
-    const closeDeleteModal = () => {
-        setShowDeleteModal(false);
-        setIsDelete(false);
-        setIsPast(false)
-      
-    };
+   
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 
@@ -331,20 +337,35 @@ const CalendarPage: React.FC = () => {
         <div>
             <div>
                 <div>
+                    <StyledDiv>
+                    <h4><strong>
+                        Welcome to {EmailId} Calendar!
+                        </strong></h4>
+                    </StyledDiv>
+                </div>
+                <StyledDiv>
+                <br/>
+                    <label><strong> Select Timezone </strong></label>
+                    <br />
+                    <select value={selectedTimezone} onChange={handleTimezoneChange}>
+                        <option value=""> {defaultTimeZone}</option>
+                        {timezones.map((timezone) => (
+
+                            <option key={timezone} value={timezone}>
+                                {timezone}
+                            </option>
+                        ))}
+                </select> </StyledDiv>
+               
+                <div >
+                    <br />
                     <strong>
-                        Welcome to your connections Calendar!
+                        <StyledDiv>
+                            Click an event to edit/delete.
+                        </StyledDiv>
                     </strong>
                 </div>
-                <label>Select Timezone:</label>
-                <select value={selectedTimezone} onChange={handleTimezoneChange}>
-                    <option value="">{defaultTimeZone}</option>
-                    {timezones.map((timezone) => (
-
-                        <option key={timezone} value={timezone}>
-                            {timezone}
-                        </option>
-                    ))}
-                </select>
+                <br />
                 <Calendar
                 
                     defaultView='week'
@@ -368,56 +389,81 @@ const CalendarPage: React.FC = () => {
 
             </div>
             {deleteEvent && (
-                <Modal show={showDeleteModal} onHide={closeDeleteModal}>
-                    <Modal.Header >
+                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                    <Modal.Header style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }} >
+
                         <Modal.Title>Details of the Event</Modal.Title>
+
                     </Modal.Header>
 
-                    <Modal.Body>
+                    <Modal.Body >
+                        <p><strong>Title:</strong> {deleteEvent.title}</p>
 
-                        <p>Title: {deleteEvent.title}</p>
                         {deleteEvent.start && (
-                            <p>Start: {deleteEvent.start.toLocaleString()}</p>
+                            <p><strong>Start:</strong> {new Date(deleteEvent.start).toLocaleString('en-US', {
+                                timeZone: deleteEvent.TimeZone,
+                                dateStyle: 'medium',
+                                timeStyle: 'medium'
+                            })}</p>
                         )}
                         {deleteEvent.end && (
-                            <p>End: {deleteEvent.end.toLocaleString()}</p>
+                            <p><strong>End:</strong> {new Date(deleteEvent.end).toLocaleString('en-US', {
+                                timeZone: deleteEvent.TimeZone,
+                                dateStyle: 'medium',
+                                timeStyle: 'medium'
+                            })}</p>
                         )}
+                        <p><strong>Event Type:</strong> {deleteEvent.priv ? 'Private' : 'Public'}</p>
 
                         {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
                             <div>
-                                <p>Connections:</p>
+                                <p><strong>Connections:</strong></p>
                                 <ul>
-                                    {deleteEvent.Connections.map((connection: any, index: any) => (
+                                    {deleteEvent.Connections.map((connection: string, index: any) => (
                                         <li key={index}>{connection}</li>
                                     ))}
                                 </ul>
                             </div>
                         )}
                         {deleteEvent.Moderator && deleteEvent.Moderator.length > 0 && (
-                            <div>
-                                <p>Moderators:</p>
+                            <>
+                                <p><strong>Moderators:</strong></p>
                                 <ul>
                                     {deleteEvent.Moderator.map((moderator: any, index: any) => (
                                         <li key={index}>{moderator}</li>
                                     ))}
                                 </ul>
-                            </div>
+                            </>
                         )}
-
-                        {isDelete && isPast&&(<p>You cannot delete/edit this event</p>)}
-                        <p>Do you want to delete/edit this event?</p>
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }} >
+                            {(!isDelete || !isPast) && <p><strong>{isPast ? "Do you want to delete this event?" : "Do you want to delete/edit this event"}</strong></p>}
+                        </div>
                     </Modal.Body>
 
-                    <Modal.Footer>
-                        <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
-                            Edit
-                        </Button>
+
+                    <Modal.Footer >
+                        {!isDelete && !isPast && 
+                            <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
+                                Edit
+                            </Button>
+                        }
+                        {!isDelete&& 
                         <Button variant="danger" onClick={DeleteEvent} disabled={isDelete}>
                             Delete
                         </Button>
-                        <Button variant="secondary" onClick={closeDeleteModal}>
+                        }
+                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                             Cancel
                         </Button>
+
                     </Modal.Footer>
 
                 </Modal>)}
@@ -426,6 +472,11 @@ const CalendarPage: React.FC = () => {
                 <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
             )}
             <EditEventModal
+                handleTimezoneChange={handleTimezoneChange}
+                selectedTimezone={selectedTimezone}
+                defaultTimeZone={defaultTimeZone}
+                timezones={timezones}
+                timeZone={"america"}
                 show={showEditModal}
                 onClose={() => setShowEditModal(false)}
                 onPost={handlePost}

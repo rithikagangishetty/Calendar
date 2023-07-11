@@ -6,9 +6,11 @@ import 'moment-timezone'; `1`
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useParams } from 'react-router-dom'
 import axios from 'axios';
+import './NavMenu.css';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import styled from 'styled-components';
 import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModal } from './Modal';
 
 
@@ -473,18 +475,7 @@ const ReactApp: FC = () => {
             />
         );
     };
-    const handleEventPropGetter = (event: any, start: any, end: any, isSelected: any) => {
-        const eventStyle = {
-            backgroundColor: 'lightblue',
-            borderRadius: '3px',
-            border: '1px solid #aaa',
-            cursor: 'pointer',
-        };
-
-        return {
-            style: eventStyle,
-        };
-    };
+   
     const handleModeratorSelection = (moderator: string) => {
         if (selectedModerators.includes(moderator)) {
             setSelectedModerators(selectedModerators.filter((selectedModerator) => selectedModerator !== moderator));
@@ -509,9 +500,14 @@ const ReactApp: FC = () => {
             }
         }
     };
+    const StyledDiv = styled.div`
+  text-align: center;
+`;
     return (
-        <div>
-            <label>Select Timezone:</label>
+        <div >
+            <StyledDiv>
+            <label><strong> Select Timezone </strong></label>
+            <br/>
             <select value={selectedTimezone} onChange={handleTimezoneChange}>
                 <option value=""> {defaultTimeZone}</option>
                 {timezones.map((timezone) => (
@@ -520,15 +516,20 @@ const ReactApp: FC = () => {
                         {timezone}
                     </option>
                 ))}
-            </select>
-
-            <div>
+                </select>
+            </StyledDiv>
+           
+            <div >
+                <br />
                 <strong>
+                    <StyledDiv>
                     Click an event to edit/delete,
                     Drag the mouse over the calendar
-                    to select a date/time range.
+                        to select a date/time range.
+                    </StyledDiv>
                 </strong>
             </div>
+            <br />
             <Calendar
                 selectable
                 defaultView='week'
@@ -540,8 +541,6 @@ const ReactApp: FC = () => {
                 titleAccessor="title"
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}
-                
-                
                 tooltipAccessor={tooltipAccessor}
                 components={{
                     event: CustomEventContent,
@@ -559,59 +558,78 @@ const ReactApp: FC = () => {
             
             {deleteEvent && (
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header >
-                    <Modal.Title>Details of the Event</Modal.Title>
+                    <Modal.Header style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }} >
+                       
+                            <Modal.Title>Details of the Event</Modal.Title>
+                        
                 </Modal.Header>
 
-                <Modal.Body>
-
-                        <p>Title: {deleteEvent.title}</p>
+                    <Modal.Body >
+                        <p><strong>Title:</strong> {deleteEvent.title}</p>
+                       
                         {deleteEvent.start && (
-                            <p>Start: {deleteEvent.start.toLocaleString()}</p>
+                            <p><strong>Start:</strong> {new Date(deleteEvent.start).toLocaleString('en-US', {
+                                timeZone: deleteEvent.TimeZone,
+                                dateStyle: 'medium',
+                                timeStyle: 'medium'
+                            })}</p>
                         )}
                         {deleteEvent.end && (
-                            <p>End: {deleteEvent.end.toLocaleString()}</p>
+                            <p><strong>End:</strong> {new Date(deleteEvent.end).toLocaleString('en-US', {
+                                timeZone: deleteEvent.TimeZone,
+                                dateStyle: 'medium',
+                                timeStyle: 'medium'
+                            })}</p>
                         )}
+                        <p><strong>Event Type:</strong> {deleteEvent.priv ? 'Private' : 'Public'}</p>
 
                         {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
                             <div>
-                                <p>Connections:</p>
+                                <p><strong>Connections:</strong></p>
                                 <ul>
-                                    { deleteEvent.Connections.map((connection: string, index: any) => (
-                                     
+                                    {deleteEvent.Connections.map((connection: string, index: any) => (
                                         <li key={index}>{connection}</li>
                                     ))}
                                 </ul>
                             </div>
                         )}
                         {deleteEvent.Moderator && deleteEvent.Moderator.length > 0 && (
-                            <div>
-                                <p>Moderators:</p>
+                            <>
+                                <p><strong>Moderators:</strong></p>
                                 <ul>
-                                    {deleteEvent.Moderator.map((moderator: any, index: any) => 
-                                        
+                                    {deleteEvent.Moderator.map((moderator: any, index: any) => (
                                         <li key={index}>{moderator}</li>
-                                    )}
+                                    ))}
                                 </ul>
-                            </div>
+                            </>
                         )}
-                        
-                       
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }} >
+                            <p><strong>{isPast ? "Do you want to delete this event?" : "Do you want to delete/edit this event"}</strong></p>
+                        </div>
+                    </Modal.Body>
 
-                   
-                    <p>Do you want to delete/edit this event?</p>
-                </Modal.Body>
 
-                <Modal.Footer>
-                        <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
-                        Edit
-                    </Button>
+                    <Modal.Footer >
+                        {!isPast &&
+                            <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
+                                Edit
+                            </Button>
+                        }
                         <Button variant="danger" onClick={DeleteEvent}>
                         Delete
                     </Button>
                         <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                         Cancel
-                    </Button>
+                            </Button>
+                   
                 </Modal.Footer>
 
                 </Modal>)}
@@ -629,9 +647,14 @@ const ReactApp: FC = () => {
                 handleModeratorSelection={handleModeratorSelection}
             />
             <EditEventModal
+                handleTimezoneChange={handleTimezoneChange }
                 show={showEditModal}
+                selectedTimezone={selectedTimezone}
+                defaultTimeZone={defaultTimeZone}
+                timezones={timezones}
                 onClose={() => setShowEditModal(false)}
                 onPost={handlePost}
+                timeZone={"america"}
                 onPrivatePost={handlePrivatePost}
                 validationError={validationError}
                 titleInput={titleInput}

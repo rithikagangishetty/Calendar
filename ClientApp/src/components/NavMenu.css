@@ -6,6 +6,9 @@
 .my-heading {
     margin: 20px 0;
 }
+.modal-title-center {
+    text-align: center;
+}
 
 
 html { font-size: 14px; }

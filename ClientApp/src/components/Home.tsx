@@ -1,5 +1,7 @@
+import axios from 'axios';
 import * as React from 'react';
 import { useParams, useHistory, Link } from "react-router-dom";
+import styled from 'styled-components';
 
 
 interface RouteParams {
@@ -8,20 +10,40 @@ interface RouteParams {
 function Home() {
     const { id } = useParams<RouteParams>();
     const history = useHistory();
+    const [EmailId, setEmailId] = React.useState<string>("");
    
 
-    
+   React.useEffect(() => {
+
+       GetEmail();
+
+        
+    }, []);
     function connect() {
         history.push(`/Connections/${id}`);
     }
     function calendar() {
         history.push(`/ReactApp/${id}`);
     }
+    const StyledDiv = styled.div`
+  text-align: center;
+`;
+    function GetEmail()
+    {
+        axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
+
+           
+            console.log(response.data);
+            setEmailId(response.data.emailId);
+        });
+
+    }
 
     return (
         <div>
-            <h1>Hello!</h1>
-            <p>Welcome to Home Page</p>
+            <StyledDiv>
+            <h2>Welcome to the Home Page {EmailId}!</h2>
+            </StyledDiv>
             <br />
            
             <div>

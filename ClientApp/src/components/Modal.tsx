@@ -55,6 +55,7 @@ interface EditEventModalProps {
     validationError: string;
     start: Date  ;
     end: Date;
+    timeZone: string;
     setStart: (value: any) => void;
     setEnd: (value: any) => void;
     titleInput: string;
@@ -62,6 +63,10 @@ interface EditEventModalProps {
     connections: string[];
     selectedModerators: string[];
     handleModeratorSelection: (moderator: string) => void;
+    handleTimezoneChange: (event: any) => void;
+    selectedTimezone: any;
+    defaultTimeZone: any;
+    timezones: any;
    // eventEdit:any
    
    
@@ -73,19 +78,19 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
         message = 'Account Exists,You are successfully logged in!';
     }
     else if (taskType === 'valid') {
-        message = 'Please enter a valid Email';
+        message = 'Please enter a valid Email.';
     }
     else if (taskType === 'eventclash') {
-        message = 'The event cannot be edited to the selected time as it clashes with other events';
+        message = 'The event cannot be edited to the selected time as it clashes with other events.';
     }
     else if (taskType === 'editpast') {
         message = 'Editing the past events is not allowed!';
     }
     else if (taskType === 'noedit') {
-        message = 'You can not Delete/Edit this event';
+        message = 'You can not Delete/Edit this event.';
     }
     else if (taskType === 'eventedited') {
-        message = 'Event Edited Successfully';
+        message = 'Event Edited Successfully.';
     }
     else if (taskType === 'sameemail') {
         message = 'Cannot add your Email as a connection!';
@@ -112,20 +117,28 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
         message = 'No Connections Found!';
     }
     else if (taskType == 'overlap') {
-        message = 'Event creation is not allowed due to overlap';
+        message = 'Event creation is not allowed due to overlap.';
     }
     else if (taskType == 'past') {
-        message = 'Event creation is not allowed for past days and time';
+        message = 'Event creation is not allowed for past days and time.';
     }
   
 
     return (
         <Modal show={show} onHide={onClose}>
-            <Modal.Header >
+            <Modal.Header style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }} >
                 <Modal.Title>Message</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-                <p>{message}</p>
+            <Modal.Body style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
+                <p><strong>{message}</strong></p>
             </Modal.Body>
             <Modal.Footer>
                 
@@ -144,6 +157,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     onPrivatePost,
     validationError,
     titleInput,
+    timeZone,
     start,
     end,
     setStart,
@@ -152,6 +166,10 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     connections,
     selectedModerators,
     handleModeratorSelection,
+    handleTimezoneChange,
+    selectedTimezone,
+    defaultTimeZone,
+    timezones
   
     
 }) => {
@@ -166,7 +184,11 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
     return (
         <Modal show={show} onHide={onClose}>
-            <Modal.Header >
+            <Modal.Header style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
                 <Modal.Title>Edit Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -183,6 +205,22 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                     />
                     <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
                 </Form.Group>
+                <br />
+                <Form.Group>
+                <div>
+                        <Form.Label>Select Timezone:</Form.Label>
+                        <br />
+                    <select value={selectedTimezone} onChange={handleTimezoneChange}>
+                        <option value=""> {defaultTimeZone}</option>
+                        {timezones.map((timezone:any) => (
+
+                            <option key={timezone} value={timezone}>
+                                {timezone}
+                            </option>
+                        ))}
+                        </select> </div>
+                </Form.Group>
+                <br />
                 <Form.Group controlId="eventStart">
                     <Form.Label>Start Date/Time of the Event</Form.Label>
                     <DatePicker
@@ -196,6 +234,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
                     />
                 </Form.Group>
+                <br />
                 <Form.Group controlId="eventEnd">
                     <Form.Label>End Date/Time of the Event</Form.Label>
                     <DatePicker
@@ -210,6 +249,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         filterTime={endTime}
                     />
                 </Form.Group>
+                <br />
                 <Form.Group controlId="eventEmails">
                     <Form.Label>Select the Moderators</Form.Label>
                     <div>
@@ -228,10 +268,10 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="success" onClick={onPost}>
-                    Update to Public Event
+                    Update Public Event
                 </Button>
                 <Button variant="success" onClick={onPrivatePost}>
-                    Update to Private Event
+                    Update Private Event
                 </Button>
                 <Button variant="secondary" onClick={onClose}>
                     Cancel
@@ -262,7 +302,11 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
 }) => {
     return (
         <Modal show={show} onHide={onClose}>
-            <Modal.Header >
+            <Modal.Header style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }} >
                 <Modal.Title>Create Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -325,8 +369,12 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
     
     return (
         <Modal show={show} onHide={onClose}>
-            <Modal.Header >
-                <Modal.Title>Select Email IDs</Modal.Title>
+            <Modal.Header style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }} >
+                <Modal.Title>Select Connections </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form>
@@ -355,7 +403,11 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, 
         
         <Modal show={show} onHide={onHide}>
           
-            <Modal.Header >
+            <Modal.Header style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }} >
                 <Modal.Title>Delete Event</Modal.Title>
             </Modal.Header>
             {event && (

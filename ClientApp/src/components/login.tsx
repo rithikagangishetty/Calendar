@@ -94,8 +94,12 @@ function Login() {
             <form className="my-form" onSubmit={handleFormSubmit}>
                 <div className="text-center">
                     <h1 className="my-heading">Hello, Users!</h1>
-                    <p>Welcome to the calendar web application</p>
-                    <p>Sign up/Login with your Email to Enter</p>
+                    <h3>Welcome to the calendar web application</h3>
+                    
+                </div>
+                <br />
+                <div className="text-center">
+                    <h5>Sign up/Login with your Email to Enter</h5>
                 </div>
                 <div className="form-group">
                     <input

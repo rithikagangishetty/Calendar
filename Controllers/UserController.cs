@@ -58,7 +58,7 @@ namespace Calenderwebapp.Controllers
         [Route("post")]
         public async Task<string> Post(UserDetails newUser)
         {
-            _logger.LogInformation("This is an information log message.");
+            
             var id= await _userSupervisor.Post(newUser);
             Console.WriteLine(id);
             return id;
