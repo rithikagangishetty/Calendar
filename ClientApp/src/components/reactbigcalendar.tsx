@@ -2,6 +2,7 @@
 import { Calendar, Event, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment';
 import React from 'react';
+import { DeleteEvents } from './Functions';
 import 'moment-timezone'; `1`
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useParams } from 'react-router-dom'
@@ -44,16 +45,10 @@ const ReactApp: FC = () => {
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
-   
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
-   
-    const handleCloseModal = () => {
 
-        setShowModal(false);
-        
-    };
     useEffect(() => {
 
         getEvents();
@@ -62,7 +57,7 @@ const ReactApp: FC = () => {
         moment.tz.setDefault();
     }, [selectedTimezone, showModal]);
 
-
+   
 
 
     moment.tz.setDefault(selectedTimezone);
@@ -210,7 +205,7 @@ const ReactApp: FC = () => {
       var _end;
      await axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: id } }).then((response) => {
 
-        
+
          eventName = response.data.eventName;
          Moderator = response.data.moderator;
          Connection = response.data.connections;
@@ -218,7 +213,7 @@ const ReactApp: FC = () => {
          _end = response.data.endDate;
          setCurrentTaskType('eventdeleted');
             setShowModal(true);
-          
+
             setShowDeleteModal(false);
         }).catch((error) => { alert(error); });
         axios.post("https://localhost:44373/User/sendmail",
@@ -237,7 +232,8 @@ const ReactApp: FC = () => {
               //  alert("email sent");
             }).catch((error) => {
                 alert("error in mail " + error)
-            });
+               });
+     
 
     };
     async function EditEvent() {
@@ -512,7 +508,7 @@ const ReactApp: FC = () => {
             <StyledDiv>
             <label><strong> Select Timezone </strong></label>
             <br/>
-            <select value={selectedTimezone} onChange={handleTimezoneChange}>
+                <select value={selectedTimezone} onChange={(event)=>setSelectedTimezone(event.target.value)}>
                 <option value=""> {defaultTimeZone}</option>
                 {timezones.map((timezone) => (
 
@@ -557,7 +553,7 @@ const ReactApp: FC = () => {
 
             />
             {currentTaskType && (
-                <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
+                <MyModal show={showModal} onClose={()=>setShowModal(false)} taskType={currentTaskType} />
             )}
             
             {deleteEvent && (

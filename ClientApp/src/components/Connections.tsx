@@ -1,7 +1,7 @@
 ﻿import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
-type TaskType = 'connectionadded' | 'connectiondeleted' | 'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
+type TaskType = 'connectionadded' | 'connectiondeleted' |"valid"|'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
 import MyModal from './Modal';
 
 
@@ -18,9 +18,13 @@ function Connections() {
     const [emailIds, setEmailIds] = useState<Array<string>>([]);
     const [userEmail, setUserEmail] = useState<string>('');
     const { id } = useParams<RouteParams>();
-    
     const history = useHistory();
    
+        /// <summary>
+        /// This function takes the emailId of the connection and gets the object Id of the user
+        /// After getting the object Id of the connection it shows the connectionId calendar
+        /// </summary>
+        /// <param name="email">Email Id</param>
 
     const handleViewCalendar = (email: string) =>
     {
@@ -38,7 +42,7 @@ function Connections() {
       
     };
 
-
+    //UseEffect renders the Get() function whenever a change is occured which can be obtained by currentTaskType.
     useEffect(() => {
         Get();
     }, [currentTaskType]);
@@ -47,10 +51,14 @@ function Connections() {
         setShowModal(false);
     };
 
-    var emails: any;
-
+    
+        /// <summary>
+        /// This function takes the object Id of the user and gets all the connections of the user.
+        /// If user has no connections the modal no connections will pop up.This function re-renders everytime currentTaskType updates.
+        /// </summary>
+        
     function Get() {
-
+        var emails: any;
 
         axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
 
@@ -74,6 +82,11 @@ function Connections() {
         });
 
     }
+        /// <summary>
+        /// This function takes the emailId of the connection the user wants to delete.
+        /// After deleting the connection modal pops up.
+        /// </summary>
+        /// <param name="email">Email Id of the connection</param>
 
     async function Delete(emailId: string) {
 
@@ -83,6 +96,12 @@ function Connections() {
             setShowModal(true);
         }).catch((error) => { alert(error); })
     }
+        /// <summary>
+        /// This function is used to update the connection list of the user
+        ///First few checks are done. If the user adds already existing connection again or their own emailId or nothing, a modal pops up with the appropriate message
+        ///After all the checks are done the connection array is updated and post request will be sent.
+        /// </summary>
+       
     async function Update(event: React.MouseEvent<HTMLButtonElement>) {
 
         event.preventDefault();
@@ -95,6 +114,11 @@ function Connections() {
         
         if (connection == userEmail) {
             setCurrentTaskType("sameemail");
+            setShowModal(true);
+            return;
+        }
+        if (connection == "") {
+            setCurrentTaskType("valid");
             setShowModal(true);
             return;
         }

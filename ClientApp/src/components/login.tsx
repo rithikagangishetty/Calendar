@@ -19,30 +19,31 @@ function Login() {
     //Modal pop up for signup and login
     const [showModal, setShowModal] = useState(false);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
-    
-    const [valid, setValid] = useState<boolean>(false);
-   
+    //The valid is true when the email entered is correct.
+    const [valid, setValid] = useState<boolean>(true);
+
+    //This function handles the emailIds, if the email Id entered is valid the page redirects to the home page
+    //else stays in the same page with a pop up of invalid email id.
     const handleCloseModal = () => {
-        //Valid check for the email Id 
+        
         if (valid) {
-            history.push(`/`);
-           
-            setShowModal(false);
-            setValid(false);
-        }
-        else {
             history.push(`/Home/${_id}`);
             setShowModal(false);
+        }
+        else {
+           
+            history.push(`/`);
+
+            setShowModal(false);
+            setValid(true);
         }
        
     };
     useEffect(() => {
 
     }, [currentTaskType]);
-    //Whenever the EmailId is changed it sets the value of the email Id.
-    const handleEmailIdChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setEmailId(event.target.value);
-    }; 
+
+   
 
     ///Function checks whether the entered Email Id is present in the database,
     ///Fist goes to login function if it is present then retrives the id of the document and pushes to the home page
@@ -53,7 +54,7 @@ function Login() {
         if (EmailId == "") {
             setCurrentTaskType('valid');
             setShowModal(true);
-            setValid(true);
+            setValid(false);
             return;
             
             
@@ -113,7 +114,7 @@ function Login() {
                         className="form-control"
                         placeholder="Enter your Email"
                         value={EmailId}
-                        onChange={handleEmailIdChange}
+                        onChange={(event)=>setEmailId(event.target.value)}
                     />
                 </div>
                 <div className="text-center">
