@@ -476,7 +476,6 @@ const CalendarPage: React.FC = () => {
                 selectedTimezone={selectedTimezone}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
-                timeZone={"america"}
                 show={showEditModal}
                 onClose={() => setShowEditModal(false)}
                 onPost={handlePost}
