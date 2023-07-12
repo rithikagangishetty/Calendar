@@ -16,8 +16,8 @@ function App() {
                     <Switch>
                         <Route  exact path="/" component={Login} />
                         <Route exact path="/Home/:id" component={Home} />
-                        <Route path="/Home/Connections/:id" component={Connections} />
-                    <Route path="/Home/ReactApp/:id" component={ReactApp} />
+                        <Route exact path="/Home/Connections/:id" component={Connections} />
+                        <Route path="/Home/ReactApp/:id" component={ReactApp} />
                         <Route path="/Home/Connections/calendar/:id/:connectionId" component={CalendarPage} />
                     </Switch>
 

@@ -1,10 +1,12 @@
-import React, { useState} from 'react';
+import moment from 'moment';
+import React, { useEffect, useState} from 'react';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-type TaskType = 'login' | 'signup' | 'connectionadded' | 'eventclash'|'valid' | 'eventedited' |'noedit'| 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
+
+type TaskType = 'login' | 'signup' | 'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
 interface MyModalProps {
     show: boolean;
     onClose: () => void;
@@ -44,7 +46,7 @@ interface CreateEventModalProps {
     onTitleInputChange: (value: string) => void;
     connections: string[];
     selectedModerators: string[];
-    handleModeratorSelection: (moderator: string) => void;
+    handleUserSelection: (user: string, connect: boolean) => void;
 }
 
 interface EditEventModalProps {
@@ -55,14 +57,13 @@ interface EditEventModalProps {
     validationError: string;
     start: Date  ;
     end: Date;
-    timeZone: string;
     setStart: (value: any) => void;
     setEnd: (value: any) => void;
     titleInput: string;
     onTitleInputChange: (value: string) => void;
     connections: string[];
     selectedModerators: string[];
-    handleModeratorSelection: (moderator: string) => void;
+    handleUserSelection: (user: string, connect: boolean) => void;
     handleTimezoneChange: (event: any) => void;
     selectedTimezone: any;
     defaultTimeZone: any;
@@ -86,6 +87,7 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     else if (taskType === 'editpast') {
         message = 'Editing the past events is not allowed!';
     }
+    
     else if (taskType === 'noedit') {
         message = 'You can not Delete/Edit this event.';
     }
@@ -157,7 +159,6 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     onPrivatePost,
     validationError,
     titleInput,
-    timeZone,
     start,
     end,
     setStart,
@@ -165,22 +166,51 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     onTitleInputChange,
     connections,
     selectedModerators,
-    handleModeratorSelection,
+    handleUserSelection,
     handleTimezoneChange,
     selectedTimezone,
     defaultTimeZone,
     timezones
-  
+        
     
 }) => {
-    const endTime = (date: Date) => {
-        const isPastTime = start.getTime() > date.getTime();
+    const timezone = ((selectedTimezone == "") ? defaultTimeZone : selectedTimezone);
+    moment.tz.setDefault(timezone);
+    const currentTime = moment();
+    const getMinDate = () => {
+
+        return currentTime.toDate();
+    };
+    
+   const setLocalZone = (date: Date, timezone: string) => {
+       const dateWithoutZone = moment
+           .tz(date, selectedTimezone)
+    .format("YYYY-MM-DDTHH:mm:ss.SSS")
+  const localZone = moment(dateWithoutZone).format("Z")
+  const dateWithLocalZone = [dateWithoutZone, localZone].join("")
+
+  return new Date(dateWithLocalZone)
+}
+
+const setOtherZone = (date: Date, timezone: string) => {
+  const dateWithoutZone = moment(date).format("YYYY-MM-DDTHH:mm:ss.SSS")
+  const otherZone = moment.tz(date, selectedTimezone).format("Z")
+  const dateWithOtherZone = [dateWithoutZone, otherZone].join("")
+
+  return new Date(dateWithOtherZone)
+}
+    const endTime = (date:  Date) => {
+        date.toLocaleString('en-US', { timeZone: selectedTimezone });
+        const isPastTime = currentTime.toDate().getTime() > date.getTime();
         return !isPastTime;
     };
     const startTime = (date: Date) => {
-        const isPastTime = new Date().getTime() > date.getTime();
+        date.toLocaleString('en-US', { timeZone: selectedTimezone });
+        const isPastTime = currentTime.toDate().getTime() > date.getTime();
         return !isPastTime;
     };
+    
+    
 
     return (
         <Modal show={show} onHide={onClose}>
@@ -226,6 +256,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                     <DatePicker
                         showTimeSelect
                         selected={start}
+                        minDate={getMinDate()}
                         onChange={setStart}
                         dateFormat="MM/dd/yyyy h:mm aa"
                         filterTime={startTime}
@@ -241,7 +272,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
                         selected={end}
                         onChange={setEnd}
-                        minDate={new Date()}
+                        minDate={getMinDate()}
                         timeInputLabel="Time:"
                         dateFormat="MM/dd/yyyy h:mm aa"
                         showTimeSelect
@@ -260,7 +291,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                                     type="checkbox"
                                     label={moderator}
                                     checked={selectedModerators.includes(moderator)}
-                                    onChange={() => handleModeratorSelection(moderator)}
+                                    onChange={() => handleUserSelection(moderator,false)}
                                 />
                             ))}
                     </div>
@@ -298,7 +329,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     onTitleInputChange,
     connections,
     selectedModerators,
-    handleModeratorSelection,
+    handleUserSelection,
 }) => {
     return (
         <Modal show={show} onHide={onClose}>
@@ -331,7 +362,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                                     type="checkbox"
                                     label={moderator}
                                     checked={selectedModerators.includes(moderator)}
-                                    onChange={() => handleModeratorSelection(moderator)}
+                                    onChange={() => handleUserSelection(moderator,false)}
                                 />
                             ))}
                     </div>

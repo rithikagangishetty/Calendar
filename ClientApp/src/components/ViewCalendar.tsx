@@ -404,7 +404,10 @@ const CalendarPage: React.FC = () => {
     };
        //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
+    const handleDeleteModal = () => {
+        setShowDeleteModal(false);
+        setIsDelete(false);
+    }
 
     return (
         <div>
@@ -462,7 +465,7 @@ const CalendarPage: React.FC = () => {
 
             </div>
             {deleteEvent && (
-                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                <Modal show={showDeleteModal} onHide={ handleDeleteModal}>
                     <Modal.Header style={{
                         display: "flex",
                         justifyContent: "center",
@@ -523,17 +526,16 @@ const CalendarPage: React.FC = () => {
 
 
                     <Modal.Footer >
-                        {!isDelete && !isPast && 
+                       
                             <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
                                 Edit
                             </Button>
-                        }
-                        {!isDelete&& 
+                      
                         <Button variant="danger" onClick={DeleteEvent} disabled={isDelete}>
                             Delete
                         </Button>
-                        }
-                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                        
+                        <Button variant="secondary" onClick={handleDeleteModal}>
                             Cancel
                         </Button>
 
