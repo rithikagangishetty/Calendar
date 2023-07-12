@@ -442,6 +442,7 @@ const ReactApp: FC = () => {
         const isPastEvent = eventStart.isBefore(currentDate);
         setIsPast(isPastEvent);
        setDeleteEventId(event._id);
+    
        showEmails(event);
         setShowDeleteModal(true);
     };
