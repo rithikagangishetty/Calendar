@@ -19,7 +19,8 @@ interface RouteParams {
     connectionId:string,
 }
 
-
+const StyledDiv = styled.div`
+  text-align: center;`;
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' | 'editpast' | 'eventclash'|'noedit'; // Define the possible task types
 const CalendarPage: React.FC = () => {
     const localizer = momentLocalizer(moment);
@@ -106,41 +107,13 @@ const CalendarPage: React.FC = () => {
     const handleTimezoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedTimezone(event.target.value);
     };
-
-
-    
-    function showEmails(event: any) {
-
-        axios
-            .get('https://localhost:44373/User/getevent', { params: { _id: event._id } })
-            .then((response) => {
-                const newEvent = {
-                    title: response.data.eventName,
-                    start: response.data.startDate.toLocaleString(),
-                    end: response.data.endDate.toLocaleString(),
-                    Moderator: response.data.moderator,
-                    UserId: response.data.userId,
-                    Connections: response.data.connections,
-                    priv: response.data.priv,
-                    _id: response.data._id,
-                    TimeZone: response.data.timeZone,
-                    Reminder:response.data.reminder,
-                };
-                setDeleteEvent(newEvent);
-
-            })
-            .catch((error) => {
-                alert(error);
-
-
-            });
-
-    }
-
-   
-   
-
-    async  function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
+        /// <summary>
+        /// DeleteEvent will delete the event based on the userId and event Id
+        ///after axios delete api call the response is the details of the events
+        ///Which are then used to send email after the deletion.
+        ///this function will be called everytime when the variables in the useEffect block changes
+        /// </summary>
+ async  function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
 
         var eventName;
@@ -177,6 +150,14 @@ const CalendarPage: React.FC = () => {
                 alert("error in mail " + error)
             });
     };
+    /// <summary>
+        /// EditEvent will edit the event after few checks
+        ///After the user enters the start and end time it checks whether any existing event overlaps with the entered data
+        ///If yes, a modal pops up with the suitable message
+        ///Else, using the event id the document gets updated
+        ///After updating a email will be sent
+        ///this function will be called everytime when the variables in the useEffect block changes
+        /// </summary>
     function EditEvent() {
         
         for (var _event of events) {
@@ -237,15 +218,14 @@ const CalendarPage: React.FC = () => {
     };
    
    
-    const CustomEventContent = ({ event }: any) => (
-        <div>
-            <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{event.title}</div>
-            <div style={{ fontSize: '13px' }}>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
-        </div>
-    );
-    const eventFormats = {
-        eventTimeRangeFormat: () => '', // Override the time format to empty string
-    };
+    ///<summary>
+    ///handlePost when the user creates a public post this function is called
+    ///All the basic checks like empty title is taken care of,
+    ///With the help of Edit boolean variable the function seperates it from an edit/post request.
+    ///If it is a edit, EditEvent() is called.
+
+    ///</summary>
+
     function handlePost(event: React.MouseEvent<HTMLButtonElement>): void {
         event.preventDefault();
 
@@ -265,6 +245,11 @@ const CalendarPage: React.FC = () => {
             
         }
     }
+    ///<summary>
+    ///The functioning is same as handlePost but this is called when the user creates a private post
+    ///In the private post the user is allowed to choose the connections, so new modal will pop up where all the connections will be displayed
+    ///That is done by the modal setShowEmailModal
+    ///</summary>
     function handlePrivatePost(event: React.MouseEvent<HTMLButtonElement>): void {
         event.preventDefault();
         if (titleInput.trim() == '') {
@@ -279,7 +264,9 @@ const CalendarPage: React.FC = () => {
             setShowEmailModal(true);
         }
     }
-
+     ///<summary>
+        ///When the user wants to edit the function this will be called, it enables the edit modal pop up and makes edit variable true.
+        ///</summary>
     function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
 
 
@@ -288,10 +275,28 @@ const CalendarPage: React.FC = () => {
 
 
     }
+    ///This function is for the displaying of the title, start and end times when scrolled over an event.
+    const CustomEventContent = ({ event }: any) => (
+        <div>
+            <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{event.title}</div>
+            <div style={{ fontSize: '13px' }}>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
+        </div>
+    );
     const tooltipAccessor = (event: any) => {
         return `Title: ${event.title}\nStart: ${event.start.toLocaleString()}\nEnd: ${event.end.toLocaleString()}`;
 
     };
+    // Override the time format to empty string which is shown in calendar
+    const eventFormats = {
+        eventTimeRangeFormat: () => '',
+    };
+     ///<summary>
+        ///When the user clicks on any event this function is called.It first checks the user whether they are moderator
+        ///or connection of the event if yes, they can delete/edit the event
+        ///else they cant modify the event
+        ///All the basic checks are done if the event is past ispast is set to true which disables the edit option.
+        ///And the delete modal becomes true
+        ///</summary>
     function handleDelete(event: any) {
 
         
@@ -312,30 +317,31 @@ const CalendarPage: React.FC = () => {
         
         setDeleteEventId(event._id);
         setUserId(event.UserId);
-        showEmails(event);
+        const newEvent = {
+            title: event.title,
+            start: event.start,
+            end: event.end,
+            Moderator: event.Moderator,
+            UserId: event.UserId,
+            Connections: event.Connections,
+            priv: event.priv,
+            _id: event._id,
+            TimeZone: event.TimeZone,
+            Reminder: event.Reminder,
+        };
+        setDeleteEvent(newEvent);
         setShowDeleteModal(true);
                 
             
         
     };
 
-    const handleConnectionSelection = (connection: string) => {
-
-        const selected = [...selectedConnections];
-
-        if (selected.includes(connection)) {
-            const index = selected.indexOf(connection);
-            selected.splice(index, 1);
-        } else {
-            selected.push(connection);
-        }
-
-        setSelectedConnections(selected);
-
-    };
-    const StyledDiv = styled.div`
-  text-align: center;
-`;
+     ///<summary>
+    ///This is the checkbox for the connections in the event details
+    ///To avoid adding the same user twice as connection and moderator this function is used.
+    ///It checks the selectedModerators array, all the users present in the array are disabled to select in the connections pop up
+    ///</summary>
+   
     const renderEmailCheckbox = (connection: string) => {
         const isDisabled = selectedModerators.includes(connection);
 
@@ -346,19 +352,42 @@ const CalendarPage: React.FC = () => {
                 id={connection}
                 label={connection}
                 checked={selectedConnections.includes(connection)}
-                onChange={() => handleConnectionSelection(connection)}
+                onChange={() => handleUserSelection(connection,true)}
                 disabled={isDisabled}
             />
         );
     };
-    const handleModeratorSelection = (moderator: string) => {
-        if (selectedModerators.includes(moderator)) {
-            setSelectedModerators(selectedModerators.filter((selectedModerator) => selectedModerator !== moderator));
-        } else {
-            setSelectedModerators([...selectedModerators, moderator]);
+      ///<summary>
+       ///For the private post the user needs to select connection/moderator which is done using this function
+       ///The user selected connection/moderators is the input,it checks if the connection is already present, if yes it will not update the array of selected
+       ///else the new connection is added to the selected array
+        ///</summary>
+    const handleUserSelection = (user: string, connect: boolean) => {
+        if (!connect) {
+            if (selectedModerators.includes(user)) {
+                setSelectedModerators(selectedModerators.filter((selectedModerator) => selectedModerator !== user));
+            } else {
+                setSelectedModerators([...selectedModerators, user]);
+            }
+        }
+        else {
+            const selected = [...selectedConnections];
+
+            if (selected.includes(user)) {
+                const index = selected.indexOf(user);
+                selected.splice(index, 1);
+            } else {
+                selected.push(user);
+            }
+
+            setSelectedConnections(selected);
+
         }
     };
-
+    ///<summary>
+        ///This is for the private post to make sure the user selects alteast one other user as connection/moderator.
+        ///If the edit is true editevent is called else post is called
+        ///</summary>
     const handleSaveSelectedConnections = () => {
         if (selectedModerators.length === 0 && selectedConnections.length === 0) {
             setValidationError('Please select at least one moderator or connection.');
@@ -373,7 +402,7 @@ const CalendarPage: React.FC = () => {
             
         }
     };
-   
+       //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 
@@ -533,7 +562,7 @@ const CalendarPage: React.FC = () => {
                 end={enddate}
                 connections={connections}
                 selectedModerators={selectedModerators}
-                handleModeratorSelection={handleModeratorSelection}
+                handleUserSelection={handleUserSelection}
             
 
             />
