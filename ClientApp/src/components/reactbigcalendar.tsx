@@ -19,7 +19,9 @@ type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedite
 interface RouteParams {
     id: string;
 }
-
+const StyledDiv = styled.div`
+  text-align: center;
+`;
 const ReactApp: FC = () => {
     const localizer = momentLocalizer(moment);
     const [Edit, setEdit] = useState<boolean>(false);
@@ -65,14 +67,17 @@ const ReactApp: FC = () => {
 
     moment.tz.setDefault(selectedTimezone);
 
-    // Handle timezone selection change
+    // Handles timezone selection change
     const handleTimezoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedTimezone(event.target.value);
     };
 
    
-
+    //Gets the defaultTimeZone
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+
+    /// getEvents will get all the events of the user based on the id.
     const getEvents = () => {
         axios.get('https://localhost:44373/User/getallevents', { params: { _id: id } }).then((response) => {
             const event = response.data.map((training: any) => {
@@ -500,9 +505,7 @@ const ReactApp: FC = () => {
             }
         }
     };
-    const StyledDiv = styled.div`
-  text-align: center;
-`;
+
     return (
         <div >
             <StyledDiv>
@@ -654,7 +657,6 @@ const ReactApp: FC = () => {
                 timezones={timezones}
                 onClose={() => setShowEditModal(false)}
                 onPost={handlePost}
-                timeZone={"america"}
                 onPrivatePost={handlePrivatePost}
                 validationError={validationError}
                 titleInput={titleInput}
