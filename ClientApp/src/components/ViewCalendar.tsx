@@ -31,6 +31,7 @@ const CalendarPage: React.FC = () => {
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteEventId, setDeleteEventId] = useState<string>('');
+    const [UserId, setUserId] = useState<string>('');
     const [deleteEvent, setDeleteEvent] = useState<Event>();
     const [titleInput, setTitleInput] = useState<string>('');
     const [startdate, setStart] = useState<Date>(new Date());
@@ -139,16 +140,42 @@ const CalendarPage: React.FC = () => {
    
    
 
-    function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
+    async  function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
         event.preventDefault();
 
+        var eventName;
+        var Moderator;
+        var Connection;
+        var _start;
+        var _end;
         axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: connectionId } }).then((response) => {
+            eventName = response.data.eventName;
+            Moderator = response.data.moderator;
+            Connection = response.data.connections;
+            _start = response.data.startDate;
+            _end = response.data.endDate;
             setCurrentTaskType('eventdeleted');
             setShowModal(true);
 
             setShowDeleteModal(false);
         }).catch((error) => { alert(error); });
-
+        axios.post("https://localhost:44373/User/sendmail",
+            {
+                _id: deleteEventId,
+                UserEmail: UserId,
+                EventName: eventName,
+                Moderator: Moderator,
+                Connections: Connection,
+                StartDate: _start,
+                Delete: true,
+                EndDate: _end,
+                Subject: "Event is Deleted",
+                Body: `An event titled '${eventName}' has been deleted.`,
+            }).then(() => {
+                //  alert("email sent");
+            }).catch((error) => {
+                alert("error in mail " + error)
+            });
     };
     function EditEvent() {
         
@@ -172,7 +199,7 @@ const CalendarPage: React.FC = () => {
 
         axios.put('https://localhost:44373/User/', {
             _id: deleteEventId,
-            UserId: id,
+            UserId: UserId,
             EventName: titleInput,
             StartDate: startdate,
             Moderator: selectedModerators,
@@ -190,7 +217,23 @@ const CalendarPage: React.FC = () => {
             setShowDeleteModal(false);
             setEdit(false);
         }).catch((error) => { alert(error); });
-
+        axios.post("https://localhost:44373/User/sendmail",
+            {
+                _id: deleteEventId,
+                UserEmail: UserId,
+                EventName: titleInput,
+                Moderator: selectedModerators,
+                Connections: (priv ? selectedConnections : connections),
+                StartDate: startdate,
+                EndDate: enddate,
+                Delete: false,
+                Subject: "Event is Edited",
+                Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startdate}' and ends at '${enddate}'.`,
+            }).then(() => {
+                //   alert("email sent");
+            }).catch((error) => {
+                alert("error in mail " + error)
+            });
     };
    
    
@@ -268,6 +311,7 @@ const CalendarPage: React.FC = () => {
         }
         
         setDeleteEventId(event._id);
+        setUserId(event.UserId);
         showEmails(event);
         setShowDeleteModal(true);
                 
