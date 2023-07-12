@@ -28,7 +28,7 @@ function Connections() {
         axios.get('https://localhost:44373/Connection/getid/', { params: { email: email } }).then((response) =>
         {
             connectionId = response.data._id;
-            history.push(`/calendar/${id}/${connectionId}`);
+            history.push(`/Home/Connections/calendar/${id}/${connectionId}`);
            
 
         }).catch((error) => {
