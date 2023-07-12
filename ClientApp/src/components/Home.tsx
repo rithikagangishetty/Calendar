@@ -7,6 +7,9 @@ import styled from 'styled-components';
 interface RouteParams {
     id: string;
 }
+const StyledDiv = styled.div`
+  text-align: center;
+`;
 function Home() {
     const { id } = useParams<RouteParams>();
     const history = useHistory();
@@ -20,14 +23,12 @@ function Home() {
         
     }, []);
     function connect() {
-        history.push(`/Connections/${id}`);
+        history.push(`/Home/Connections/${id}`);
     }
     function calendar() {
-        history.push(`/ReactApp/${id}`);
+        history.push(`/Home/ReactApp/${id}`);
     }
-    const StyledDiv = styled.div`
-  text-align: center;
-`;
+   
     function GetEmail()
     {
         axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
@@ -42,7 +43,7 @@ function Home() {
     return (
         <div>
             <StyledDiv>
-            <h2>Welcome to the Home Page {EmailId}!</h2>
+            <h2>Welcome to the Home Page, {EmailId}!</h2>
             </StyledDiv>
             <br />
            
