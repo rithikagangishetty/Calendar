@@ -16,13 +16,14 @@ function Login() {
     const [EmailId, setEmailId] = useState<string>('');
     const history = useHistory();
     const [_id, setId] = useState<string>("");
-    const [details, setDetails] = useState<Connections>();
-
+    //Modal pop up for signup and login
     const [showModal, setShowModal] = useState(false);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
+    
     const [valid, setValid] = useState<boolean>(false);
    
     const handleCloseModal = () => {
+        //Valid check for the email Id 
         if (valid) {
             history.push(`/`);
            
@@ -38,12 +39,17 @@ function Login() {
     useEffect(() => {
 
     }, [currentTaskType]);
+    //Whenever the EmailId is changed it sets the value of the email Id.
     const handleEmailIdChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEmailId(event.target.value);
     }; 
-   
+
+    ///Function checks whether the entered Email Id is present in the database,
+    ///Fist goes to login function if it is present then retrives the id of the document and pushes to the home page
+    ///else,creates/calls signup function and retrives id and pushes to the home page
     const handleFormSubmit = (event: FormEvent) => {
         event.preventDefault();
+        //Prevents the user from logging in without entering any data
         if (EmailId == "") {
             setCurrentTaskType('valid');
             setShowModal(true);
