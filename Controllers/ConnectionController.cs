@@ -21,8 +21,14 @@ namespace Calenderwebapp.Controllers
         {
             _connectionSupervisor = connectionSupervisor;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_id"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("get")]
+        
         public async Task<ActionResult<Connections>> GetEmailId(string _id)
         {
             var _connection = await _connectionSupervisor.GetEmailId(_id);

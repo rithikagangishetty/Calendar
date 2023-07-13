@@ -37,8 +37,8 @@ const ReactApp: FC = () => {
     const [deleteEvent, setDeleteEvent] = useState<Event>();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
-    const [startdate, setStart] = useState<Date>(new Date());
-    const [enddate, setEnd] = useState<Date>(new Date());
+    const [startdate, setStart] = useState<Date>(new Date(moment().toDate()));
+    const [enddate, setEnd] = useState<Date>(new Date(moment().toDate()));
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [priv, setPrivate] = useState<boolean>();
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
@@ -48,6 +48,7 @@ const ReactApp: FC = () => {
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
+ 
 
     useEffect(() => {
 

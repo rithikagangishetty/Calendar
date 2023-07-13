@@ -4,7 +4,7 @@ import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
 
 type TaskType = 'login' | 'signup' | 'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
 interface MyModalProps {
@@ -177,41 +177,27 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     const timezone = ((selectedTimezone == "") ? defaultTimeZone : selectedTimezone);
     moment.tz.setDefault(timezone);
     const currentTime = moment();
-    const getMinDate = () => {
+   
+    const minTime = new Date(
+        currentTime.year(),
+        currentTime.month(),
+        currentTime.date(),
+        currentTime.hour(),
+        currentTime.minute()
+    );
+    const endMinTime = new Date();
+    endMinTime.setMinutes(endMinTime.getMinutes() + 15);
+   
+    const endOfDay = moment(currentTime).endOf('day').toDate();
+    const maxTime = new Date(
+        endOfDay.getFullYear(),
+        endOfDay.getMonth(),
+        endOfDay.getDate(),
+        23,
+        59
+    );
 
-        return currentTime.toDate();
-    };
-    
-   const setLocalZone = (date: Date, timezone: string) => {
-       const dateWithoutZone = moment
-           .tz(date, selectedTimezone)
-    .format("YYYY-MM-DDTHH:mm:ss.SSS")
-  const localZone = moment(dateWithoutZone).format("Z")
-  const dateWithLocalZone = [dateWithoutZone, localZone].join("")
-
-  return new Date(dateWithLocalZone)
-}
-
-const setOtherZone = (date: Date, timezone: string) => {
-  const dateWithoutZone = moment(date).format("YYYY-MM-DDTHH:mm:ss.SSS")
-  const otherZone = moment.tz(date, selectedTimezone).format("Z")
-  const dateWithOtherZone = [dateWithoutZone, otherZone].join("")
-
-  return new Date(dateWithOtherZone)
-}
-    const endTime = (date:  Date) => {
-        date.toLocaleString('en-US', { timeZone: selectedTimezone });
-        const isPastTime = currentTime.toDate().getTime() > date.getTime();
-        return !isPastTime;
-    };
-    const startTime = (date: Date) => {
-        date.toLocaleString('en-US', { timeZone: selectedTimezone });
-        const isPastTime = currentTime.toDate().getTime() > date.getTime();
-        return !isPastTime;
-    };
-    
-    
-
+    const timeInterval = 15;
     return (
         <Modal show={show} onHide={onClose}>
             <Modal.Header style={{
@@ -255,29 +241,34 @@ const setOtherZone = (date: Date, timezone: string) => {
                     <Form.Label>Start Date/Time of the Event</Form.Label>
                     <DatePicker
                         showTimeSelect
+                        timeFormat="HH:mm"
+                        minTime={minTime}
                         selected={start}
-                        minDate={getMinDate()}
                         onChange={setStart}
                         dateFormat="MM/dd/yyyy h:mm aa"
-                        filterTime={startTime}
-                        timeIntervals={15}
+                        placeholderText="Select start date and time"
+                        timeIntervals={timeInterval}
                         timeInputLabel="Time:"
-
+                        maxTime={maxTime}
+                        isClearable
                     />
                 </Form.Group>
                 <br />
                 <Form.Group controlId="eventEnd">
                     <Form.Label>End Date/Time of the Event</Form.Label>
                     <DatePicker
-
+                        timeFormat="HH:mm"
                         selected={end}
                         onChange={setEnd}
-                        minDate={getMinDate()}
+                        minTime={endMinTime}
                         timeInputLabel="Time:"
                         dateFormat="MM/dd/yyyy h:mm aa"
                         showTimeSelect
-                        timeIntervals={15}
-                        filterTime={endTime}
+                        timeIntervals={timeInterval}
+                        placeholderText="Select end date and time"
+                        maxTime={maxTime}
+                        isClearable
+                       
                     />
                 </Form.Group>
                 <br />

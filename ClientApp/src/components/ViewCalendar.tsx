@@ -385,9 +385,10 @@ const CalendarPage: React.FC = () => {
         }
     };
     ///<summary>
-        ///This is for the private post to make sure the user selects alteast one other user as connection/moderator.
-        ///If the edit is true editevent is called else post is called
-        ///</summary>
+    ///This is for the private post to make sure the user selects alteast one other 
+    ///user as connection / moderator.
+    ///If the edit is true editevent is called else post is called
+    ///</summary>
     const handleSaveSelectedConnections = () => {
         if (selectedModerators.length === 0 && selectedConnections.length === 0) {
             setValidationError('Please select at least one moderator or connection.');
