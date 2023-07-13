@@ -6,7 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-type TaskType = 'login' | 'signup' | 'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
+type TaskType = 'login' | 'signup'  | "noemail" | 'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
 interface MyModalProps {
     show: boolean;
     onClose: () => void;
@@ -86,6 +86,9 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     }
     else if (taskType === 'editpast') {
         message = 'Editing the past events is not allowed!';
+    }
+    else if (taskType === 'noemail') {
+        message = 'Entered email does not exist!';
     }
     
     else if (taskType === 'noedit') {

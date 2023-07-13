@@ -1,7 +1,7 @@
 ﻿import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
-type TaskType = 'connectionadded' | 'connectiondeleted' |"valid"|'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
+type TaskType = 'connectionadded' |"noemail"| 'connectiondeleted' |"valid"|'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
 import MyModal from './Modal';
 
 
@@ -16,6 +16,7 @@ function Connections() {
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [connection, setConnection] = useState<string>("");
     const [emailIds, setEmailIds] = useState<Array<string>>([]);
+    const [allEmails, setAllEmailIds] = useState<Array<string>>([]);
     const [userEmail, setUserEmail] = useState<string>('');
     const { id } = useParams<RouteParams>();
     const history = useHistory();
@@ -45,6 +46,7 @@ function Connections() {
     //UseEffect renders the Get() function whenever a change is occured which can be obtained by currentTaskType.
     useEffect(() => {
         Get();
+        GetAll();
     }, [currentTaskType]);
     const handleCloseModal = () => {
 
@@ -81,6 +83,26 @@ function Connections() {
             alert(error)
         });
 
+    }
+    function GetAll() {
+        var emails;
+        axios.get('https://localhost:44373/Connection/getall/', ).then((response) => {
+
+       
+            emails = response.data;
+            
+            if (emails.length > 0) {
+                setAllEmailIds(emails)
+
+            }
+
+            
+
+
+
+        }).catch((error) => {
+            alert(error)
+        });
     }
         /// <summary>
         /// This function takes the emailId of the connection the user wants to delete.
@@ -119,6 +141,12 @@ function Connections() {
         }
         if (connection == "") {
             setCurrentTaskType("valid");
+            setShowModal(true);
+            return;
+        }
+        if (!allEmails.includes(connection))
+        {
+            setCurrentTaskType("noemail");
             setShowModal(true);
             return;
         }
