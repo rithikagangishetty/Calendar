@@ -177,7 +177,10 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     const timezone = ((selectedTimezone == "") ? defaultTimeZone : selectedTimezone);
     moment.tz.setDefault(timezone);
     const currentTime = moment();
-   
+    useEffect(() => {
+        setStart(null);
+        setEnd(null);
+    }, []);
     const minTime = new Date(
         currentTime.year(),
         currentTime.month(),
@@ -196,7 +199,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         23,
         59
     );
-
+   
     const timeInterval = 15;
     return (
         <Modal show={show} onHide={onClose}>
@@ -239,26 +242,29 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 <br />
                 <Form.Group controlId="eventStart">
                     <Form.Label>Start Date/Time of the Event</Form.Label>
+                   
                     <DatePicker
                         showTimeSelect
                         timeFormat="HH:mm"
                         minTime={minTime}
-                        selected={start}
+                        selected={start ||null }
                         onChange={setStart}
                         dateFormat="MM/dd/yyyy h:mm aa"
                         placeholderText="Select start date and time"
                         timeIntervals={timeInterval}
                         timeInputLabel="Time:"
                         maxTime={maxTime}
-                        isClearable
-                    />
+                        
+                        //isClearable
+                        />
+                   
                 </Form.Group>
                 <br />
                 <Form.Group controlId="eventEnd">
                     <Form.Label>End Date/Time of the Event</Form.Label>
                     <DatePicker
                         timeFormat="HH:mm"
-                        selected={end}
+                        selected={end || null} 
                         onChange={setEnd}
                         minTime={endMinTime}
                         timeInputLabel="Time:"
@@ -267,7 +273,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         timeIntervals={timeInterval}
                         placeholderText="Select end date and time"
                         maxTime={maxTime}
-                        isClearable
+                      
                        
                     />
                 </Form.Group>
