@@ -230,6 +230,34 @@ const ReactApp: FC = () => {
      
 
     };
+    function showEmails(event: any) {
+
+        axios
+            .get('https://localhost:44373/User/getevent', { params: { _id: event._id } })
+            .then((response) => {
+                const newEvent = {
+                    title: response.data.eventName,
+                    start: response.data.startDate,
+                    end: response.data.endDate,
+                    Moderator: response.data.moderator,
+                    UserId: response.data.userId,
+                    Connections: response.data.connections,
+                    priv: response.data.priv,
+                    _id: response.data._id,
+                    TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
+                    Reminder: response.data.reminder,
+                };
+                setDeleteEvent(newEvent);
+
+            })
+            .catch((error) => {
+                alert(error);
+
+
+            });
+
+    }
+
         /// <summary>
         /// EditEvent will edit the event after few checks
         ///After the user enters the start and end time it checks whether any existing event overlaps with the entered data
@@ -473,20 +501,7 @@ const ReactApp: FC = () => {
         const isPastEvent = eventStart.isBefore(currentDate);
         setIsPast(isPastEvent);
        setDeleteEventId(event._id);
-       const newEvent = {
-           title: event.title,
-           start: event.start,
-           end: event.end,
-           Moderator: event.Moderator,
-           UserId: event.UserId,
-           Connections: event.Connections,
-           priv: event.priv,
-           _id: event._id,
-           TimeZone:event.TimeZone,
-           Reminder: event.Reminder,
-       };
-       
-       setDeleteEvent(newEvent);
+       showEmails(event);
 
         setShowDeleteModal(true);
     };
