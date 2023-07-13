@@ -163,6 +163,9 @@ const CalendarPage: React.FC = () => {
                 alert("error in mail " + error)
             });
     };
+    /// <summary>
+        ///Takes the event and returns the moderators and connections array with emailIds instead of object Id.
+        /// </summary>
     function showEmails(event: any) {
 
         axios
