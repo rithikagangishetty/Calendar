@@ -597,7 +597,7 @@ const CalendarPage: React.FC = () => {
                 connections={connections}
                 selectedModerators={selectedModerators}
                 handleUserSelection={handleUserSelection}
-            
+                priv={false }
 
             />
             

@@ -60,7 +60,7 @@ namespace Calenderwebapp.Controllers
         {
             
             var id= await _userSupervisor.Post(newUser);
-            Console.WriteLine(id);
+            
             return id;
         }
 

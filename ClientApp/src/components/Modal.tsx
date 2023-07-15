@@ -70,6 +70,7 @@ interface EditEventModalProps {
     selectedTimezone: any;
     defaultTimeZone: any;
     timezones: any;
+    priv: boolean;
    // eventEdit:any
    
    
@@ -175,12 +176,15 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     handleTimezoneChange,
     selectedTimezone,
     defaultTimeZone,
-    timezones
-
+    timezones,
+    priv
 
 }) => {
-    const timezone = ((selectedTimezone == "") ? defaultTimeZone : selectedTimezone);
-    moment.tz.setDefault(timezone);
+   
+    if (selectedTimezone == "") {
+        selectedTimezone = defaultTimeZone;
+    }
+    moment.tz.setDefault(selectedTimezone);
     const currentTime = moment();
     useEffect(() => {
         setStart(null);
@@ -188,7 +192,18 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     }, []);
     var now = new Date();
     
-   
+    function OnPost(event:any) {
+        start.setMinutes(start.getMinutes() + timeOffset);
+        end.setMinutes(end.getMinutes() + timeOffset);
+
+        onPost(event);
+    }
+    function OnPrivatePost(event: any) {
+        //start.setMinutes(start.getMinutes() + timeOffset);
+        //end.setMinutes(end.getMinutes() + timeOffset);
+        onPrivatePost(event);
+    }
+
     function areDatesOnSameDay(date1: Date, date2: Date): boolean {
         const year1 = date1.getFullYear();
         const month1 = date1.getMonth();
@@ -200,7 +215,13 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
         return year1 === year2 && month1 === month2 && day1 === day2;
     }
+    const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
+    const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
+
+    const timeOffset: number = defaultOffset - selectedOffset;
+
   
+    
     var  minTime = new Date(
             currentTime.year(),
             currentTime.month(),
@@ -208,21 +229,14 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
             currentTime.hour(),
             currentTime.minute()
     );
-    var endMinTime;
-    if (start != null) {
-        endMinTime = new Date(start);
-        endMinTime.setMinutes(endMinTime.getMinutes() + 15);
-    }
-    else {
-
-         endMinTime = new Date(
-            currentTime.year(),
-            currentTime.month(),
-            currentTime.date(),
-            currentTime.hour(),
-            currentTime.minute()
+    var  endMinTime = new Date(
+        currentTime.year(),
+        currentTime.month(),
+        currentTime.date(),
+        currentTime.hour(),
+        currentTime.minute()
         );
-    }
+    
     if (start != null) {
         
         if (!areDatesOnSameDay(start, now)) {
@@ -233,14 +247,10 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     }
     if (end != null) {
         if (!areDatesOnSameDay(end, now)) {
-            if (start != null) {
-                endMinTime = new Date(start);
-                endMinTime.setMinutes(endMinTime.getMinutes() + 15);
-            }
-            else {
+        
                 endMinTime = new Date();
                 endMinTime.setHours(0, 0, 0, 0);
-            }
+           
            // endMinTime.setMinutes(endMinTime.getMinutes() + 15);
         }
     }
@@ -353,11 +363,11 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 </Form.Group>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="success" onClick={onPost}>
-                    Update Public Event
+                <Button variant="success" onClick={OnPost}>
+                    {priv ? "Update to Public Event" : "Update Public Event"}
                 </Button>
-                <Button variant="success" onClick={onPrivatePost}>
-                    Update Private Event
+                <Button variant="success" onClick={OnPrivatePost}>
+                    {priv ? "Update Private Event" : "Update to Private Event"}
                 </Button>
                 <Button variant="secondary" onClick={onClose}>
                     Cancel

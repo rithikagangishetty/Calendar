@@ -33,6 +33,7 @@ const ReactApp: FC = () => {
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteEventId, setDeleteEventId] = useState<string>('');
+    const [deleteEventUserId, setDeleteEventUserId] = useState<string>('');
     const [deleteEvent, setDeleteEvent] = useState<Event>();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
@@ -40,6 +41,7 @@ const ReactApp: FC = () => {
     const [enddate, setEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [priv, setPrivate] = useState<boolean>();
+
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
     const timezones = moment.tz.names();
@@ -73,6 +75,7 @@ const ReactApp: FC = () => {
         setSelectedModerators([]);
         setStart(currentDate.toDate());
         setEnd(currentDate.toDate());
+        setPrivate(undefined);
     }
     //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -164,6 +167,7 @@ const ReactApp: FC = () => {
                 StartDate: startdate,
                 EndDate: enddate,
                 Delete: false,
+                priv:priv,
                 Subject: "Event is Created",
                 Body: `An event titled '${titleInput}' has been created.
                 The start time of the event is '${startdate}' and ends at '${enddate}'.`,
@@ -226,7 +230,8 @@ const ReactApp: FC = () => {
                 Moderator: Moderator,
                 Connections: Connection,
                 StartDate: _start,
-                Delete:true,
+                Delete: true,
+                priv: priv,
                 EndDate: _end,
                 Subject: "Event is Deleted",
                 Body: `An event titled '${eventName}' has been deleted.`,
@@ -259,7 +264,7 @@ const ReactApp: FC = () => {
                     Reminder: response.data.reminder,
                 };
                 setDeleteEvent(newEvent);
-
+                setPrivate(newEvent.priv);
             })
             .catch((error) => {
                 alert(error);
@@ -279,10 +284,11 @@ const ReactApp: FC = () => {
         /// </summary>
     async function EditEvent() {
         
-                
+        var _connections;
         for (var _event of events) {
             // Check if the event overlaps with any existing event
             if (_event.start !== undefined && _event.end !== undefined) {
+                
                 if (_event._id != deleteEventId) {
                     if (
                         (startdate >= _event.start && startdate < _event.end) ||
@@ -297,6 +303,13 @@ const ReactApp: FC = () => {
                 }
             }
         }
+ 
+        await axios.get('https://localhost:44373/Connection/get', { params: { _id: deleteEventUserId } }).then((response) => {
+
+            _connections = response.data.connection;
+
+        }).catch((error) => { alert("error in get " + error) });
+        console.log(priv);
       await  axios.put('https://localhost:44373/User/', {
             _id: deleteEventId,
             UserId: id,
@@ -304,7 +317,7 @@ const ReactApp: FC = () => {
             StartDate: startdate,
             Moderator: selectedModerators,
             EndDate: enddate,
-            Connections: (priv ? selectedConnections : connections),
+            Connections: (priv ? selectedConnections : _connections),
             priv: priv,
             TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
             Reminder: false,
@@ -325,9 +338,10 @@ const ReactApp: FC = () => {
                 UserEmail: id,
                 EventName: titleInput,
                 Moderator: selectedModerators,
-                Connections: (priv ? selectedConnections : connections),
+                Connections: (priv ? selectedConnections : _connections),
                 StartDate: startdate,
                 EndDate: enddate,
+                priv: priv,
                 Delete:false,
                 Subject: "Event is Edited",
                 Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startdate}' and ends at '${enddate}'.`,
@@ -466,6 +480,7 @@ const ReactApp: FC = () => {
         else {
             setValidationError('');
             setPrivate(false);
+            console.log(priv);
             if (Edit) {
                
                     EditEvent();
@@ -508,11 +523,13 @@ const ReactApp: FC = () => {
         ///And the delete modal becomes true
         ///</summary>
    async function handleDelete(event: any) {
-      
+       setPrivate(event.priv);
        const eventStart = moment(event.start);
         const isPastEvent = eventStart.isBefore(currentDate);
-        setIsPast(isPastEvent);
+       setIsPast(isPastEvent);
+      
        setDeleteEventId(event._id);
+       setDeleteEventUserId(event.UserId);
        showEmails(event);
 
         setShowDeleteModal(true);
@@ -521,6 +538,7 @@ const ReactApp: FC = () => {
         setShowCreateModal(false);
         setShowEditModal(false);
         onClose();
+      
     }
 
    ///<summary>
@@ -736,7 +754,7 @@ const ReactApp: FC = () => {
                 handleUserSelection={handleUserSelection}
             />
             <EditEventModal
-                handleTimezoneChange={handleTimezoneChange }
+                handleTimezoneChange={handleTimezoneChange}
                 show={showEditModal}
                 selectedTimezone={selectedTimezone}
                 defaultTimeZone={defaultTimeZone}
@@ -754,7 +772,7 @@ const ReactApp: FC = () => {
                 connections={connections}
                 selectedModerators={selectedModerators}
                 handleUserSelection={handleUserSelection}
-             
+                priv={(priv==undefined)?false:priv}
                
                 />
 
