@@ -2,8 +2,7 @@
 import { Calendar, Event, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment';
 import React from 'react';
-import { DeleteEvents } from './Functions';
-import 'moment-timezone'; `1`
+import 'moment-timezone'; 
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { useParams } from 'react-router-dom'
 import axios from 'axios';
@@ -37,8 +36,8 @@ const ReactApp: FC = () => {
     const [deleteEvent, setDeleteEvent] = useState<Event>();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
-    const [startdate, setStart] = useState<Date>(new Date(moment().toDate()));
-    const [enddate, setEnd] = useState<Date>(new Date(moment().toDate()));
+    const [startdate, setStart] = useState<Date>(new Date());
+    const [enddate, setEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [priv, setPrivate] = useState<boolean>();
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
@@ -68,7 +67,13 @@ const ReactApp: FC = () => {
         setSelectedTimezone(event.target.value);
     };
 
-   
+    const onClose = () => {
+        setTitleInput("");
+        setSelectedConnections([]);
+        setSelectedModerators([]);
+        setStart(currentDate.toDate());
+        setEnd(currentDate.toDate());
+    }
     //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -137,7 +142,8 @@ const ReactApp: FC = () => {
                 Reminder: false,
            }).then((response) => {
                eventId = response.data;
-                setShowCreateModal(false);
+               setShowCreateModal(false);
+               onClose();
                 setCurrentTaskType('eventadded');
                 setShowModal(true);
 
@@ -205,10 +211,12 @@ const ReactApp: FC = () => {
          Connection = response.data.connections;
          _start = response.data.startDate;
          _end = response.data.endDate;
+         setShowDeleteModal(false);
          setCurrentTaskType('eventdeleted');
             setShowModal(true);
 
-            setShowDeleteModal(false);
+         
+         onClose();
         }).catch((error) => { alert(error); });
         axios.post("https://localhost:44373/User/sendmail",
             {
@@ -307,6 +315,7 @@ const ReactApp: FC = () => {
             setShowModal(true);
             setShowEditModal(false);
             setShowDeleteModal(false);
+            onClose();
             setEdit(false);
         }).catch((error) => { alert(error); });
 
@@ -508,7 +517,11 @@ const ReactApp: FC = () => {
 
         setShowDeleteModal(true);
     };
-
+    const handleClose = () => {
+        setShowCreateModal(false);
+        setShowEditModal(false);
+        onClose();
+    }
 
    ///<summary>
     ///This is the checkbox for the connections in the event details
@@ -569,6 +582,7 @@ const ReactApp: FC = () => {
             setValidationError('');
             setSelectedConnections([]);
             setShowEmailModal(false);
+            
             if (Edit) {
                 EditEvent();
             }
@@ -711,7 +725,7 @@ const ReactApp: FC = () => {
            
             <CreateEventModal
                 show={showCreateModal}
-                onClose={() => setShowCreateModal(false)}
+                onClose={handleClose}
                 onPost={handlePost}
                 onPrivatePost={handlePrivatePost}
                 validationError={validationError}
@@ -727,7 +741,7 @@ const ReactApp: FC = () => {
                 selectedTimezone={selectedTimezone}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
-                onClose={() => setShowEditModal(false)}
+                onClose={handleClose}
                 onPost={handlePost}
                 onPrivatePost={handlePrivatePost}
                 validationError={validationError}

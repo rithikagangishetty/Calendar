@@ -116,6 +116,7 @@ function Connections() {
             console.log(response.data);
             setCurrentTaskType('connectiondeleted');
             setShowModal(true);
+            setConnection('');
         }).catch((error) => { alert(error); })
     }
         /// <summary>
@@ -131,23 +132,27 @@ function Connections() {
         if (exists) {
             setCurrentTaskType('connectionexist');
             setShowModal(true);
+            setConnection('');
             return;
         }
         
         if (connection == userEmail) {
             setCurrentTaskType("sameemail");
             setShowModal(true);
+            setConnection('');
             return;
         }
         if (connection == "") {
             setCurrentTaskType("valid");
             setShowModal(true);
+          
             return;
         }
         if (!allEmails.includes(connection))
         {
             setCurrentTaskType("noemail");
             setShowModal(true);
+            setConnection('');
             return;
         }
         var newconnections;
@@ -164,11 +169,11 @@ function Connections() {
             if (response.data.connection == null) {
                 newconnections = [connection];
             }
-
+        
            
         }).catch((error) => {
             alert("error in getting the _id  " + error);
-
+           
 
         });
         axios.put("https://localhost:44373/Connection/update",
@@ -184,13 +189,15 @@ function Connections() {
                 console.log(response.data);
                 setCurrentTaskType('connectionadded');
                 setShowModal(true);
-                setConnection('');
+                
 
             }).catch((error) => {
                 alert("error in update " + error);
+                
             });
 
         setConnection('');
+        console.log(connection);
 
     }
 
@@ -219,22 +226,19 @@ function Connections() {
             </div>
             <div>
 
-                {<div>
+                <div>
                     {emailIds.length > 0 && (
                         <table className="table table-light">
                             <thead>
                                 <tr>
-
                                     <th scope="col">Your Connections</th>
                                 </tr>
                             </thead>
-                            {emailIds.map(function fn(email: any) {
-                                return (
-                                    <tbody>
-                                        <tr>
-
-                                            <td>{email}</td>
-
+                            <tbody>
+                                {emailIds.map((email: any) => (
+                                    <tr key={email}>
+                                        <td>{email}</td>
+                                        <td>
                                             <button
                                                 type="button"
                                                 className="btn btn-success"
@@ -242,10 +246,8 @@ function Connections() {
                                             >
                                                 View Calendar
                                             </button>
-                                            
-                                          
-                                          
-                                            
+                                        </td>
+                                        <td>
                                             <button
                                                 type="button"
                                                 className="btn btn-danger"
@@ -253,16 +255,15 @@ function Connections() {
                                             >
                                                 Delete
                                             </button>
-                                           
-                                            
+                                        </td>
+                                    </tr>
+                                ))}
 
-                                        </tr>
-                                    </tbody>
-                                );
-                            })}
+                            </tbody>
                         </table>
                     )}
-                </div>}
+                </div>
+
 
             </div>
            

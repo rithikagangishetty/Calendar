@@ -10,6 +10,7 @@
     "@fullcalendar/timegrid": "^6.1.8",
     "bootstrap": "~4.6.1",
     "connected-react-router": "^6.9.3",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.49",
     "history": "4.10.1",
     "jquery": "~3.6.0",
     "merge": "2.1.1",

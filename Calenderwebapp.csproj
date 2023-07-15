@@ -46,6 +46,7 @@
     <None Remove="ClientApp\src\components\Connections.tsx" />
     <None Remove="ClientApp\src\components\login.tsx" />
     <None Remove="ClientApp\src\components\reactbigcalendar.tsx" />
+    <None Remove="ClientApp\src\components\TimeZone.tsx" />
     <None Remove="ClientApp\src\components\ViewCalendar.tsx" />
   </ItemGroup>
 

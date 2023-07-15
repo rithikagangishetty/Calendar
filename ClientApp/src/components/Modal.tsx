@@ -6,6 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+
 type TaskType = 'login' | 'signup'  | "noemail" | 'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
 interface MyModalProps {
     show: boolean;
@@ -34,6 +35,7 @@ interface SelectEmailModalProps {
     renderEmailCheckbox: (connection: string) => JSX.Element;
    
 }
+
 
 
 interface CreateEventModalProps {
@@ -174,8 +176,8 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     selectedTimezone,
     defaultTimeZone,
     timezones
-        
-    
+
+
 }) => {
     const timezone = ((selectedTimezone == "") ? defaultTimeZone : selectedTimezone);
     moment.tz.setDefault(timezone);
@@ -184,16 +186,69 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         setStart(null);
         setEnd(null);
     }, []);
-    const minTime = new Date(
-        currentTime.year(),
-        currentTime.month(),
-        currentTime.date(),
-        currentTime.hour(),
-        currentTime.minute()
-    );
-    const endMinTime = new Date();
-    endMinTime.setMinutes(endMinTime.getMinutes() + 15);
+    var now = new Date();
+    
    
+    function areDatesOnSameDay(date1: Date, date2: Date): boolean {
+        const year1 = date1.getFullYear();
+        const month1 = date1.getMonth();
+        const day1 = date1.getDate();
+
+        const year2 = date2.getFullYear();
+        const month2 = date2.getMonth();
+        const day2 = date2.getDate();
+
+        return year1 === year2 && month1 === month2 && day1 === day2;
+    }
+  
+    var  minTime = new Date(
+            currentTime.year(),
+            currentTime.month(),
+            currentTime.date(),
+            currentTime.hour(),
+            currentTime.minute()
+    );
+    var endMinTime;
+    if (start != null) {
+        endMinTime = new Date(start);
+        endMinTime.setMinutes(endMinTime.getMinutes() + 15);
+    }
+    else {
+
+         endMinTime = new Date(
+            currentTime.year(),
+            currentTime.month(),
+            currentTime.date(),
+            currentTime.hour(),
+            currentTime.minute()
+        );
+    }
+    if (start != null) {
+        
+        if (!areDatesOnSameDay(start, now)) {
+            minTime = new Date();
+            minTime.setHours(0, 0, 0, 0);
+            
+        }
+    }
+    if (end != null) {
+        if (!areDatesOnSameDay(end, now)) {
+            if (start != null) {
+                endMinTime = new Date(start);
+                endMinTime.setMinutes(endMinTime.getMinutes() + 15);
+            }
+            else {
+                endMinTime = new Date();
+                endMinTime.setHours(0, 0, 0, 0);
+            }
+           // endMinTime.setMinutes(endMinTime.getMinutes() + 15);
+        }
+    }
+   
+    const minDate = currentTime.toDate();
+
+    
+
     const endOfDay = moment(currentTime).endOf('day').toDate();
     const maxTime = new Date(
         endOfDay.getFullYear(),
@@ -202,7 +257,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         23,
         59
     );
-   
+
     const timeInterval = 15;
     return (
         <Modal show={show} onHide={onClose}>
@@ -221,53 +276,53 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         value={titleInput}
                         onChange={(e) => onTitleInputChange(e.target.value)}
                         isInvalid={validationError !== ''}
-                    
 
-                       
+
+
                     />
                     <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
                 </Form.Group>
                 <br />
                 <Form.Group>
-                <div>
+                    <div>
                         <Form.Label>Select Timezone:</Form.Label>
                         <br />
-                    <select value={selectedTimezone} onChange={handleTimezoneChange}>
-                        <option value=""> {defaultTimeZone}</option>
-                        {timezones.map((timezone:any) => (
+                        <select value={selectedTimezone} onChange={handleTimezoneChange}>
+                            <option value=""> {defaultTimeZone}</option>
+                            {timezones.map((timezone: any) => (
 
-                            <option key={timezone} value={timezone}>
-                                {timezone}
-                            </option>
-                        ))}
+                                <option key={timezone} value={timezone}>
+                                    {timezone}
+                                </option>
+                            ))}
                         </select> </div>
                 </Form.Group>
                 <br />
                 <Form.Group controlId="eventStart">
                     <Form.Label>Start Date/Time of the Event</Form.Label>
-                   
+
                     <DatePicker
                         showTimeSelect
                         timeFormat="HH:mm"
                         minTime={minTime}
-                        selected={start ||null }
+                        selected={start || null}
                         onChange={setStart}
                         dateFormat="MM/dd/yyyy h:mm aa"
                         placeholderText="Select start date and time"
                         timeIntervals={timeInterval}
                         timeInputLabel="Time:"
                         maxTime={maxTime}
-                        
-                        //isClearable
-                        />
-                   
+                        minDate={minDate}
+                    //isClearable
+                    />
+
                 </Form.Group>
                 <br />
                 <Form.Group controlId="eventEnd">
                     <Form.Label>End Date/Time of the Event</Form.Label>
                     <DatePicker
                         timeFormat="HH:mm"
-                        selected={end || null} 
+                        selected={end || null}
                         onChange={setEnd}
                         minTime={endMinTime}
                         timeInputLabel="Time:"
@@ -276,8 +331,8 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         timeIntervals={timeInterval}
                         placeholderText="Select end date and time"
                         maxTime={maxTime}
-                      
-                       
+                        minDate={minDate}
+
                     />
                 </Form.Group>
                 <br />
@@ -291,7 +346,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                                     type="checkbox"
                                     label={moderator}
                                     checked={selectedModerators.includes(moderator)}
-                                    onChange={() => handleUserSelection(moderator,false)}
+                                    onChange={() => handleUserSelection(moderator, false)}
                                 />
                             ))}
                     </div>
@@ -311,7 +366,6 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         </Modal>
     );
 };
-
 
 
 
@@ -429,7 +483,7 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
 
 
 export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, onDelete, isPast, start, end, moderator, title, connections, event }) => {
-    console.log(start);
+    
     return (
         
         <Modal show={show} onHide={onHide}>
