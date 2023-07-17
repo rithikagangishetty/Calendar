@@ -29,33 +29,33 @@ namespace Calenderwebapp.Controllers
            
            // _userSupervisor.SimulateConcurrentRequests().Wait();
         }
-        [HttpGet]
-        [Route("getallevents")]
-        public async Task<List<UserDetails>> GetEvents(string _id)
+        [HttpGet("getallevents")]
+        //[Route("getallevents")]
+        public async Task<List<UserDetails>> GetEvents(string id)
         {
 
-            var result = await _userSupervisor.GetEvents(_id);
+            var result = await _userSupervisor.GetEvents(id);
             return result;
         }
-        [HttpGet]
-        [Route("getconnectionevents")]
-        public async Task<List<UserDetails>> GetViewEvents(string _id, string connectionId)
+        [HttpGet("getconnectionevents")]
+        //[Route("getconnectionevents")]
+        public async Task<List<UserDetails>> GetViewEvents(string id, string connectionId)
         {
-            var result = await _userSupervisor.GetViewEvents(_id, connectionId);
+            var result = await _userSupervisor.GetViewEvents(id, connectionId);
             Console.WriteLine(result);
             return result;
         }
-        [HttpGet]
-        [Route("getevent")]
-        public async Task<ActionResult<UserDetails>> GetEvent(string _id)
+        [HttpGet("getevent")]
+      //  [Route("getevent")]
+        public async Task<ActionResult<UserDetails>> GetEvent(string id)
         {
-            var events = await _userSupervisor.GetEvent(_id);
+            var events = await _userSupervisor.GetEvent(id);
             
 
             return events;
         }
-        [HttpPost]
-        [Route("post")]
+        [HttpPost("post")]
+       // [Route("post")]
         public async Task<string> Post(UserDetails newUser)
         {
             
@@ -64,11 +64,11 @@ namespace Calenderwebapp.Controllers
             return id;
         }
 
-        [HttpPost]
-        [Route("sendmail")]
-        public async Task<ActionResult> SendMailAsync(EmailDetails _id)
+        [HttpPost("sendmail")]
+       // [Route("sendmail")]
+        public async Task<ActionResult> SendMailAsync(EmailDetails id)
         {
-            await _userSupervisor.SendMailAsync(_id);
+            await _userSupervisor.SendMailAsync(id);
             return Ok();
         }
         [HttpPut]
@@ -86,10 +86,10 @@ namespace Calenderwebapp.Controllers
         }
         [HttpDelete]
 
-        public async Task<UserDetails> Delete(string _id, string userId)
+        public async Task<UserDetails> Delete(string id, string userId)
         {
 
-         var user=   await _userSupervisor.Delete(_id,userId);
+         var user=   await _userSupervisor.Delete(id,userId);
             return user; 
             
            

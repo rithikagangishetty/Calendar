@@ -26,12 +26,12 @@ function Home() {
         history.push(`/Home/Connections/${id}`);
     }
     function calendar() {
-        history.push(`/Home/ReactApp/${id}`);
+        history.push(`/Home/Calendar/${id}`);
     }
    
     function GetEmail()
     {
-        axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
+        axios.get('https://localhost:44373/Connection/get/', { params: { id: id } }).then((response) => {
 
            
             console.log(response.data);

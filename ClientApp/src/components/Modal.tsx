@@ -189,7 +189,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     useEffect(() => {
         setStart(null);
         setEnd(null);
-    }, []);
+    }, [selectedTimezone]);
     var now = new Date();
     
     function OnPost(event:any) {

@@ -27,21 +27,21 @@ namespace Calenderwebapp.Controllers
         /// </summary>
         /// <param name="_id"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("get")]
+        [HttpGet("get")]
+       
         
-        public async Task<ActionResult<Connections>> GetEmailId(string _id)
+        public async Task<ActionResult<Connections>> GetEmailId(string id)
         {
-            var _connection = await _connectionSupervisor.GetEmailId(_id);
-            if (_connection is null)
+            var connection = await _connectionSupervisor.GetEmailId(id);
+            if (connection is null)
             {
                 return NotFound();
             }
 
-            return _connection;
+            return connection;
         }
-        [HttpGet]
-        [Route("getall")]
+        [HttpGet("getall")]
+       
         public async Task<ActionResult<List<string>>> Get()
         {
             var res = await _connectionSupervisor.Get();
@@ -53,23 +53,23 @@ namespace Calenderwebapp.Controllers
             return res;
         }
 
-        [HttpGet]
-        [Route("getid")]
+        [HttpGet("getid")]
+       
         public async Task<ActionResult<Connections>> GetId(string email)
         {
-            var _connection = await _connectionSupervisor.GetId(email);
-            if (_connection is null)
+            var connection = await _connectionSupervisor.GetId(email);
+            if (connection is null)
             {
                 return NotFound();
             }
 
-            return _connection;
+            return connection;
         }
-        [HttpGet]
-        [Route("getemail")]
-        public async Task<ActionResult<Connections>> GetEmail(string _id)
+        [HttpGet("getemail")]
+       
+        public async Task<ActionResult<Connections>> GetEmail(string id)
         {
-           var user=await _connectionSupervisor.GetEmail(_id);
+           var user=await _connectionSupervisor.GetEmail(id);
             if(user is null)
             {
                 return NotFound();
@@ -84,19 +84,19 @@ namespace Calenderwebapp.Controllers
             return CreatedAtAction(nameof(GetEmailId), new { id = newConnection._id }, newConnection);
 
         }
-        [HttpPut]
-        [Route("update")]
+        [HttpPut("update")]
+       
         public async Task Update(Connections updatedConnection)
         {
             await  _connectionSupervisor.Update(updatedConnection);
             
             
         }
-        [HttpDelete]
-        [Route("delete")]
-        public async Task Delete(string emailId, string _id)
+        [HttpDelete("delete")]
+       
+        public async Task Delete(string emailId, string id)
         {
-            await _connectionSupervisor.Delete(emailId,_id);
+            await _connectionSupervisor.Delete(emailId,id);
              
         }
     }

@@ -49,7 +49,7 @@ function Connections() {
         GetAll();
     }, [currentTaskType]);
     const handleCloseModal = () => {
-
+        setConnection("");
         setShowModal(false);
     };
 
@@ -62,9 +62,9 @@ function Connections() {
     function Get() {
         var emails: any;
 
-        axios.get('https://localhost:44373/Connection/getemail/', { params: { _id: id } }).then((response) => {
+        axios.get('https://localhost:44373/Connection/getemail/', { params: { id: id } }).then((response) => {
 
-            console.log(response.data);
+           
             emails = response.data.connection;
             setUserEmail(response.data.emailId);
             if (emails.length > 0) {
@@ -112,11 +112,12 @@ function Connections() {
 
     async function Delete(emailId: string) {
 
-        axios.delete('https://localhost:44373/Connection/delete/', { params: { emailId: emailId, _id: id } }).then((response) => {
-            console.log(response.data);
+      await  axios.delete('https://localhost:44373/Connection/delete/', { params: { emailId: emailId, id: id } }).then((response) => {
+           
             setCurrentTaskType('connectiondeleted');
             setShowModal(true);
             setConnection('');
+            setEmailIds(prevEmailIds => prevEmailIds.filter(email => email !== emailId));
         }).catch((error) => { alert(error); })
     }
         /// <summary>
@@ -155,19 +156,19 @@ function Connections() {
             setConnection('');
             return;
         }
-        var newconnections;
+        var newConnections;
         var Id;
         var Emailid;
-      await  axios.get('https://localhost:44373/Connection/get/', { params: { _id: id } }).then((response) => {
-            console.log(response.data);
+      await  axios.get('https://localhost:44373/Connection/get/', { params: { id: id } }).then((response) => {
+           
             Id = response.data._id;
             Emailid = response.data.emailId;
-             newconnections = response.data.connection;
+          newConnections = response.data.connection;
             if (response.data.connection != null) {
-                newconnections = [...newconnections, connection];
+                newConnections = [...newConnections, connection];
             }
             if (response.data.connection == null) {
-                newconnections = [connection];
+                newConnections = [connection];
             }
         
            
@@ -176,17 +177,17 @@ function Connections() {
            
 
         });
-        axios.put("https://localhost:44373/Connection/update",
+       await axios.put("https://localhost:44373/Connection/update",
             {
 
                 _id: Id,
                 EmailId: Emailid,
-                Connection: newconnections,
+                Connection: newConnections,
 
 
             }).then((response) => {
 
-                console.log(response.data);
+                setEmailIds(prevEmailIds => [...prevEmailIds, connection]);
                 setCurrentTaskType('connectionadded');
                 setShowModal(true);
                 
@@ -197,7 +198,7 @@ function Connections() {
             });
 
         setConnection('');
-        console.log(connection);
+       
 
     }
 
@@ -210,6 +211,7 @@ function Connections() {
                         type="text"
                         className="form-control"
                         id="emailid"
+                        value={connection }
                         placeholder={"Add Email of the required connection"}
                         onChange={(event) => {
                             setConnection(event.target.value);

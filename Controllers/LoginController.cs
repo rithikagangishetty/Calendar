@@ -16,11 +16,11 @@ namespace Calenderwebapp.Controllers
         {
             _loginSupervisor = loginSupervisor;
         }
-        [HttpPost]
-        [Route("login")]
-        public IActionResult Login(Connections userdata)
+        [HttpPost("login")]
+       
+        public IActionResult Login(Connections userData)
         {
-            var user = _loginSupervisor.login(userdata);
+            var user = _loginSupervisor.login(userData);
             if (user != null)
             { return Ok(user); }
             else
@@ -28,11 +28,11 @@ namespace Calenderwebapp.Controllers
                 return NotFound();
             }
         }
-        [HttpPost]
-        [Route("signup")]
-        public Connections Signup(Connections userdata)
+        [HttpPost("signup")]
+       
+        public Connections Signup(Connections userData)
         {
-           var user= _loginSupervisor.Signup(userdata);
+           var user= _loginSupervisor.Signup(userData);
 
             return user;
         }

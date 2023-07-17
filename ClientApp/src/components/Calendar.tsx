@@ -22,7 +22,7 @@ interface RouteParams {
 const StyledDiv = styled.div`
   text-align: center;
 `;
-const ReactApp: FC = () => {
+const CalendarApp: FC = () => {
     const localizer = momentLocalizer(moment);
     const [Edit, setEdit] = useState<boolean>(false);
     const [isPast, setIsPast] = useState<boolean>(false);
@@ -88,7 +88,7 @@ const ReactApp: FC = () => {
         /// </summary>
        
     const getEvents = () => {
-        axios.get('https://localhost:44373/User/getallevents', { params: { _id: id } }).then((response) => {
+        axios.get('https://localhost:44373/User/getallevents', { params: { id: id } }).then((response) => {
             const event = response.data.map((training: any) => {
                
                 return {
@@ -127,7 +127,7 @@ const ReactApp: FC = () => {
 
         var _connections;
         var eventId;
-        await axios.get('https://localhost:44373/Connection/get', { params: { _id: id } }).then((response) => {
+        await axios.get('https://localhost:44373/Connection/get', { params: { id: id } }).then((response) => {
 
             _connections = response.data.connection;
 
@@ -184,7 +184,7 @@ const ReactApp: FC = () => {
         ///this function will be called everytime when the variables in the useEffect block changes
         /// </summary>
     function GetConnections() {
-        axios.get('https://localhost:44373/Connection/getemail', { params: { _id: id } }).then((response) => {
+        axios.get('https://localhost:44373/Connection/getemail', { params: { id: id } }).then((response) => {
             
             setConnections(response.data.connection);
         }).catch((error) => {
@@ -208,7 +208,7 @@ const ReactApp: FC = () => {
       var Connection;
       var _start;
       var _end;
-     await axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: id } }).then((response) => {
+     await axios.delete('https://localhost:44373/User/', { params: { id: deleteEventId, userId: id } }).then((response) => {
 
 
          eventName = response.data.eventName;
@@ -250,7 +250,7 @@ const ReactApp: FC = () => {
     function showEmails(event: any) {
 
         axios
-            .get('https://localhost:44373/User/getevent', { params: { _id: event._id } })
+            .get('https://localhost:44373/User/getevent', { params: { id: event._id } })
             .then((response) => {
                 const newEvent = {
                     title: response.data.eventName,
@@ -305,7 +305,7 @@ const ReactApp: FC = () => {
             }
         }
  
-        await axios.get('https://localhost:44373/Connection/get', { params: { _id: deleteEventUserId } }).then((response) => {
+        await axios.get('https://localhost:44373/Connection/get', { params: { id: deleteEventUserId } }).then((response) => {
 
             _connections = response.data.connection;
 
@@ -800,7 +800,7 @@ const ReactApp: FC = () => {
            
         </div >
     );
-}; export default ReactApp
+}; export default CalendarApp;
 
 
 

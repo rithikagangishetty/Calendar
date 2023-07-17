@@ -42,11 +42,10 @@
 
   <ItemGroup>
     <None Remove="ClientApp\src\calenderweb.tsx" />
+    <None Remove="ClientApp\src\components\Calendar.tsx" />
     <None Remove="ClientApp\src\components\calendarweb.ts" />
     <None Remove="ClientApp\src\components\Connections.tsx" />
     <None Remove="ClientApp\src\components\login.tsx" />
-    <None Remove="ClientApp\src\components\reactbigcalendar.tsx" />
-    <None Remove="ClientApp\src\components\TimeZone.tsx" />
     <None Remove="ClientApp\src\components\ViewCalendar.tsx" />
   </ItemGroup>
 

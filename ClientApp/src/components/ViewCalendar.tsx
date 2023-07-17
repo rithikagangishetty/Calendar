@@ -63,7 +63,7 @@ const CalendarPage: React.FC = () => {
 
 
     function GetEmail() {
-        axios.get('https://localhost:44373/Connection/get/', { params: { _id: connectionId } }).then((response) => {
+        axios.get('https://localhost:44373/Connection/get/', { params: { id: connectionId } }).then((response) => {
 
 
             console.log(response.data);
@@ -76,7 +76,7 @@ const CalendarPage: React.FC = () => {
 
 
 
-        axios.get('https://localhost:44373/User/getconnectionevents', { params: { _id: id, connectionId: connectionId } }).then((response) => {
+        axios.get('https://localhost:44373/User/getconnectionevents', { params: { id: id, connectionId: connectionId } }).then((response) => {
             const event = response.data.map((training: any) => {
                 return {
                     _id: training._id,
@@ -106,7 +106,7 @@ const CalendarPage: React.FC = () => {
     ///this function will be called everytime when the variables in the useEffect block changes
     /// </summary>
     function GetConnections() {
-        axios.get('https://localhost:44373/Connection/getemail', { params: { _id: connectionId } }).then((response) => {
+        axios.get('https://localhost:44373/Connection/getemail', { params: { id: connectionId } }).then((response) => {
 
             setConnections(response.data.connection);
         }).catch((error) => {
@@ -134,7 +134,7 @@ const CalendarPage: React.FC = () => {
         var Connection;
         var _start;
         var _end;
-        axios.delete('https://localhost:44373/User/', { params: { _id: deleteEventId, userId: connectionId } }).then((response) => {
+        axios.delete('https://localhost:44373/User/', { params: { id: deleteEventId, userId: connectionId } }).then((response) => {
             eventName = response.data.eventName;
             Moderator = response.data.moderator;
             Connection = response.data.connections;
@@ -169,7 +169,7 @@ const CalendarPage: React.FC = () => {
     function showEmails(event: any) {
 
         axios
-            .get('https://localhost:44373/User/getevent', { params: { _id: event._id } })
+            .get('https://localhost:44373/User/getevent', { params: { id: event._id } })
             .then((response) => {
                 const newEvent = {
                     title: response.data.eventName,
