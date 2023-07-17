@@ -4,7 +4,7 @@ import moment from 'moment';
 import React from 'react';
 import 'moment-timezone'; 
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import { useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import axios from 'axios';
 import './NavMenu.css';
 import { Form } from 'react-bootstrap';
@@ -15,7 +15,7 @@ import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModa
 
 
 
-type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' |'editpast'|'eventclash'; // Define the possible task types
+type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
 interface RouteParams {
     id: string;
 }
@@ -40,7 +40,7 @@ const CalendarApp: FC = () => {
     const [startdate, setStart] = useState<Date>(new Date());
     const [enddate, setEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
-   
+    const history = useHistory();
     const [priv, setPrivate] = useState<boolean>();
 
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
@@ -187,6 +187,12 @@ const CalendarApp: FC = () => {
         axios.get('https://localhost:44373/Connection/getemail', { params: { id: id } }).then((response) => {
             
             setConnections(response.data.connection);
+            var length = response.data.connection;
+            if (length.length == 0) {
+                setCurrentTaskType('noconnections');
+                setShowModal(true);
+                history.push(`/Home/Connections/${id}`);
+            }
         }).catch((error) => {
             alert(error)
         });
@@ -310,7 +316,7 @@ const CalendarApp: FC = () => {
             _connections = response.data.connection;
 
         }).catch((error) => { alert("error in get " + error) });
-        console.log(priv);
+       
       await  axios.put('https://localhost:44373/User/', {
             _id: deleteEventId,
             UserId: id,
@@ -481,7 +487,7 @@ const CalendarApp: FC = () => {
         else {
             setValidationError('');
             setPrivate(false);
-            console.log(priv);
+          
             if (Edit) {
                
                     EditEvent();

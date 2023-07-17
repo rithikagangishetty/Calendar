@@ -122,7 +122,7 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
         message = 'Event Deleted Successfully!';
     }
     else if (taskType == 'noconnections') {
-        message = 'No Connections Found!';
+        message = 'No Connections Found! Please add a connection.';
     }
     else if (taskType == 'overlap') {
         message = 'Event creation is not allowed due to overlap.';
@@ -219,7 +219,6 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
 
     const timeOffset: number = defaultOffset - selectedOffset;
-
   
     
     var  minTime = new Date(
