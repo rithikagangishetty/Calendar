@@ -187,8 +187,8 @@ const CalendarApp: FC = () => {
         axios.get('https://localhost:44373/Connection/getemail', { params: { id: id } }).then((response) => {
             
             setConnections(response.data.connection);
-            var length = response.data.connection;
-            if (length.length == 0) {
+            var res = response.data.connection;
+            if (res.length == 0) {
                 setCurrentTaskType('noconnections');
                 setShowModal(true);
                 history.push(`/Home/Connections/${id}`);
