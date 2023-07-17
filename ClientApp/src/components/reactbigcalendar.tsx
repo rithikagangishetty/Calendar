@@ -40,6 +40,7 @@ const ReactApp: FC = () => {
     const [startdate, setStart] = useState<Date>(new Date());
     const [enddate, setEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
+    const [isDelete, setIsDelete] = useState(false);
     const [priv, setPrivate] = useState<boolean>();
 
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
@@ -525,8 +526,17 @@ const ReactApp: FC = () => {
    async function handleDelete(event: any) {
        setPrivate(event.priv);
        const eventStart = moment(event.start);
+       
         const isPastEvent = eventStart.isBefore(currentDate);
        setIsPast(isPastEvent);
+       if (!event.Moderator.includes(id) && event.UserId != id) {
+
+           setIsDelete(true);
+           setIsPast(true);
+
+
+
+       }
       
        setDeleteEventId(event._id);
        setDeleteEventUserId(event.UserId);
@@ -677,6 +687,7 @@ const ReactApp: FC = () => {
 
                     <Modal.Body >
                         <p><strong>Title:</strong> {deleteEvent.title}</p>
+                        <p><strong>Event Created by:</strong> {deleteEvent.UserId}</p>
                        
                         {deleteEvent.start && (
                             <p><strong>Start:</strong> {new Date(deleteEvent.start).toLocaleString('en-US', {

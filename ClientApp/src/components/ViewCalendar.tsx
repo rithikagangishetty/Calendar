@@ -348,15 +348,12 @@ const CalendarPage: React.FC = () => {
         const isPastEvent = eventStart.isBefore(currentDate);
         setIsPast(isPastEvent);
     
-            if (!event.Moderator.includes(connectionId)||event.UserId!=id)
+            if (event.Connections.includes(connectionId)||event.Connections.includes(id))
             {
                 
                 setIsDelete(true);
                 setIsPast(true);
-            
-
-               
-        }
+            }
         
         setDeleteEventId(event._id);
         setUserId(event.UserId);
@@ -510,6 +507,7 @@ const CalendarPage: React.FC = () => {
 
                     <Modal.Body >
                         <p><strong>Title:</strong> {deleteEvent.title}</p>
+                        <p><strong>Event Created by:</strong> {deleteEvent.UserId}</p>
 
                         {deleteEvent.start && (
                             <p><strong>Start:</strong> {new Date(deleteEvent.start).toLocaleString('en-US', {
@@ -558,15 +556,16 @@ const CalendarPage: React.FC = () => {
 
 
                     <Modal.Footer >
-                       
+                        {!isPast &&
                             <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
                                 Edit
                             </Button>
-                      
-                        <Button variant="danger" onClick={DeleteEvent} disabled={isDelete}>
-                            Delete
-                        </Button>
-                        
+                        }
+                        {!isDelete &&
+                            <Button variant="danger" onClick={DeleteEvent} disabled={isDelete}>
+                                Delete
+                            </Button>
+                        }
                         <Button variant="secondary" onClick={handleDeleteModal}>
                             Cancel
                         </Button>
