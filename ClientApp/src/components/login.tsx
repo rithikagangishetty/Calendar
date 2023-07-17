@@ -5,12 +5,7 @@ import './NavMenu.css';
 import { useHistory } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 type TaskType = 'login' | 'signup'|'valid';
-type Connections = {
-    _id: string;
-    emailId: string;
-    Connection: Array<string>;
 
-};
 function Login() {
    
     const [EmailId, setEmailId] = useState<string>('');

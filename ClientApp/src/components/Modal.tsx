@@ -199,8 +199,8 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         onPost(event);
     }
     function OnPrivatePost(event: any) {
-        //start.setMinutes(start.getMinutes() + timeOffset);
-        //end.setMinutes(end.getMinutes() + timeOffset);
+        start.setMinutes(start.getMinutes() + timeOffset);
+        end.setMinutes(end.getMinutes() + timeOffset);
         onPrivatePost(event);
     }
 

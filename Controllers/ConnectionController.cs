@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
+
 namespace Calenderwebapp.Controllers
 {
     [ApiController]
@@ -16,8 +17,8 @@ namespace Calenderwebapp.Controllers
     public class ConnectionController : Controller
     {
        
-        private readonly ConnectionSupervisor _connectionSupervisor;
-        public ConnectionController(ConnectionSupervisor connectionSupervisor)
+        private readonly IConnectionSupervisor _connectionSupervisor;
+        public ConnectionController(IConnectionSupervisor connectionSupervisor)
         {
             _connectionSupervisor = connectionSupervisor;
         }

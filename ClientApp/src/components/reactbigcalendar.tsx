@@ -40,7 +40,7 @@ const ReactApp: FC = () => {
     const [startdate, setStart] = useState<Date>(new Date());
     const [enddate, setEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
-    const [isDelete, setIsDelete] = useState(false);
+   
     const [priv, setPrivate] = useState<boolean>();
 
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
@@ -531,7 +531,8 @@ const ReactApp: FC = () => {
        setIsPast(isPastEvent);
        if (!event.Moderator.includes(id) && event.UserId != id) {
 
-           setIsDelete(true);
+
+
            setIsPast(true);
 
 

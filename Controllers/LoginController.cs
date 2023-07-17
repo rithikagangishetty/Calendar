@@ -1,5 +1,4 @@
 ﻿using Main.Models;
-using CalendarDb;
 using Main.Supervisor;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +11,8 @@ namespace Calenderwebapp.Controllers
     [Route("[controller]")]
     public class LoginController : Controller
     {
-        private readonly LoginSupervisor _loginSupervisor;
-        public LoginController(LoginSupervisor loginSupervisor)
+        private readonly ILoginSupervisor _loginSupervisor;
+        public LoginController(ILoginSupervisor loginSupervisor)
         {
             _loginSupervisor = loginSupervisor;
         }
