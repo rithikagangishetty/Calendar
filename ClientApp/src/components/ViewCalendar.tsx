@@ -64,7 +64,7 @@ const CalendarPage: React.FC = () => {
 
 
     function GetEmail() {
-        axios.get('https://localhost:44373/Connection/get/', { params: { id: connectionId } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/get/`, { params: { id: connectionId } }).then((response) => {
 
 
             console.log(response.data);
@@ -77,7 +77,7 @@ const CalendarPage: React.FC = () => {
 
 
 
-        axios.get('https://localhost:44373/User/getconnectionevents', { params: { id: id, connectionId: connectionId } }).then((response) => {
+        axios.get(`${baseUrl}/User/getconnectionevents`, { params: { id: id, connectionId: connectionId } }).then((response) => {
             const event = response.data.map((training: any) => {
                 return {
                     _id: training._id,
@@ -107,7 +107,7 @@ const CalendarPage: React.FC = () => {
     ///this function will be called everytime when the variables in the useEffect block changes
     /// </summary>
     function GetConnections() {
-        axios.get('https://localhost:44373/Connection/getemail', { params: { id: connectionId } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/getemail`, { params: { id: connectionId } }).then((response) => {
 
             setConnections(response.data.connection);
         }).catch((error) => {
@@ -135,7 +135,7 @@ const CalendarPage: React.FC = () => {
         var Connection;
         var _start;
         var _end;
-        axios.delete('https://localhost:44373/User/', { params: { id: deleteEventId, userId: connectionId } }).then((response) => {
+     axios.delete(`${baseUrl}/User/`, { params: { id: deleteEventId, userId: connectionId } }).then((response) => {
             eventName = response.data.eventName;
             Moderator = response.data.moderator;
             Connection = response.data.connections;
@@ -146,7 +146,7 @@ const CalendarPage: React.FC = () => {
 
             setShowDeleteModal(false);
         }).catch((error) => { alert(error); });
-        axios.post("https://localhost:44373/User/sendmail",
+     axios.post(`${baseUrl}/User/sendmail`,
             {
                 _id: deleteEventId,
                 UserEmail: UserId,
@@ -170,7 +170,7 @@ const CalendarPage: React.FC = () => {
     function showEmails(event: any) {
 
         axios
-            .get('https://localhost:44373/User/getevent', { params: { id: event._id } })
+            .get(`${baseUrl}/User/getevent`, { params: { id: event._id } })
             .then((response) => {
                 const newEvent = {
                     title: response.data.eventName,
@@ -222,7 +222,7 @@ const CalendarPage: React.FC = () => {
             }
         }
 
-        axios.put('https://localhost:44373/User/', {
+        axios.put(`${baseUrl}/User/`, {
             _id: deleteEventId,
             UserId: UserId,
             EventName: titleInput,
@@ -242,7 +242,7 @@ const CalendarPage: React.FC = () => {
             setShowDeleteModal(false);
             setEdit(false);
         }).catch((error) => { alert(error); });
-        axios.post("https://localhost:44373/User/sendmail",
+        axios.post(`${baseUrl}/User/sendmail`,
             {
                 _id: deleteEventId,
                 UserEmail: UserId,

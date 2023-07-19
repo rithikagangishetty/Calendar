@@ -90,7 +90,7 @@ const CalendarApp: FC = () => {
         /// </summary>
        
     const getEvents = () => {
-        axios.get('https://localhost:44373/User/getallevents', { params: { id: id } }).then((response) => {
+        axios.get(`${baseUrl}/User/getallevents`, { params: { id: id } }).then((response) => {
             const event = response.data.map((training: any) => {
                
                 return {
@@ -134,7 +134,7 @@ const CalendarApp: FC = () => {
             _connections = response.data.connection;
 
         }).catch((error) => { alert("error in get " + error) });
-         await axios.post("https://localhost:44373/User/post",
+        await axios.post(`${baseUrl}/User/post`,
             {
                 _id: '',
                 UserId: id,
@@ -160,7 +160,7 @@ const CalendarApp: FC = () => {
                 alert("error in post " + error)
             });
 
-        axios.post("https://localhost:44373/User/sendmail",
+        axios.post(`${baseUrl}/User/sendmail`,
             {
                 _id: eventId,
                 UserEmail: id,
@@ -186,7 +186,7 @@ const CalendarApp: FC = () => {
         ///this function will be called everytime when the variables in the useEffect block changes
         /// </summary>
     function GetConnections() {
-        axios.get('https://localhost:44373/Connection/getemail', { params: { id: id } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/getemail`, { params: { id: id } }).then((response) => {
             
             setConnections(response.data.connection);
             var res = response.data.connection;
@@ -216,7 +216,7 @@ const CalendarApp: FC = () => {
       var Connection;
       var _start;
       var _end;
-     await axios.delete('https://localhost:44373/User/', { params: { id: deleteEventId, userId: id } }).then((response) => {
+        await axios.delete(`${baseUrl}/User/`, { params: { id: deleteEventId, userId: id } }).then((response) => {
 
 
          eventName = response.data.eventName;
@@ -231,7 +231,7 @@ const CalendarApp: FC = () => {
          
          onClose();
         }).catch((error) => { alert(error); });
-        axios.post("https://localhost:44373/User/sendmail",
+        axios.post(`${baseUrl}/User/sendmail`,
             {
                 _id: deleteEventId,
                 UserEmail: id,
@@ -258,7 +258,7 @@ const CalendarApp: FC = () => {
     function showEmails(event: any) {
 
         axios
-            .get('https://localhost:44373/User/getevent', { params: { id: event._id } })
+            .get(`${baseUrl}/User/getevent`, { params: { id: event._id } })
             .then((response) => {
                 const newEvent = {
                     title: response.data.eventName,
@@ -318,13 +318,13 @@ const CalendarApp: FC = () => {
             }
         }
  
-        await axios.get('https://localhost:44373/Connection/get', { params: { id: deleteEventUserId } }).then((response) => {
+        await axios.get(`${baseUrl}/Connection/get`, { params: { id: deleteEventUserId } }).then((response) => {
 
             _connections = response.data.connection;
 
         }).catch((error) => { alert("error in get " + error) });
        
-      await  axios.put('https://localhost:44373/User/', {
+        await axios.put(`${baseUrl}/User/`, {
             _id: deleteEventId,
             UserId: id,
             EventName: titleInput,
@@ -346,7 +346,7 @@ const CalendarApp: FC = () => {
             setEdit(false);
         }).catch((error) => { alert(error); });
 
-        axios.post("https://localhost:44373/User/sendmail",
+        axios.post(`${baseUrl}/User/sendmail`,
             {
                 _id: deleteEventId,
                 UserEmail: id,
