@@ -14,7 +14,7 @@ function Home() {
     const { id } = useParams<RouteParams>();
     const history = useHistory();
     const [EmailId, setEmailId] = React.useState<string>("");
-   
+    const baseUrl = process.env.REACT_APP_URL;
 
    React.useEffect(() => {
 
@@ -31,7 +31,7 @@ function Home() {
    
     function GetEmail()
     {
-        axios.get('https://localhost:44373/Connection/get/', { params: { id: id } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/get/`, { params: { id: id } }).then((response) => {
 
            
             console.log(response.data);

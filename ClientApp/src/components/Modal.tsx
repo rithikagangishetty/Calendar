@@ -32,8 +32,9 @@ interface SelectEmailModalProps {
     onSaveSelectedConnections: () => void;
     validationError: string;
     connections: string[];
-    renderEmailCheckbox: (connection: string) => JSX.Element;
-   
+    selectedConnections: string[];
+    renderEmailCheckbox: (connection: string,defaultChecked:boolean) => JSX.Element;
+    setSelectedConnections: (connection: string[]) => void;
 }
 
 
@@ -48,11 +49,13 @@ interface CreateEventModalProps {
     onTitleInputChange: (value: string) => void;
     connections: string[];
     selectedModerators: string[];
+   
     handleUserSelection: (user: string, connect: boolean) => void;
 }
 
 interface EditEventModalProps {
     show: boolean;
+    setSelectedModerators: (moderators: string[]) => void;
     onClose: () => void;
     onPost: (event: any) => void;
     onPrivatePost: (event: any) => void;
@@ -71,6 +74,7 @@ interface EditEventModalProps {
     defaultTimeZone: any;
     timezones: any;
     priv: boolean;
+    setPrivate:(value: boolean)=> void;
    // eventEdit:any
    
    
@@ -166,6 +170,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     validationError,
     titleInput,
     start,
+    setPrivate,
     end,
     setStart,
     setEnd,
@@ -177,7 +182,8 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     selectedTimezone,
     defaultTimeZone,
     timezones,
-    priv
+    priv,
+    setSelectedModerators
 
 }) => {
    
@@ -195,13 +201,23 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     function OnPost(event:any) {
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
-
+        setPrivate(false);
+        setSelectedModerators(selectedModerators);
         onPost(event);
+
+        onTitleInputChange(titleInput);
+        setStart(start);
+        setEnd(end);
     }
     function OnPrivatePost(event: any) {
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
+        setPrivate(true);
+        setSelectedModerators(selectedModerators);
         onPrivatePost(event);
+        onTitleInputChange(titleInput);
+        setStart(start);
+        setEnd(end);
     }
 
     function areDatesOnSameDay(date1: Date, date2: Date): boolean {
@@ -217,7 +233,6 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     }
     const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
-
     const timeOffset: number = defaultOffset - selectedOffset;
   
     
@@ -279,7 +294,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
             </Modal.Header>
             <Modal.Body>
                 <Form.Group controlId="eventTitle">
-                    <Form.Label>Title</Form.Label>
+                    <Form.Label><strong>Title</strong></Form.Label>
                     <Form.Control
                         type="text"
                         value={titleInput}
@@ -294,7 +309,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 <br />
                 <Form.Group>
                     <div>
-                        <Form.Label>Select Timezone:</Form.Label>
+                        <Form.Label><strong>Select Timezone:</strong></Form.Label>
                         <br />
                         <select value={selectedTimezone} onChange={handleTimezoneChange}>
                             <option value=""> {defaultTimeZone}</option>
@@ -308,7 +323,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 </Form.Group>
                 <br />
                 <Form.Group controlId="eventStart">
-                    <Form.Label>Start Date/Time of the Event</Form.Label>
+                    <Form.Label><strong>Start Date and Time of the Event</strong></Form.Label>
 
                     <DatePicker
                         showTimeSelect
@@ -322,13 +337,13 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         timeInputLabel="Time:"
                         maxTime={maxTime}
                         minDate={minDate}
-                    //isClearable
+                    
                     />
 
                 </Form.Group>
                 <br />
                 <Form.Group controlId="eventEnd">
-                    <Form.Label>End Date/Time of the Event</Form.Label>
+                    <Form.Label><strong>End Date and Time of the Event</strong></Form.Label>
                     <DatePicker
                         timeFormat="HH:mm"
                         selected={end || null}
@@ -346,7 +361,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 </Form.Group>
                 <br />
                 <Form.Group controlId="eventEmails">
-                    <Form.Label>Select the Moderators</Form.Label>
+                    <Form.Label><strong>Select the Moderators</strong></Form.Label>
                     <div>
                         {connections.length > 0 &&
                             connections.map((moderator) => (
@@ -354,6 +369,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                                     key={moderator}
                                     type="checkbox"
                                     label={moderator}
+                                    value={selectedModerators }
                                     checked={selectedModerators.includes(moderator)}
                                     onChange={() => handleUserSelection(moderator, false)}
                                 />
@@ -405,7 +421,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
             </Modal.Header>
             <Modal.Body>
                 <Form.Group controlId="eventTitle">
-                    <Form.Label>Title</Form.Label>
+                    <Form.Label><strong>Title</strong></Form.Label>
                     <Form.Control
                         type="text"
                         value={titleInput}
@@ -414,9 +430,9 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     />
                     <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
                 </Form.Group>
-
+                <br />
                 <Form.Group controlId="eventEmails">
-                    <Form.Label>Select the Moderators</Form.Label>
+                    <Form.Label><strong>Select the Moderators</strong></Form.Label>
                     <div>
                         {connections.length > 0 &&
                             connections.map((moderator) => (
@@ -430,6 +446,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                             ))}
                     </div>
                 </Form.Group>
+                <br />
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="success" onClick={onPost}>
@@ -456,11 +473,12 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
     onSaveSelectedConnections,
     validationError,
     connections,
+    selectedConnections,
     renderEmailCheckbox,
-    
+    setSelectedConnections,
     
 }) => {
-    
+    setSelectedConnections(selectedConnections);
     return (
         <Modal show={show} onHide={onClose}>
             <Modal.Header style={{
@@ -472,7 +490,7 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
             </Modal.Header>
             <Modal.Body>
                 <Form>
-                    {connections.length > 0 && connections.map((connection) => renderEmailCheckbox(connection))}
+                    {connections.length > 0 && connections.map((connection) => renderEmailCheckbox(connection, selectedConnections.includes(connection)))}
                 </Form>
                 {validationError && <div className="text-danger">{validationError}</div>}
             </Modal.Body>
@@ -523,7 +541,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, 
                 )}
                 {moderator && moderator.length > 0 && (
                     <div>
-                        <p>Moderators:</p>
+                            <p><strong>Moderators:</strong></p>
                         <ul>
                             {moderator.map((moderator:any, index:any) => (
                                 <li key={index}>{moderator}</li>
@@ -533,7 +551,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, 
                     )}
 
                 {/* Add more event details here */}
-                <p>Are you sure you want to delete/edit this event?</p>
+                    <p><strong>Are you sure you want to delete/edit this event?</strong></p>
             </Modal.Body>
             )}
             <Modal.Footer>

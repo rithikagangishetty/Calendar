@@ -3,9 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 type TaskType = 'connectionadded' |"noemail"| 'connectiondeleted' |"valid"|'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
 import MyModal from './Modal';
-
-
-
 interface RouteParams {
     id: string;
 
@@ -20,6 +17,10 @@ function Connections() {
     const [userEmail, setUserEmail] = useState<string>('');
     const { id } = useParams<RouteParams>();
     const history = useHistory();
+    const baseUrl = process.env.REACT_APP_URL;
+    
+
+ 
    
         /// <summary>
         /// This function takes the emailId of the connection and gets the object Id of the user
@@ -29,8 +30,8 @@ function Connections() {
 
     const handleViewCalendar = (email: string) =>
     {
-        var connectionId:string;
-        axios.get('https://localhost:44373/Connection/getid/', { params: { email: email } }).then((response) =>
+        var connectionId: string;
+        axios.get(`${baseUrl}/Connection/getid/`, { params: { email: email } }).then((response) =>
         {
             connectionId = response.data._id;
             history.push(`/Home/Connections/calendar/${id}/${connectionId}`);
@@ -62,7 +63,7 @@ function Connections() {
     function Get() {
         var emails: any;
 
-        axios.get('https://localhost:44373/Connection/getemail/', { params: { id: id } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/getemail/`, { params: { id: id } }).then((response) => {
 
            
             emails = response.data.connection;
@@ -86,7 +87,7 @@ function Connections() {
     }
     function GetAll() {
         var emails;
-        axios.get('https://localhost:44373/Connection/getall/', ).then((response) => {
+        axios.get(`${baseUrl}/Connection/getall/`, ).then((response) => {
 
        
             emails = response.data;
@@ -112,7 +113,7 @@ function Connections() {
 
     async function Delete(emailId: string) {
 
-      await  axios.delete('https://localhost:44373/Connection/delete/', { params: { emailId: emailId, id: id } }).then((response) => {
+        await axios.delete(`${baseUrl}/Connection/delete/`, { params: { emailId: emailId, id: id } }).then((response) => {
            
             setCurrentTaskType('connectiondeleted');
             setShowModal(true);
@@ -159,7 +160,7 @@ function Connections() {
         var newConnections;
         var Id;
         var Emailid;
-      await  axios.get('https://localhost:44373/Connection/get/', { params: { id: id } }).then((response) => {
+        await axios.get(`${baseUrl}/Connection/get/`, { params: { id: id } }).then((response) => {
            
             Id = response.data._id;
             Emailid = response.data.emailId;
@@ -177,7 +178,7 @@ function Connections() {
            
 
         });
-       await axios.put("https://localhost:44373/Connection/update",
+        await axios.put(`${baseUrl}/Connection/update`,
             {
 
                 _id: Id,

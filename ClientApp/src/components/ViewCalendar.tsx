@@ -46,6 +46,7 @@ const CalendarPage: React.FC = () => {
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
+    const baseUrl = process.env.REACT_APP_URL;
     const [isPast, setIsPast] = useState<boolean>(false);
     const [isDelete, setIsDelete] = useState<boolean>(false);
     const [EmailId, setEmailId] = useState<string>("");
@@ -493,8 +494,9 @@ const CalendarPage: React.FC = () => {
 
 
             </div>
+
             {deleteEvent && (
-                <Modal show={showDeleteModal} onHide={ handleDeleteModal}>
+                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
                     <Modal.Header style={{
                         display: "flex",
                         justifyContent: "center",
@@ -508,7 +510,8 @@ const CalendarPage: React.FC = () => {
                     <Modal.Body >
                         <p><strong>Title:</strong> {deleteEvent.title}</p>
                         <p><strong>Event Created by:</strong> {deleteEvent.UserId}</p>
-
+                        <p><strong>Event Type:</strong> {deleteEvent.priv ? 'Private' : 'Public'}</p>
+                        <p><strong>TimeZone:</strong> {deleteEvent.TimeZone}</p>
                         {deleteEvent.start && (
                             <p><strong>Start:</strong> {new Date(deleteEvent.start).toLocaleString('en-US', {
                                 timeZone: deleteEvent.TimeZone,
@@ -523,7 +526,6 @@ const CalendarPage: React.FC = () => {
                                 timeStyle: 'medium'
                             })}</p>
                         )}
-                        <p><strong>Event Type:</strong> {deleteEvent.priv ? 'Private' : 'Public'}</p>
 
                         {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
                             <div>
@@ -550,26 +552,28 @@ const CalendarPage: React.FC = () => {
                             justifyContent: "center",
                             alignItems: "center",
                         }} >
-                            {(!isDelete || !isPast) && <p><strong>{isPast ? "Do you want to delete this event?" : "Do you want to delete/edit this event"}</strong></p>}
+
                         </div>
                     </Modal.Body>
 
 
-                    <Modal.Footer >
-                        {!isPast &&
-                            <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
-                                Edit
-                            </Button>
-                        }
-                        {!isDelete &&
-                            <Button variant="danger" onClick={DeleteEvent} disabled={isDelete}>
-                                Delete
-                            </Button>
-                        }
-                        <Button variant="secondary" onClick={handleDeleteModal}>
-                            Cancel
-                        </Button>
-
+                    <Modal.Footer style={{ display: "flex", justifyContent: "center" }}>
+                        <div>
+                            <p><strong>{isPast ? "Do you want to delete this event?" : "Do you want to delete/edit this event"}</strong></p>
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                {!isPast && (
+                                    <Button variant="success" onClick={handleEditEvent} disabled={isPast}>
+                                        Edit
+                                    </Button>
+                                )}
+                                <Button variant="danger" onClick={DeleteEvent}>
+                                    Delete
+                                </Button>
+                                <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                                    Cancel
+                                </Button>
+                            </div>
+                        </div>
                     </Modal.Footer>
 
                 </Modal>)}
@@ -580,6 +584,7 @@ const CalendarPage: React.FC = () => {
             <EditEventModal
                 handleTimezoneChange={handleTimezoneChange}
                 selectedTimezone={selectedTimezone}
+                setPrivate={setPrivate}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
                 show={showEditModal}

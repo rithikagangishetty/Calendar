@@ -1,5 +1,5 @@
 ﻿import { FC, useState, useEffect } from 'react'
-import { Calendar, Event, momentLocalizer } from 'react-big-calendar'
+import { Calendar, Event, Views, momentLocalizer,View } from 'react-big-calendar'
 import moment from 'moment';
 import React from 'react';
 import 'moment-timezone'; 
@@ -13,7 +13,9 @@ import Modal from 'react-bootstrap/Modal';
 import styled from 'styled-components';
 import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModal } from './Modal';
 
-
+interface CustomAgendaProps {
+    events: Event[];
+}
 
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
 interface RouteParams {
@@ -41,8 +43,8 @@ const CalendarApp: FC = () => {
     const [enddate, setEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
     const history = useHistory();
-    const [priv, setPrivate] = useState<boolean>();
-
+    const [priv, setPrivate] = useState<boolean>(false);
+    const baseUrl = process.env.REACT_APP_URL;
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
     const timezones = moment.tz.names();
@@ -76,7 +78,7 @@ const CalendarApp: FC = () => {
         setSelectedModerators([]);
         setStart(currentDate.toDate());
         setEnd(currentDate.toDate());
-        setPrivate(undefined);
+        setPrivate(false);
     }
     //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -271,6 +273,11 @@ const CalendarApp: FC = () => {
                     Reminder: response.data.reminder,
                 };
                 setDeleteEvent(newEvent);
+                setTitleInput(newEvent.title);
+                setStart(new Date(newEvent.start));
+                setEnd(new Date(newEvent.end));
+                setSelectedModerators(newEvent.Moderator);
+                setSelectedConnections(newEvent.Connections);
                 setPrivate(newEvent.priv);
             })
             .catch((error) => {
@@ -557,13 +564,28 @@ const CalendarApp: FC = () => {
         onClose();
       
     }
-
+   
    ///<summary>
     ///This is the checkbox for the connections in the event details
     ///To avoid adding the same user twice as connection and moderator this function is used.
     ///It checks the selectedModerators array, all the users present in the array are disabled to select in the connections pop up
     ///</summary>
-    const renderEmailCheckbox = (connection: string) => {
+    //const renderEmailCheckbox = (connection: string) => {
+    //    const isDisabled = selectedModerators.includes(connection);
+
+    //    return (
+    //        <Form.Check
+    //            key={connection}
+    //            type="checkbox"
+    //            id={connection}
+    //            label={connection}
+    //            checked={selectedConnections.includes(connection)}
+    //            onChange={() => handleUserSelection(connection,true)}
+    //            disabled={isDisabled}
+    //        />
+    //    );
+    //};
+    const renderEmailCheckbox = (connection: string, defaultChecked: boolean) => {
         const isDisabled = selectedModerators.includes(connection);
 
         return (
@@ -572,12 +594,13 @@ const CalendarApp: FC = () => {
                 type="checkbox"
                 id={connection}
                 label={connection}
-                checked={selectedConnections.includes(connection)}
-                onChange={() => handleUserSelection(connection,true)}
+                checked={selectedConnections.includes(connection) || defaultChecked}
+                onChange={() => handleUserSelection(connection, true)}
                 disabled={isDisabled}
             />
         );
     };
+
         ///<summary>
        ///For the private post the user needs to select connection/moderator which is done using this function
        ///The user selected connection/moderators is the input,it checks if the connection is already present, if yes it will not update the array of selected
@@ -605,6 +628,40 @@ const CalendarApp: FC = () => {
 
         }
     };
+    const CustomAgendaView: React.FC<any> = ({ events }) => {
+        // Custom rendering for the whole agenda view
+        return (
+            <div>
+                {events.map((event:any) => (
+                    <div key={event._id}>
+                        <strong>{event.title}</strong>
+                        <br />
+                        {`${new Date(event.start).toLocaleString('en-US', {
+                            timeZone: event.TimeZone
+                        })} - ${new Date(event.end).toLocaleString('en-US', { timeZone:event.TimeZone })}`}
+                    </div>
+                ))}
+            </div>
+        );
+    };
+    const allEventsRange = {
+        start: moment.min(events.map(event => moment(event.start))).toDate(),
+        end: moment.max(events.map(event => moment(event.end))).toDate(),
+    };
+
+    const handleNavigate = (date: Date) => {
+        // Prevent navigation to a date outside the allEventsRange
+        if (date < allEventsRange.start) {
+            date = allEventsRange.start;
+        } else if (date > allEventsRange.end) {
+            date = allEventsRange.end;
+        }
+    };
+    const views = {
+        month: true,
+        week: true,
+        day: true,
+        agenda: true,  };
         ///<summary>
         ///This is for the private post to make sure the user selects alteast one other user as connection/moderator.
         ///If the edit is true editevent is called else post is called
@@ -647,16 +704,18 @@ const CalendarApp: FC = () => {
                 <br />
                 <strong>
                     <StyledDiv>
-                    Click an event to edit/delete,
-                    Drag the mouse over the calendar
-                        to select a date/time range.
+                    Click an event to edit/delete,In the week/day view
+                    drag the mouse over the calendar
+                        to select a date/time range.<br/>
+                        In the month view the event will be created for the entire day.
                     </StyledDiv>
                 </strong>
             </div>
+            
             <br />
             <Calendar
                 selectable
-                defaultView='week'
+                defaultView='month'
                 events={events}
                 localizer={localizer}
                 startAccessor="start"
@@ -666,16 +725,17 @@ const CalendarApp: FC = () => {
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}
                 tooltipAccessor={tooltipAccessor}
+                onNavigate={handleNavigate}
                 components={{
                     event: CustomEventContent,
+                  
                 }}
+                popup={true}
+                views={views}
                 style={{ height: '80vh' }}
                 step={15}
-             
-                
-               
-
             />
+          
             {currentTaskType && (
                 <MyModal show={showModal} onClose={()=>setShowModal(false)} taskType={currentTaskType} />
             )}
@@ -695,7 +755,8 @@ const CalendarApp: FC = () => {
                     <Modal.Body >
                         <p><strong>Title:</strong> {deleteEvent.title}</p>
                         <p><strong>Event Created by:</strong> {deleteEvent.UserId}</p>
-                       
+                        <p><strong>Event Type:</strong> {deleteEvent.priv ? 'Private' : 'Public'}</p>
+                        <p><strong>TimeZone:</strong> {deleteEvent.TimeZone}</p>
                         {deleteEvent.start && (
                             <p><strong>Start:</strong> {new Date(deleteEvent.start).toLocaleString('en-US', {
                                 timeZone: deleteEvent.TimeZone,
@@ -710,8 +771,7 @@ const CalendarApp: FC = () => {
                                 timeStyle: 'medium'
                             })}</p>
                         )}
-                        <p><strong>Event Type:</strong> {deleteEvent.priv ? 'Private' : 'Public'}</p>
-
+                        
                         {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
                             <div>
                                 <p><strong>Connections:</strong></p>
@@ -737,27 +797,68 @@ const CalendarApp: FC = () => {
                             justifyContent: "center",
                             alignItems: "center",
                         }} >
-                            <p><strong>{isPast ? "Do you want to delete this event?" : "Do you want to delete/edit this event"}</strong></p>
+                           
                         </div>
                     </Modal.Body>
 
 
-                    <Modal.Footer >
-                        {!isPast &&
-                            <Button variant="success" onClick={handleEditEvent} disabled={isPast} >
+            <Modal.Footer style={{ display: "flex", justifyContent: "center" }}>
+                <div>
+                    <p><strong>{isPast ? "Do you want to delete this event?" : "Do you want to delete/edit this event"}</strong></p>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        {!isPast && (
+                            <Button variant="success" onClick={handleEditEvent} disabled={isPast}>
                                 Edit
                             </Button>
-                        }
+                        )}
                         <Button variant="danger" onClick={DeleteEvent}>
-                        Delete
-                    </Button>
+                            Delete
+                        </Button>
                         <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        Cancel
-                            </Button>
-                   
-                </Modal.Footer>
+                            Cancel
+                        </Button>
+                    </div>
+                </div>
+            </Modal.Footer>
 
                 </Modal>)}
+            {/*{deleteEvent && (*/}
+
+
+            {/*    <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>*/}
+            {/*        <Modal.Header style={{*/}
+            {/*            display: "flex",*/}
+            {/*            justifyContent: "center",*/}
+            {/*            alignItems: "center",*/}
+            {/*        }}>*/}
+            {/*            <Modal.Title>Details of the Event</Modal.Title>*/}
+            {/*        </Modal.Header>*/}
+
+            {/*        <Modal.Body>*/}
+            {/*            */}{/* Event details here */}
+            {/*        </Modal.Body>*/}
+
+            {/*        <Modal.Footer style={{ display: "flex", justifyContent: "center" }}>*/}
+            {/*            <div>*/}
+            {/*                <p><strong>{isPast ? "Do you want to delete this event?" : "Do you want to delete/edit this event"}</strong></p>*/}
+            {/*                <div style={{ display: "flex", justifyContent: "space-between" }}>*/}
+            {/*                    {!isPast && (*/}
+            {/*                        <Button variant="success" onClick={handleEditEvent} disabled={isPast}>*/}
+            {/*                            Edit*/}
+            {/*                        </Button>*/}
+            {/*                    )}*/}
+            {/*                    <Button variant="danger" onClick={DeleteEvent}>*/}
+            {/*                        Delete*/}
+            {/*                    </Button>*/}
+            {/*                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>*/}
+            {/*                        Cancel*/}
+            {/*                    </Button>*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*        </Modal.Footer>*/}
+            {/*    </Modal>*/}
+            {/*)}*/}
+
            
             <CreateEventModal
                 show={showCreateModal}
@@ -774,6 +875,7 @@ const CalendarApp: FC = () => {
             <EditEventModal
                 handleTimezoneChange={handleTimezoneChange}
                 show={showEditModal}
+                setPrivate={setPrivate}
                 selectedTimezone={selectedTimezone}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
@@ -788,19 +890,22 @@ const CalendarApp: FC = () => {
                 start={startdate}
                 end={enddate}
                 connections={connections}
+                setSelectedModerators={setSelectedModerators}
                 selectedModerators={selectedModerators}
                 handleUserSelection={handleUserSelection}
-                priv={(priv==undefined)?false:priv}
+                priv={priv}
                
                 />
 
             <SelectEmailModal
+                selectedConnections={selectedConnections}
                 show={showEmailModal}
                 onClose={() => setShowEmailModal(false)}
                 onSaveSelectedConnections={handleSaveSelectedConnections}
                 validationError={validationError}
                 connections={connections}
                 renderEmailCheckbox={renderEmailCheckbox}
+                setSelectedConnections={setSelectedConnections }
                
             />
            

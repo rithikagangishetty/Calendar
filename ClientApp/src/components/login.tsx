@@ -16,7 +16,7 @@ function Login() {
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     //The valid is true when the email entered is correct.
     const [valid, setValid] = useState<boolean>(true);
-
+    const baseUrl = process.env.REACT_APP_URL;
     //This function handles the emailIds, if the email Id entered is valid the page redirects to the home page
     //else stays in the same page with a pop up of invalid email id.
     const handleCloseModal = () => {
@@ -55,7 +55,7 @@ function Login() {
             
         }
        
-         axios.post('https://localhost:44373/Login/login', {
+        axios.post(`${baseUrl}/Login/login`, {
 
              _id: "",
              EmailId: EmailId,
@@ -70,7 +70,7 @@ function Login() {
             
         }).catch((error) => {
             
-            axios.post("https://localhost:44373/Login/signup", {
+            axios.post(`${baseUrl}/Login/signup`, {
 
                 _id: "",
                 EmailId: EmailId,
