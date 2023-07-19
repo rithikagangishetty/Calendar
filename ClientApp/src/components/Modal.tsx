@@ -186,7 +186,8 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     setSelectedModerators
 
 }) => {
-   
+    const [startDateValidity, setStartDateValidity] = useState(true);
+    const [endDateValidity, setEndDateValidity] = useState(true);
     if (selectedTimezone == "") {
         selectedTimezone = defaultTimeZone;
     }
@@ -196,8 +197,20 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         setStart(null);
         setEnd(null);
     }, [selectedTimezone]);
+
     var now = new Date();
-    
+    const setEndDate = (date: Date) => {
+       
+            setEndDateValidity(date !== null&&date > start);
+        
+        setEnd(date);
+    };
+    const setStartDate = (date: Date) => {
+        
+            setStartDateValidity(date !== null && date < end);
+        
+        setStart(date);
+    };
     function OnPost(event:any) {
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
@@ -235,7 +248,11 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
     const timeOffset: number = defaultOffset - selectedOffset;
   
-    
+    function OnCloseFunc() {
+        setStart(null);
+        setEnd(null);
+        onClose();
+    }
     var  minTime = new Date(
             currentTime.year(),
             currentTime.month(),
@@ -284,7 +301,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
     const timeInterval = 15;
     return (
-        <Modal show={show} onHide={onClose}>
+        <Modal show={show} onHide={OnCloseFunc}>
             <Modal.Header style={{
                 display: "flex",
                 justifyContent: "center",
@@ -330,7 +347,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         timeFormat="HH:mm"
                         minTime={minTime}
                         selected={start || null}
-                        onChange={setStart}
+                        onChange={setStartDate}
                         dateFormat="MM/dd/yyyy h:mm aa"
                         placeholderText="Select start date and time"
                         timeIntervals={timeInterval}
@@ -339,15 +356,18 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         minDate={minDate}
                     
                     />
-
+                    {!startDateValidity && (
+                        <div style={{ color: 'red' }}>Start date and time must be before the end date and time.</div>
+                    )}
                 </Form.Group>
+               
                 <br />
                 <Form.Group controlId="eventEnd">
                     <Form.Label><strong>End Date and Time of the Event</strong></Form.Label>
                     <DatePicker
                         timeFormat="HH:mm"
                         selected={end || null}
-                        onChange={setEnd}
+                        onChange={setEndDate}
                         minTime={endMinTime}
                         timeInputLabel="Time:"
                         dateFormat="MM/dd/yyyy h:mm aa"
@@ -358,6 +378,9 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         minDate={minDate}
 
                     />
+                    {!endDateValidity && (
+                        <div style={{ color: 'red' }}>End date and time must be after the start date and time.</div>
+                    )}
                 </Form.Group>
                 <br />
                 <Form.Group controlId="eventEmails">
@@ -378,13 +401,13 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 </Form.Group>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="success" onClick={OnPost}>
+                <Button variant="success" onClick={OnPost} disabled={!startDateValidity || !endDateValidity || start === null || end === null} >
                     {priv ? "Update to Public Event" : "Update Public Event"}
                 </Button>
-                <Button variant="success" onClick={OnPrivatePost}>
+                <Button variant="success" onClick={OnPrivatePost} disabled={!startDateValidity || !endDateValidity || start === null || end === null} >
                     {priv ? "Update Private Event" : "Update to Private Event"}
                 </Button>
-                <Button variant="secondary" onClick={onClose}>
+                <Button variant="secondary" onClick={OnCloseFunc} >
                     Cancel
                 </Button>
             </Modal.Footer>
