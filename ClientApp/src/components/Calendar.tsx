@@ -74,9 +74,9 @@ const CalendarApp: FC = () => {
 
     const onClose = () => {
         setTitleInput("");
+        setStart(currentDate.toDate());
         setSelectedConnections([]);
         setSelectedModerators([]);
-        setStart(currentDate.toDate());
         setEnd(currentDate.toDate());
         setPrivate(false);
     }
@@ -127,11 +127,11 @@ const CalendarApp: FC = () => {
     async function Post() {
 
 
-        var _connections;
+        var userConnections;
         var eventId;
         await axios.get('https://localhost:44373/Connection/get', { params: { id: id } }).then((response) => {
 
-            _connections = response.data.connection;
+            userConnections = response.data.connection;
 
         }).catch((error) => { alert("error in get " + error) });
         await axios.post(`${baseUrl}/User/post`,
@@ -142,7 +142,7 @@ const CalendarApp: FC = () => {
                 StartDate: startdate,
                 Moderator: selectedModerators,
                 EndDate: enddate,
-                Connections: (priv ? selectedConnections : _connections),
+                Connections: (priv ? selectedConnections : userConnections),
                 priv: priv,
                 TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
                 Reminder: false,
@@ -166,7 +166,7 @@ const CalendarApp: FC = () => {
                 UserEmail: id,
                 EventName: titleInput,
                 Moderator: selectedModerators,
-                Connections: (priv ? selectedConnections : _connections),
+                Connections: (priv ? selectedConnections : userConnections),
                 StartDate: startdate,
                 EndDate: enddate,
                 Delete: false,
@@ -177,7 +177,7 @@ const CalendarApp: FC = () => {
             }).then(() => {
                // alert("email sent");
             }).catch((error) => {
-                alert("error in mail " + error)
+               // alert("error in mail " + error)
             });
 
     };
@@ -247,7 +247,7 @@ const CalendarApp: FC = () => {
             }).then(() => {
               //  alert("email sent");
             }).catch((error) => {
-                alert("error in mail " + error)
+             //   alert("error in mail " + error)
                });
      
 
@@ -298,7 +298,7 @@ const CalendarApp: FC = () => {
         /// </summary>
     async function EditEvent() {
         
-        var _connections;
+        var users;
         for (var _event of events) {
             // Check if the event overlaps with any existing event
             if (_event.start !== undefined && _event.end !== undefined) {
@@ -320,18 +320,18 @@ const CalendarApp: FC = () => {
  
         await axios.get(`${baseUrl}/Connection/get`, { params: { id: deleteEventUserId } }).then((response) => {
 
-            _connections = response.data.connection;
+            users = response.data.connection;
 
         }).catch((error) => { alert("error in get " + error) });
        
         await axios.put(`${baseUrl}/User/`, {
             _id: deleteEventId,
-            UserId: id,
+            UserId: deleteEventUserId,
             EventName: titleInput,
             StartDate: startdate,
             Moderator: selectedModerators,
             EndDate: enddate,
-            Connections: (priv ? selectedConnections : _connections),
+            Connections: (priv ? selectedConnections : users),
             priv: priv,
             TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
             Reminder: false,
@@ -352,7 +352,7 @@ const CalendarApp: FC = () => {
                 UserEmail: id,
                 EventName: titleInput,
                 Moderator: selectedModerators,
-                Connections: (priv ? selectedConnections : _connections),
+                Connections: (priv ? selectedConnections : users),
                 StartDate: startdate,
                 EndDate: enddate,
                 priv: priv,
@@ -362,7 +362,7 @@ const CalendarApp: FC = () => {
             }).then(() => {
              //   alert("email sent");
             }).catch((error) => {
-                alert("error in mail " + error)
+              //  alert("error in mail " + error)
             });
 
     };
@@ -496,7 +496,7 @@ const CalendarApp: FC = () => {
             setPrivate(false);
           
             if (Edit) {
-               
+                setPrivate(false);
                     EditEvent();
                 
             }
@@ -512,6 +512,7 @@ const CalendarApp: FC = () => {
     ///</summary>
     function handlePrivatePost(event: React.MouseEvent<HTMLButtonElement>):void {
         event.preventDefault();
+       
         if (titleInput.trim() == '') {
             setValidationError('Please enter a valid title.');
             return;
@@ -546,6 +547,7 @@ const CalendarApp: FC = () => {
 
 
 
+
            setIsPast(true);
 
 
@@ -570,22 +572,7 @@ const CalendarApp: FC = () => {
     ///To avoid adding the same user twice as connection and moderator this function is used.
     ///It checks the selectedModerators array, all the users present in the array are disabled to select in the connections pop up
     ///</summary>
-    //const renderEmailCheckbox = (connection: string) => {
-    //    const isDisabled = selectedModerators.includes(connection);
-
-    //    return (
-    //        <Form.Check
-    //            key={connection}
-    //            type="checkbox"
-    //            id={connection}
-    //            label={connection}
-    //            checked={selectedConnections.includes(connection)}
-    //            onChange={() => handleUserSelection(connection,true)}
-    //            disabled={isDisabled}
-    //        />
-    //    );
-    //};
-    const renderEmailCheckbox = (connection: string, defaultChecked: boolean) => {
+    const renderEmailCheckbox = (connection: string) => {
         const isDisabled = selectedModerators.includes(connection);
 
         return (
@@ -594,12 +581,27 @@ const CalendarApp: FC = () => {
                 type="checkbox"
                 id={connection}
                 label={connection}
-                checked={selectedConnections.includes(connection) || defaultChecked}
-                onChange={() => handleUserSelection(connection, true)}
+                checked={selectedConnections.includes(connection)}
+                onChange={() => handleUserSelection(connection,true)}
                 disabled={isDisabled}
             />
         );
     };
+    //const renderEmailCheckbox = (connection: string, defaultChecked: boolean) => {
+    //    const isDisabled = selectedModerators.includes(connection);
+
+    //    return (
+    //        <Form.Check
+    //            key={connection}
+    //            type="checkbox"
+    //            id={connection}
+    //            label={connection}
+    //            checked={selectedConnections.includes(connection) || defaultChecked}
+    //            onChange={() => handleUserSelection(connection, true)}
+    //            disabled={isDisabled}
+    //        />
+    //    );
+    //};
 
         ///<summary>
        ///For the private post the user needs to select connection/moderator which is done using this function
@@ -676,9 +678,12 @@ const CalendarApp: FC = () => {
             setShowEmailModal(false);
             
             if (Edit) {
+                //setPrivate(true);
                 EditEvent();
+                
             }
             else {
+               // setPrivate(true);
                 Post();
             }
         }
@@ -822,43 +827,7 @@ const CalendarApp: FC = () => {
             </Modal.Footer>
 
                 </Modal>)}
-            {/*{deleteEvent && (*/}
-
-
-            {/*    <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>*/}
-            {/*        <Modal.Header style={{*/}
-            {/*            display: "flex",*/}
-            {/*            justifyContent: "center",*/}
-            {/*            alignItems: "center",*/}
-            {/*        }}>*/}
-            {/*            <Modal.Title>Details of the Event</Modal.Title>*/}
-            {/*        </Modal.Header>*/}
-
-            {/*        <Modal.Body>*/}
-            {/*            */}{/* Event details here */}
-            {/*        </Modal.Body>*/}
-
-            {/*        <Modal.Footer style={{ display: "flex", justifyContent: "center" }}>*/}
-            {/*            <div>*/}
-            {/*                <p><strong>{isPast ? "Do you want to delete this event?" : "Do you want to delete/edit this event"}</strong></p>*/}
-            {/*                <div style={{ display: "flex", justifyContent: "space-between" }}>*/}
-            {/*                    {!isPast && (*/}
-            {/*                        <Button variant="success" onClick={handleEditEvent} disabled={isPast}>*/}
-            {/*                            Edit*/}
-            {/*                        </Button>*/}
-            {/*                    )}*/}
-            {/*                    <Button variant="danger" onClick={DeleteEvent}>*/}
-            {/*                        Delete*/}
-            {/*                    </Button>*/}
-            {/*                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>*/}
-            {/*                        Cancel*/}
-            {/*                    </Button>*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*        </Modal.Footer>*/}
-            {/*    </Modal>*/}
-            {/*)}*/}
-
+           
            
             <CreateEventModal
                 show={showCreateModal}

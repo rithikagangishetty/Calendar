@@ -33,7 +33,7 @@ interface SelectEmailModalProps {
     validationError: string;
     connections: string[];
     selectedConnections: string[];
-    renderEmailCheckbox: (connection: string,defaultChecked:boolean) => JSX.Element;
+    renderEmailCheckbox: (connection: string) => JSX.Element;
     setSelectedConnections: (connection: string[]) => void;
 }
 
@@ -62,6 +62,7 @@ interface EditEventModalProps {
     validationError: string;
     start: Date  ;
     end: Date;
+   
     setStart: (value: any) => void;
     setEnd: (value: any) => void;
     titleInput: string;
@@ -183,7 +184,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     defaultTimeZone,
     timezones,
     priv,
-    setSelectedModerators
+    
 
 }) => {
     const [startDateValidity, setStartDateValidity] = useState(true);
@@ -211,28 +212,30 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         
         setStart(date);
     };
-    function OnPost(event:any) {
+    function Post(event: any) 
+    {
+        setPrivate(false);
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
-        setPrivate(false);
-        setSelectedModerators(selectedModerators);
-        onPost(event);
-
+      
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
+        onPost(event);
+       
     }
-    function OnPrivatePost(event: any) {
+    
+    function PrivatePost(event: any) {
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
         setPrivate(true);
-        setSelectedModerators(selectedModerators);
-        onPrivatePost(event);
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
+        onPrivatePost(event);
+        
     }
-
+           
     function areDatesOnSameDay(date1: Date, date2: Date): boolean {
         const year1 = date1.getFullYear();
         const month1 = date1.getMonth();
@@ -251,6 +254,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     function OnCloseFunc() {
         setStart(null);
         setEnd(null);
+        onTitleInputChange("");
         onClose();
     }
     var  minTime = new Date(
@@ -401,10 +405,10 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 </Form.Group>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="success" onClick={OnPost} disabled={!startDateValidity || !endDateValidity || start === null || end === null} >
+                <Button variant="success" onClick={Post} disabled={!startDateValidity || !endDateValidity || start === null || end === null} >
                     {priv ? "Update to Public Event" : "Update Public Event"}
                 </Button>
-                <Button variant="success" onClick={OnPrivatePost} disabled={!startDateValidity || !endDateValidity || start === null || end === null} >
+                <Button variant="success" onClick={PrivatePost} disabled={!startDateValidity || !endDateValidity || start === null || end === null} >
                     {priv ? "Update Private Event" : "Update to Private Event"}
                 </Button>
                 <Button variant="secondary" onClick={OnCloseFunc} >
@@ -414,6 +418,11 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         </Modal>
     );
 };
+
+
+
+
+
 
 
 
@@ -501,7 +510,7 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
     setSelectedConnections,
     
 }) => {
-    setSelectedConnections(selectedConnections);
+   
     return (
         <Modal show={show} onHide={onClose}>
             <Modal.Header style={{
@@ -513,7 +522,7 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
             </Modal.Header>
             <Modal.Body>
                 <Form>
-                    {connections.length > 0 && connections.map((connection) => renderEmailCheckbox(connection, selectedConnections.includes(connection)))}
+                    {connections.length > 0 && connections.map((connection) => renderEmailCheckbox(connection))}
                 </Form>
                 {validationError && <div className="text-danger">{validationError}</div>}
             </Modal.Body>
