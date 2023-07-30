@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, { useEffect, useState} from 'react';
-import { Form } from 'react-bootstrap';
+import { Form, FormGroup } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import DatePicker from 'react-datepicker';
@@ -202,13 +202,13 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     var now = new Date();
     const setEndDate = (date: Date) => {
        
-            setEndDateValidity(date !== null&&date > start);
-        
+        setEndDateValidity(date !== null&&date > start);
+        setStartDateValidity(start < date);
         setEnd(date);
     };
     const setStartDate = (date: Date) => {
-        
-            setStartDateValidity(date !== null && date < end);
+        setEndDateValidity(end > date);
+        setStartDateValidity(date !== null && date < end);
         
         setStart(date);
     };
@@ -360,12 +360,15 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         minDate={minDate}
                     
                     />
-                    {!startDateValidity && (
-                        <div style={{ color: 'red' }}>Start date and time must be before the end date and time.</div>
-                    )}
+                   
                 </Form.Group>
-               
-                <br />
+               <br/>
+                {(!startDateValidity || !endDateValidity) && (    <FormGroup>
+                   
+                    <div style={{ color: 'red' }}>Invalid Start/End date and time</div>
+                    <br />
+                </FormGroup>  )}
+              
                 <Form.Group controlId="eventEnd">
                     <Form.Label><strong>End Date and Time of the Event</strong></Form.Label>
                     <DatePicker
@@ -382,9 +385,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         minDate={minDate}
 
                     />
-                    {!endDateValidity && (
-                        <div style={{ color: 'red' }}>End date and time must be after the start date and time.</div>
-                    )}
+                  
                 </Form.Group>
                 <br />
                 <Form.Group controlId="eventEmails">

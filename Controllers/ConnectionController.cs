@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-
+using MongoDB.Driver;
 
 namespace Calenderwebapp.Controllers
 {
@@ -32,6 +32,10 @@ namespace Calenderwebapp.Controllers
         
         public async Task<ActionResult<Connections>> GetEmailId(string id)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest("Invalid id parameter.");
+            }
             var connection = await _connectionSupervisor.GetEmailId(id);
             if (connection is null)
             {
@@ -57,6 +61,10 @@ namespace Calenderwebapp.Controllers
        
         public async Task<ActionResult<Connections>> GetId(string email)
         {
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest("Invalid email parameter.");
+            }
             var connection = await _connectionSupervisor.GetId(email);
             if (connection is null)
             {
@@ -69,7 +77,11 @@ namespace Calenderwebapp.Controllers
        
         public async Task<ActionResult<Connections>> GetEmail(string id)
         {
-           var user=await _connectionSupervisor.GetEmail(id);
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest("Invalid id parameter.");
+            }
+            var user=await _connectionSupervisor.GetEmail(id);
             if(user is null)
             {
                 return NotFound();
@@ -79,6 +91,10 @@ namespace Calenderwebapp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Connections newConnection)
         {
+            if (newConnection == null)
+            {
+                return BadRequest("Invalid user data.");
+            }
             await _connectionSupervisor.Post(newConnection);
 
             return CreatedAtAction(nameof(GetEmailId), new { id = newConnection._id }, newConnection);
@@ -86,17 +102,27 @@ namespace Calenderwebapp.Controllers
         }
         [HttpPut("update")]
        
-        public async Task Update(Connections updatedConnection)
+        public async Task<IActionResult> Update(Connections updatedConnection)
         {
+            if (updatedConnection == null)
+            {
+                return BadRequest("Invalid user data.");
+            }
             await  _connectionSupervisor.Update(updatedConnection);
-            
+            return Ok();
             
         }
         [HttpDelete("delete")]
        
-        public async Task Delete(string emailId, string id)
+        public async Task<IActionResult> Delete(string emailId, string id)
         {
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(emailId))
+            {
+                return BadRequest("Invalid id or emailId parameters.");
+            }
+            
             await _connectionSupervisor.Delete(emailId,id);
+        return Ok();
              
         }
     }

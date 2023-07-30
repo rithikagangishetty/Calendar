@@ -1,8 +1,7 @@
 ﻿using Main.Models;
 using Main.Supervisor;
 using Microsoft.AspNetCore.Mvc;
-
-
+using System.Threading.Tasks;
 
 namespace Calenderwebapp.Controllers
     
@@ -30,8 +29,13 @@ namespace Calenderwebapp.Controllers
         }
         [HttpPost("signup")]
        
-        public Connections Signup(Connections userData)
+        public  ActionResult<Connections> Signup(Connections userData)
         {
+            if(userData == null)
+            {
+                return NotFound();
+
+            }
            var user= _loginSupervisor.Signup(userData);
 
             return user;

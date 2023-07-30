@@ -1,5 +1,5 @@
 ﻿import { FC, useState, useEffect } from 'react'
-import { Calendar, Event, Views, momentLocalizer,View } from 'react-big-calendar'
+import { Calendar, Event, momentLocalizer, EventProps } from 'react-big-calendar'
 import moment from 'moment';
 import React from 'react';
 import 'moment-timezone'; 
@@ -13,20 +13,18 @@ import Modal from 'react-bootstrap/Modal';
 import styled from 'styled-components';
 import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModal } from './Modal';
 
-interface CustomAgendaProps {
-    events: Event[];
-}
+
 
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
 interface RouteParams {
     id: string;
 }
 const StyledDiv = styled.div`
-  text-align: center;
-`;
+  text-align: center;`;
+
 const CalendarApp: FC = () => {
     const localizer = momentLocalizer(moment);
-    const [Edit, setEdit] = useState<boolean>(false);
+    const [edit, setEdit] = useState<boolean>(false);
     const [isPast, setIsPast] = useState<boolean>(false);
     const [events, setEvents] = useState<Event[]>([]);
     const [connections, setConnections] = useState<Array<string>>([]);
@@ -39,8 +37,8 @@ const CalendarApp: FC = () => {
     const [deleteEvent, setDeleteEvent] = useState<Event>();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
-    const [startdate, setStart] = useState<Date>(new Date());
-    const [enddate, setEnd] = useState<Date>(new Date());
+    const [startDate, setStart] = useState<Date>(new Date());
+    const [endDate, setEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
     const history = useHistory();
     const [priv, setPrivate] = useState<boolean>(false);
@@ -139,9 +137,9 @@ const CalendarApp: FC = () => {
                 _id: '',
                 UserId: id,
                 EventName: titleInput,
-                StartDate: startdate,
+                StartDate: startDate,
                 Moderator: selectedModerators,
-                EndDate: enddate,
+                EndDate: endDate,
                 Connections: (priv ? selectedConnections : userConnections),
                 priv: priv,
                 TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
@@ -167,13 +165,13 @@ const CalendarApp: FC = () => {
                 EventName: titleInput,
                 Moderator: selectedModerators,
                 Connections: (priv ? selectedConnections : userConnections),
-                StartDate: startdate,
-                EndDate: enddate,
+                StartDate: startDate,
+                EndDate: endDate,
                 Delete: false,
                 priv:priv,
                 Subject: "Event is Created",
                 Body: `An event titled '${titleInput}' has been created.
-                The start time of the event is '${startdate}' and ends at '${enddate}'.`,
+                The start time of the event is '${startDate}' and ends at '${endDate}'.`,
             }).then(() => {
                // alert("email sent");
             }).catch((error) => {
@@ -212,18 +210,18 @@ const CalendarApp: FC = () => {
        
       
       var eventName;
-      var Moderator;
-      var Connection;
-      var _start;
-      var _end;
+      var moderator;
+      var connection;
+      var dateStart;
+      var dateEnd;
         await axios.delete(`${baseUrl}/User/`, { params: { id: deleteEventId, userId: id } }).then((response) => {
 
 
          eventName = response.data.eventName;
-         Moderator = response.data.moderator;
-         Connection = response.data.connections;
-         _start = response.data.startDate;
-         _end = response.data.endDate;
+         moderator = response.data.moderator;
+         connection = response.data.connections;
+         dateStart = response.data.startDate;
+         dateEnd = response.data.endDate;
          setShowDeleteModal(false);
          setCurrentTaskType('eventdeleted');
             setShowModal(true);
@@ -236,12 +234,12 @@ const CalendarApp: FC = () => {
                 _id: deleteEventId,
                 UserEmail: id,
                 EventName: eventName,
-                Moderator: Moderator,
-                Connections: Connection,
-                StartDate: _start,
+                Moderator: moderator,
+                Connections: connection,
+                StartDate: dateStart,
                 Delete: true,
                 priv: priv,
-                EndDate: _end,
+                EndDate: dateEnd,
                 Subject: "Event is Deleted",
                 Body: `An event titled '${eventName}' has been deleted.`,
             }).then(() => {
@@ -305,9 +303,9 @@ const CalendarApp: FC = () => {
                 
                 if (_event._id != deleteEventId) {
                     if (
-                        (startdate >= _event.start && startdate < _event.end) ||
-                        (enddate > _event.start && enddate <= _event.end) ||
-                        (startdate <= _event.start && enddate >= _event.end)
+                        (startDate >= _event.start && startDate < _event.end) ||
+                        (endDate > _event.start && endDate <= _event.end) ||
+                        (startDate <= _event.start && endDate >= _event.end)
                     ) {
                         setCurrentTaskType('eventclash');
                         setShowModal(true);
@@ -328,9 +326,9 @@ const CalendarApp: FC = () => {
             _id: deleteEventId,
             UserId: deleteEventUserId,
             EventName: titleInput,
-            StartDate: startdate,
+            StartDate: startDate,
             Moderator: selectedModerators,
-            EndDate: enddate,
+            EndDate: endDate,
             Connections: (priv ? selectedConnections : users),
             priv: priv,
             TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
@@ -353,12 +351,12 @@ const CalendarApp: FC = () => {
                 EventName: titleInput,
                 Moderator: selectedModerators,
                 Connections: (priv ? selectedConnections : users),
-                StartDate: startdate,
-                EndDate: enddate,
+                StartDate: startDate,
+                EndDate: endDate,
                 priv: priv,
                 Delete:false,
                 Subject: "Event is Edited",
-                Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startdate}' and ends at '${enddate}'.`,
+                Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startDate}' and ends at '${endDate}'.`,
             }).then(() => {
              //   alert("email sent");
             }).catch((error) => {
@@ -495,7 +493,7 @@ const CalendarApp: FC = () => {
             setValidationError('');
             setPrivate(false);
           
-            if (Edit) {
+            if (edit) {
                 setPrivate(false);
                     EditEvent();
                 
@@ -630,22 +628,7 @@ const CalendarApp: FC = () => {
 
         }
     };
-    const CustomAgendaView: React.FC<any> = ({ events }) => {
-        // Custom rendering for the whole agenda view
-        return (
-            <div>
-                {events.map((event:any) => (
-                    <div key={event._id}>
-                        <strong>{event.title}</strong>
-                        <br />
-                        {`${new Date(event.start).toLocaleString('en-US', {
-                            timeZone: event.TimeZone
-                        })} - ${new Date(event.end).toLocaleString('en-US', { timeZone:event.TimeZone })}`}
-                    </div>
-                ))}
-            </div>
-        );
-    };
+    
     const allEventsRange = {
         start: moment.min(events.map(event => moment(event.start))).toDate(),
         end: moment.max(events.map(event => moment(event.end))).toDate(),
@@ -663,7 +646,9 @@ const CalendarApp: FC = () => {
         month: true,
         week: true,
         day: true,
-        agenda: true,  };
+        agenda: true,
+       // allEvents: { component: AllEventsView },
+};
         ///<summary>
         ///This is for the private post to make sure the user selects alteast one other user as connection/moderator.
         ///If the edit is true editevent is called else post is called
@@ -677,7 +662,7 @@ const CalendarApp: FC = () => {
             setSelectedConnections([]);
             setShowEmailModal(false);
             
-            if (Edit) {
+            if (edit) {
                 //setPrivate(true);
                 EditEvent();
                 
@@ -688,6 +673,9 @@ const CalendarApp: FC = () => {
             }
         }
     };
+
+
+
 
     return (
         <div >
@@ -734,9 +722,9 @@ const CalendarApp: FC = () => {
                 components={{
                     event: CustomEventContent,
                   
+                  
                 }}
                 popup={true}
-                views={views}
                 style={{ height: '80vh' }}
                 step={15}
             />
@@ -856,8 +844,8 @@ const CalendarApp: FC = () => {
                 onTitleInputChange={setTitleInput}
                 setEnd={setEnd}
                 setStart={setStart}
-                start={startdate}
-                end={enddate}
+                start={startDate}
+                end={endDate}
                 connections={connections}
                 setSelectedModerators={setSelectedModerators}
                 selectedModerators={selectedModerators}
