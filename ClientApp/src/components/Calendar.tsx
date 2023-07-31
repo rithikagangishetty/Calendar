@@ -42,6 +42,7 @@ const CalendarApp: FC = () => {
     const [showEmailModal, setShowEmailModal] = useState(false);
     const history = useHistory();
     const [priv, setPrivate] = useState<boolean>(false);
+    const [deleteEventPriv, setDeleteEventPrivate] = useState<boolean>();
     const baseUrl = process.env.REACT_APP_URL;
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
@@ -76,7 +77,7 @@ const CalendarApp: FC = () => {
         setSelectedConnections([]);
         setSelectedModerators([]);
         setEnd(currentDate.toDate());
-        setPrivate(false);
+       /* setPrivate(false);*/
     }
     //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -124,7 +125,7 @@ const CalendarApp: FC = () => {
         /// </summary>
     async function Post() {
 
-
+        console.log(priv, "at post");
         var userConnections;
         var eventId;
         await axios.get('https://localhost:44373/Connection/get', { params: { id: id } }).then((response) => {
@@ -276,7 +277,8 @@ const CalendarApp: FC = () => {
                 setEnd(new Date(newEvent.end));
                 setSelectedModerators(newEvent.Moderator);
                 setSelectedConnections(newEvent.Connections);
-                setPrivate(newEvent.priv);
+                setDeleteEventPrivate(newEvent.priv);
+               
             })
             .catch((error) => {
                 alert(error);
@@ -294,8 +296,8 @@ const CalendarApp: FC = () => {
         ///After updating a email will be sent 
         ///this function will be called everytime when the variables in the useEffect block changes
         /// </summary>
-    async function EditEvent() {
-        
+    async function EditEvent(Priv:boolean) {
+        console.log(Priv, "at edit event");
         var users;
         for (var _event of events) {
             // Check if the event overlaps with any existing event
@@ -319,7 +321,7 @@ const CalendarApp: FC = () => {
         await axios.get(`${baseUrl}/Connection/get`, { params: { id: deleteEventUserId } }).then((response) => {
 
             users = response.data.connection;
-
+            
         }).catch((error) => { alert("error in get " + error) });
        
         await axios.put(`${baseUrl}/User/`, {
@@ -329,8 +331,8 @@ const CalendarApp: FC = () => {
             StartDate: startDate,
             Moderator: selectedModerators,
             EndDate: endDate,
-            Connections: (priv ? selectedConnections : users),
-            priv: priv,
+            Connections: (Priv ? selectedConnections : users),
+            priv: Priv,
             TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
             Reminder: false,
         }).then(() => {
@@ -350,10 +352,10 @@ const CalendarApp: FC = () => {
                 UserEmail: id,
                 EventName: titleInput,
                 Moderator: selectedModerators,
-                Connections: (priv ? selectedConnections : users),
+                Connections: (Priv ? selectedConnections : users),
                 StartDate: startDate,
                 EndDate: endDate,
-                priv: priv,
+                priv: Priv,
                 Delete:false,
                 Subject: "Event is Edited",
                 Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startDate}' and ends at '${endDate}'.`,
@@ -494,8 +496,9 @@ const CalendarApp: FC = () => {
             setPrivate(false);
           
             if (edit) {
-                setPrivate(false);
-                    EditEvent();
+                
+               
+                    EditEvent(false);
                 
             }
             else {
@@ -520,6 +523,7 @@ const CalendarApp: FC = () => {
         else {
             setValidationError('');
             setPrivate(true);
+            console.log(priv, "at post");
             setShowEmailModal(true);
         }
     }
@@ -663,12 +667,12 @@ const CalendarApp: FC = () => {
             setShowEmailModal(false);
             
             if (edit) {
-                //setPrivate(true);
-                EditEvent();
+                
+                EditEvent(true);
                 
             }
             else {
-               // setPrivate(true);
+           
                 Post();
             }
         }
@@ -850,7 +854,7 @@ const CalendarApp: FC = () => {
                 setSelectedModerators={setSelectedModerators}
                 selectedModerators={selectedModerators}
                 handleUserSelection={handleUserSelection}
-                priv={priv}
+                priv={deleteEventPriv}
                
                 />
 

@@ -74,7 +74,7 @@ interface EditEventModalProps {
     selectedTimezone: any;
     defaultTimeZone: any;
     timezones: any;
-    priv: boolean;
+    priv: any;
     setPrivate:(value: boolean)=> void;
    // eventEdit:any
    
@@ -195,11 +195,11 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     moment.tz.setDefault(selectedTimezone);
     const currentTime = moment();
     useEffect(() => {
-        setStart(null);
-        setEnd(null);
+
     }, [selectedTimezone]);
 
     var now = new Date();
+    console.log(priv, "initial");
     const setEndDate = (date: Date) => {
        
         setEndDateValidity(date !== null&&date > start);
@@ -214,21 +214,22 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     };
     function Post(event: any) 
     {
-        setPrivate(false);
+      
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
-      
+        console.log(priv, "at modal");
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
         onPost(event);
        
     }
-    
+    function dummy(event: any) {
+      
+    }
     function PrivatePost(event: any) {
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
-        setPrivate(true);
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
