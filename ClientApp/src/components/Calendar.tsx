@@ -125,7 +125,7 @@ const CalendarApp: FC = () => {
         /// </summary>
     async function Post() {
 
-        console.log(priv, "at post");
+        
         var userConnections;
         var eventId;
         await axios.get('https://localhost:44373/Connection/get', { params: { id: id } }).then((response) => {
@@ -297,7 +297,7 @@ const CalendarApp: FC = () => {
         ///this function will be called everytime when the variables in the useEffect block changes
         /// </summary>
     async function EditEvent(Priv:boolean) {
-        console.log(Priv, "at edit event");
+       
         var users;
         for (var _event of events) {
             // Check if the event overlaps with any existing event
@@ -346,7 +346,7 @@ const CalendarApp: FC = () => {
             setEdit(false);
         }).catch((error) => { alert(error); });
 
-        axios.post(`${baseUrl}/User/sendmail`,
+        await axios.post(`${baseUrl}/User/sendmail`,
             {
                 _id: deleteEventId,
                 UserEmail: id,
@@ -832,6 +832,11 @@ const CalendarApp: FC = () => {
                 connections={connections}
                 selectedModerators={selectedModerators}
                 handleUserSelection={handleUserSelection}
+                start={startDate}
+                end={endDate}
+                defaultTimeZone={defaultTimeZone}
+                Timezone={selectedTimezone}
+
             />
             <EditEventModal
                 handleTimezoneChange={handleTimezoneChange}

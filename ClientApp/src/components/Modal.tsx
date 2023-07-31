@@ -49,7 +49,10 @@ interface CreateEventModalProps {
     onTitleInputChange: (value: string) => void;
     connections: string[];
     selectedModerators: string[];
-   
+    start: Date;
+    end: Date;
+    Timezone: any;
+    defaultTimeZone: any;
     handleUserSelection: (user: string, connect: boolean) => void;
 }
 
@@ -62,7 +65,6 @@ interface EditEventModalProps {
     validationError: string;
     start: Date  ;
     end: Date;
-   
     setStart: (value: any) => void;
     setEnd: (value: any) => void;
     titleInput: string;
@@ -195,7 +197,8 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     moment.tz.setDefault(selectedTimezone);
     const currentTime = moment();
     useEffect(() => {
-
+        setStart(moment(start).tz(selectedTimezone).toDate());
+        setEnd(moment(end).tz(selectedTimezone).toDate());
     }, [selectedTimezone]);
 
     var now = new Date();
@@ -217,16 +220,15 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
       
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
-        console.log(priv, "at modal");
+       
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
         onPost(event);
        
     }
-    function dummy(event: any) {
-      
-    }
+   
+   
     function PrivatePost(event: any) {
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
@@ -287,7 +289,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 endMinTime = new Date();
                 endMinTime.setHours(0, 0, 0, 0);
            
-           // endMinTime.setMinutes(endMinTime.getMinutes() + 15);
+         
         }
     }
    
@@ -443,7 +445,16 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     connections,
     selectedModerators,
     handleUserSelection,
+    start,
+    end,
+    defaultTimeZone,
+    Timezone,
+    
 }) => {
+    if (Timezone == "") {
+        Timezone = defaultTimeZone;
+    }
+    console.log(Timezone);
     return (
         <Modal show={show} onHide={onClose}>
             <Modal.Header style={{
@@ -465,6 +476,20 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
                 </Form.Group>
                 <br />
+                <p><strong>TimeZone:</strong> {Timezone}</p>
+                    <p><strong>Start:</strong> {new Date(start).toLocaleString('en-US', {
+                        timeZone: Timezone,
+                        dateStyle: 'medium',
+                        timeStyle: 'medium'
+                    })}</p>
+               
+                    <p><strong>End:</strong> {new Date(end).toLocaleString('en-US', {
+                       timeZone: Timezone,
+                        dateStyle: 'medium',
+                        timeStyle: 'medium'
+                    })}</p>
+                <br />
+               
                 <Form.Group controlId="eventEmails">
                     <Form.Label><strong>Select the Moderators</strong></Form.Label>
                     <div>
@@ -520,7 +545,17 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
                 justifyContent: "center",
                 alignItems: "center",
             }} >
-                <Modal.Title>Select Connections </Modal.Title>
+                <Modal.Title>
+                    Select Connections
+                    <br />
+                    <div style={{ fontSize: '14px', fontWeight: 'normal', textDecoration: 'underline' }}>
+                        The connections selected here are not added as moderators
+                    </div>
+                </Modal.Title>
+
+             
+                
+
             </Modal.Header>
             <Modal.Body>
                 <Form>
