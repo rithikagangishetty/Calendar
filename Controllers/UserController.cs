@@ -177,7 +177,7 @@ namespace Calenderwebapp.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(UserDetails updatedUser/*,string userId*/)
+        public async Task<IActionResult> Update(UserDetails updatedUser)
         {
             if (updatedUser == null)
             {
