@@ -25,6 +25,8 @@ type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedite
 const CalendarPage: React.FC = () => {
     const localizer = momentLocalizer(moment);
     const { id, connectionId } = useParams<RouteParams>();
+    const [creator, setCreator] = useState<boolean>(true);
+    const [deleteUserEmail, setDeleteUserEmail] = useState<string>('');
     const [Edit, setEdit] = useState<boolean>(false);
     const [events, setEvents] = useState<Event[]>([]);
     const [connections, setConnections] = useState<Array<string>>([]);
@@ -50,6 +52,7 @@ const CalendarPage: React.FC = () => {
     const [isPast, setIsPast] = useState<boolean>(false);
     const [isDelete, setIsDelete] = useState<boolean>(false);
     const [EmailId, setEmailId] = useState<string>("");
+    const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const handleCloseModal = () => {
 
         setShowModal(false);
@@ -60,7 +63,7 @@ const CalendarPage: React.FC = () => {
         GetEmail();
         GetConnections()
         moment.tz.setDefault();
-    }, [currentTaskType, showDeleteModal, showEditModal, selectedTimezone]);
+    }, [ showModal, selectedTimezone]);
 
 
     function GetEmail() {
@@ -181,11 +184,17 @@ const CalendarPage: React.FC = () => {
                     Connections: response.data.connections,
                     priv: response.data.priv,
                     _id: response.data._id,
-                    TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
+                    TimeZone:response.data.timeZone,
                     Reminder: response.data.reminder,
                 };
                 setDeleteEvent(newEvent);
-
+                setTitleInput(newEvent.title);
+                setStart(new Date(newEvent.start));
+                setEnd(new Date(newEvent.end));
+                setSelectedModerators(newEvent.Moderator);
+                setSelectedConnections(newEvent.Connections);
+                setPrivate(newEvent.priv);
+                setDeleteUserEmail(newEvent.UserId);
             })
             .catch((error) => {
                 alert(error);
@@ -202,11 +211,15 @@ const CalendarPage: React.FC = () => {
         ///After updating a email will be sent
         ///this function will be called everytime when the variables in the useEffect block changes
         /// </summary>
-    function EditEvent() {
-        
+    async function EditEvent(Priv: boolean) {
+
+        var users;
+
+
         for (var _event of events) {
-            
+            // Check if the event overlaps with any existing event
             if (_event.start !== undefined && _event.end !== undefined) {
+
                 if (_event._id != deleteEventId) {
                     if (
                         (startdate >= _event.start && startdate < _event.end) ||
@@ -222,17 +235,23 @@ const CalendarPage: React.FC = () => {
             }
         }
 
-        axios.put(`${baseUrl}/User/`, {
+        await axios.get(`${baseUrl}/Connection/get`, { params: { id: UserId } }).then((response) => {
+
+            users = response.data.connection;
+
+        }).catch((error) => { alert("error in get " + error) });
+
+        await axios.put(`${baseUrl}/User/`, {
             _id: deleteEventId,
-            UserId: UserId,
+            UserId: (creator) ? UserId : id,
             EventName: titleInput,
             StartDate: startdate,
             Moderator: selectedModerators,
             EndDate: enddate,
-            Connections: (priv ? selectedConnections : connections),
-            priv: priv,
+            Connections: (Priv ? selectedConnections : users),
+            priv: Priv,
             TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
-            Reminder:false,
+            Reminder: false,
         }).then(() => {
 
 
@@ -240,27 +259,30 @@ const CalendarPage: React.FC = () => {
             setShowModal(true);
             setShowEditModal(false);
             setShowDeleteModal(false);
+            onClose();
             setEdit(false);
         }).catch((error) => { alert(error); });
-        axios.post(`${baseUrl}/User/sendmail`,
+
+        await axios.post(`${baseUrl}/User/sendmail`,
             {
                 _id: deleteEventId,
-                UserEmail: UserId,
+                UserEmail: id,
                 EventName: titleInput,
                 Moderator: selectedModerators,
-                Connections: (priv ? selectedConnections : connections),
+                Connections: (Priv ? selectedConnections : users),
                 StartDate: startdate,
                 EndDate: enddate,
+                priv: Priv,
                 Delete: false,
                 Subject: "Event is Edited",
-                Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startdate}' and ends at '${enddate}'.`,
+                Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startDate}' and ends at '${endDate}'.`,
             }).then(() => {
                 //   alert("email sent");
             }).catch((error) => {
-                alert("error in mail " + error)
+                //  alert("error in mail " + error)
             });
+
     };
-   
    
     ///<summary>
     ///handlePost when the user creates a public post this function is called
@@ -283,7 +305,7 @@ const CalendarPage: React.FC = () => {
             setPrivate(false);
             if (Edit) {
 
-                EditEvent();
+                EditEvent(false);
 
             }
             
@@ -344,12 +366,12 @@ const CalendarPage: React.FC = () => {
     function handleDelete(event: any) {
 
         
-
+        setPrivate(event.priv);
         const eventStart = moment(event.start);
         const isPastEvent = eventStart.isBefore(currentDate);
         setIsPast(isPastEvent);
     
-            if (event.Connections.includes(connectionId)||event.Connections.includes(id))
+            if (event.Connections.includes(id))
             {
                 
                 setIsDelete(true);
@@ -364,7 +386,21 @@ const CalendarPage: React.FC = () => {
             
         
     };
+    const onClose = () => {
+        setTitleInput("");
+        setStart(currentDate.toDate());
+        setSelectedConnections([]);
+        setSelectedModerators([]);
+        setEnd(currentDate.toDate());
+         setPrivate(false);
+    }
+    const handleClose = () => {
+        
+        setShowEditModal(false);
+        onClose();
 
+    }
+   
      ///<summary>
     ///This is the checkbox for the connections in the event details
     ///To avoid adding the same user twice as connection and moderator this function is used.
@@ -372,7 +408,7 @@ const CalendarPage: React.FC = () => {
     ///</summary>
    
     const renderEmailCheckbox = (connection: string) => {
-        const isDisabled = selectedModerators.includes(connection);
+        const isDisabled = selectedModerators.includes(connection) || (connection == deleteUserEmail && creator);;
 
         return (
             <Form.Check
@@ -427,17 +463,14 @@ const CalendarPage: React.FC = () => {
             setSelectedConnections([]);
             setShowEmailModal(false);
             if (Edit) {
-                EditEvent();
+                EditEvent(true);
             }
             
         }
     };
        //Gets the defaultTimeZone of the client
-    const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const handleDeleteModal = () => {
-        setShowDeleteModal(false);
-        setIsDelete(false);
-    }
+   
+   
 
     return (
         <div>
@@ -474,7 +507,7 @@ const CalendarPage: React.FC = () => {
                 <br />
                 <Calendar
                 
-                    defaultView='week'
+                    defaultView='month'
                     events={events}
                     localizer={localizer}
                     startAccessor="start"
@@ -578,18 +611,22 @@ const CalendarPage: React.FC = () => {
 
                 </Modal>)}
 
+
             {currentTaskType && (
                 <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
             )}
             <EditEventModal
                 handleTimezoneChange={handleTimezoneChange}
-                selectedTimezone={selectedTimezone}
+                selectedTimezone={defaultTimeZone}
+                userId={deleteUserEmail}
+                creator={creator}
                 setPrivate={setPrivate}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
                 show={showEditModal}
-                onClose={() => setShowEditModal(false)}
+                onClose={handleClose}
                 onPost={handlePost}
+                setCreator={setCreator}
                 onPrivatePost={handlePrivatePost}
                 validationError={validationError}
                 titleInput={titleInput}
@@ -600,8 +637,9 @@ const CalendarPage: React.FC = () => {
                 end={enddate}
                 connections={connections}
                 selectedModerators={selectedModerators}
+                setSelectedModerators={setSelectedModerators}
                 handleUserSelection={handleUserSelection}
-                priv={false }
+                priv={priv }
 
             />
             

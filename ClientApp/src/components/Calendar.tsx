@@ -78,7 +78,7 @@ const CalendarApp: FC = () => {
         setSelectedConnections([]);
         setSelectedModerators([]);
         setEnd(currentDate.toDate());
-       /* setPrivate(false);*/
+        setPrivate(false);
     }
     //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -311,7 +311,7 @@ const CalendarApp: FC = () => {
     async function EditEvent(Priv:boolean) {
        
         var users;
-        console.log(creator);
+        
        
         for (var _event of events) {
             // Check if the event overlaps with any existing event
@@ -881,14 +881,14 @@ const CalendarApp: FC = () => {
                 />
 
             <SelectEmailModal
-                selectedConnections={selectedConnections}
+                
                 show={showEmailModal}
                 onClose={() => setShowEmailModal(false)}
                 onSaveSelectedConnections={handleSaveSelectedConnections}
                 validationError={validationError}
                 connections={connections}
                 renderEmailCheckbox={renderEmailCheckbox}
-                setSelectedConnections={setSelectedConnections }
+               
                
             />
            

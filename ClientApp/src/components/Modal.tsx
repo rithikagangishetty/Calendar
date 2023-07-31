@@ -32,9 +32,8 @@ interface SelectEmailModalProps {
     onSaveSelectedConnections: () => void;
     validationError: string;
     connections: string[];
-    selectedConnections: string[];
-    renderEmailCheckbox: (connection: string) => JSX.Element;
-    setSelectedConnections: (connection: string[]) => void;
+   renderEmailCheckbox: (connection: string) => JSX.Element;
+    
 }
 
 
@@ -585,9 +584,9 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
     onSaveSelectedConnections,
     validationError,
     connections,
-    selectedConnections,
+    
     renderEmailCheckbox,
-    setSelectedConnections,
+   
     
 }) => {
    
