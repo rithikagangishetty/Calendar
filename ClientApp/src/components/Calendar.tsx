@@ -27,6 +27,7 @@ const CalendarApp: FC = () => {
     const [edit, setEdit] = useState<boolean>(false);
     const [isPast, setIsPast] = useState<boolean>(false);
     const [events, setEvents] = useState<Event[]>([]);
+    const [creator, setCreator] = useState<boolean>(true);
     const [connections, setConnections] = useState<Array<string>>([]);
     const { id } = useParams<RouteParams>();
     const [showModal, setShowModal] = useState(false);
@@ -42,9 +43,9 @@ const CalendarApp: FC = () => {
     const [showEmailModal, setShowEmailModal] = useState(false);
     const history = useHistory();
     const [priv, setPrivate] = useState<boolean>(false);
-    const [deleteEventPriv, setDeleteEventPrivate] = useState<boolean>();
     const baseUrl = process.env.REACT_APP_URL;
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
+    const [deleteUserEmail, setDeleteUserEmail] = useState<string>('');
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
@@ -90,24 +91,27 @@ const CalendarApp: FC = () => {
        
     const getEvents = () => {
         axios.get(`${baseUrl}/User/getallevents`, { params: { id: id } }).then((response) => {
-            const event = response.data.map((training: any) => {
-               
-                return {
-                    _id: training._id,
-                    title: training.eventName,
-                    start: new Date(training.startDate),
-                    end: new Date(training.endDate),
-                    allDay: false,
-                    UserId: training.userId,
-                    Moderator: training.moderator,
-                    Connections: training.connections,
-                    priv: training.priv,
-                    TimeZone: training.timeZone,
-                    Reminder:training.reminder,
-                }
-            })
            
-            setEvents(event);
+                const event = response.data.map((training: any) => {
+
+                    return {
+                        _id: training._id,
+                        title: training.eventName,
+                        start: new Date(training.startDate),
+                        end: new Date(training.endDate),
+                        allDay: false,
+                        UserId: training.userId,
+                        Moderator: training.moderator,
+                        Connections: training.connections,
+                        priv: training.priv,
+                        TimeZone: training.timeZone,
+                        Reminder: training.reminder,
+                    }
+                })
+                setEvents(event);
+            
+            
+          
         }).catch((err) => {
             alert(err)
         });
@@ -254,9 +258,10 @@ const CalendarApp: FC = () => {
          /// <summary>
         ///Takes the event and returns the moderators and connections array with emailIds instead of object Id.
         /// </summary>
-    function showEmails(event: any) {
-
-        axios
+    
+   async function  showEmails(event: any) {
+       
+        await axios
             .get(`${baseUrl}/User/getevent`, { params: { id: event._id } })
             .then((response) => {
                 const newEvent = {
@@ -268,24 +273,31 @@ const CalendarApp: FC = () => {
                     Connections: response.data.connections,
                     priv: response.data.priv,
                     _id: response.data._id,
-                    TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
+                    TimeZone: response.data.timeZone,
                     Reminder: response.data.reminder,
                 };
+                
                 setDeleteEvent(newEvent);
                 setTitleInput(newEvent.title);
                 setStart(new Date(newEvent.start));
                 setEnd(new Date(newEvent.end));
                 setSelectedModerators(newEvent.Moderator);
                 setSelectedConnections(newEvent.Connections);
-                setDeleteEventPrivate(newEvent.priv);
-               
+                setPrivate(newEvent.priv);
+                setDeleteUserEmail(newEvent.UserId);
+
+                
+
+                
             })
             .catch((error) => {
                 alert(error);
 
 
             });
+        
 
+     
     }
 
         /// <summary>
@@ -299,6 +311,8 @@ const CalendarApp: FC = () => {
     async function EditEvent(Priv:boolean) {
        
         var users;
+        console.log(creator);
+       
         for (var _event of events) {
             // Check if the event overlaps with any existing event
             if (_event.start !== undefined && _event.end !== undefined) {
@@ -326,7 +340,7 @@ const CalendarApp: FC = () => {
        
         await axios.put(`${baseUrl}/User/`, {
             _id: deleteEventId,
-            UserId: deleteEventUserId,
+            UserId: (creator)?deleteEventUserId:id,
             EventName: titleInput,
             StartDate: startDate,
             Moderator: selectedModerators,
@@ -523,7 +537,7 @@ const CalendarApp: FC = () => {
         else {
             setValidationError('');
             setPrivate(true);
-            console.log(priv, "at post");
+            
             setShowEmailModal(true);
         }
     }
@@ -575,7 +589,7 @@ const CalendarApp: FC = () => {
     ///It checks the selectedModerators array, all the users present in the array are disabled to select in the connections pop up
     ///</summary>
     const renderEmailCheckbox = (connection: string) => {
-        const isDisabled = selectedModerators.includes(connection);
+        const isDisabled = selectedModerators.includes(connection) || (connection == deleteUserEmail && creator);
 
         return (
             <Form.Check
@@ -841,12 +855,15 @@ const CalendarApp: FC = () => {
             <EditEventModal
                 handleTimezoneChange={handleTimezoneChange}
                 show={showEditModal}
+                userId={deleteUserEmail}
+                creator={creator }
                 setPrivate={setPrivate}
-                selectedTimezone={selectedTimezone}
+                selectedTimezone={defaultTimeZone}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
                 onClose={handleClose}
                 onPost={handlePost}
+                setCreator={setCreator}
                 onPrivatePost={handlePrivatePost}
                 validationError={validationError}
                 titleInput={titleInput}
@@ -859,7 +876,7 @@ const CalendarApp: FC = () => {
                 setSelectedModerators={setSelectedModerators}
                 selectedModerators={selectedModerators}
                 handleUserSelection={handleUserSelection}
-                priv={deleteEventPriv}
+                priv={priv}
                
                 />
 

@@ -177,22 +177,22 @@ namespace Calenderwebapp.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(UserDetails updatedUser)
+        public async Task<IActionResult> Update(UserDetails updatedUser/*,string userId*/)
         {
             if (updatedUser == null)
             {
                 return BadRequest("Invalid user data.");
             }
-
-            var user = await _userSupervisor.Update(updatedUser);
-            if (user == null)
-            {
-                return NotFound();
-            }
             if (DateTime.Parse(updatedUser.StartDate) >= DateTime.Parse(updatedUser.EndDate))
             {
                 return BadRequest("Invalid End Date/Time of the event");
             }
+            var user = await _userSupervisor.Update(updatedUser/*,userId*/);
+            if (user == null)
+            {
+                return NotFound();
+            }
+           
 
             return NoContent();
         }

@@ -41,6 +41,7 @@ interface SelectEmailModalProps {
 
 interface CreateEventModalProps {
     show: boolean;
+    
     onClose: () => void;
     onPost: (event: any) => void;
     onPrivatePost: (event: any) => void;
@@ -58,12 +59,15 @@ interface CreateEventModalProps {
 
 interface EditEventModalProps {
     show: boolean;
+    creator: boolean;
     setSelectedModerators: (moderators: string[]) => void;
     onClose: () => void;
     onPost: (event: any) => void;
     onPrivatePost: (event: any) => void;
     validationError: string;
-    start: Date  ;
+    start: Date;
+    userId: any;
+    setCreator: (value: any) => void;
     end: Date;
     setStart: (value: any) => void;
     setEnd: (value: any) => void;
@@ -78,7 +82,7 @@ interface EditEventModalProps {
     timezones: any;
     priv: any;
     setPrivate:(value: boolean)=> void;
-   // eventEdit:any
+   
    
    
 }
@@ -168,14 +172,17 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
 export const EditEventModal: React.FC<EditEventModalProps> = ({
     show,
     onClose,
+    creator,
     onPost,
     onPrivatePost,
     validationError,
     titleInput,
     start,
     setPrivate,
+    userId,
     end,
     setStart,
+    setCreator,
     setEnd,
     onTitleInputChange,
     connections,
@@ -195,14 +202,17 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         selectedTimezone = defaultTimeZone;
     }
     moment.tz.setDefault(selectedTimezone);
+    
     const currentTime = moment();
     useEffect(() => {
-        setStart(moment(start).tz(selectedTimezone).toDate());
-        setEnd(moment(end).tz(selectedTimezone).toDate());
+       
+
     }, [selectedTimezone]);
 
+
+
     var now = new Date();
-    console.log(priv, "initial");
+  
     const setEndDate = (date: Date) => {
        
         setEndDateValidity(date !== null&&date > start);
@@ -220,7 +230,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
       
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
-       
+        setCreator(creator);
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
@@ -230,6 +240,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
    
    
     function PrivatePost(event: any) {
+        setCreator(creator);
         start.setMinutes(start.getMinutes() + timeOffset);
         end.setMinutes(end.getMinutes() + timeOffset);
         onTitleInputChange(titleInput);
@@ -294,9 +305,15 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     }
    
     const minDate = currentTime.toDate();
+    //if (userId && userId.trim() !== '') {
+    //    // Assuming 'useremail' is a valid email address and is not an empty string
+    //    if (!connections.includes(userId)) {
+    //        // Add 'useremail' to 'connections' if it's not already present
+    //        connections.push(userId);
+    //    }
+    //}
 
     
-
     const endOfDay = moment(currentTime).endOf('day').toDate();
     const maxTime = new Date(
         endOfDay.getFullYear(),
@@ -305,7 +322,10 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         23,
         59
     );
-
+    
+    const handleCreatorChange = () => {
+        setCreator(!creator);
+    };
     const timeInterval = 15;
     return (
         <Modal show={show} onHide={OnCloseFunc}>
@@ -399,14 +419,47 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                                 <Form.Check
                                     key={moderator}
                                     type="checkbox"
-                                    label={moderator}
-                                    value={selectedModerators }
+                                    label={ moderator}
+                                    value={selectedModerators}
                                     checked={selectedModerators.includes(moderator)}
                                     onChange={() => handleUserSelection(moderator, false)}
+                                    disabled={creator && moderator === userId}
                                 />
                             ))}
                     </div>
                 </Form.Group>
+                <br />
+                <Form.Group controlId="eventCreator">
+                    <Form.Label>
+                        <strong>Creator of the Event</strong>
+                    </Form.Label>
+                    <div>
+                        <Form.Check
+                            type="checkbox"
+                            label={`${userId} (creator)`}
+                            checked={creator}
+                            onChange={handleCreatorChange}
+                            disabled={selectedModerators.includes(userId)}
+                        />
+                    </div>
+                </Form.Group>
+                {/*<Form.Group controlId="eventEmails">*/}
+                {/*    <Form.Label><strong>Select the Moderators</strong></Form.Label>*/}
+                {/*    <div>*/}
+                {/*        {connections.length > 0 &&*/}
+                {/*            connections.map((moderator) => (*/}
+                {/*                <Form.Check*/}
+                {/*                    key={moderator}*/}
+                {/*                    type="checkbox"*/}
+                {/*                    label={moderator === userId ? `${moderator} (creator)` : moderator}*/}
+
+                {/*                    value={selectedModerators}*/}
+                {/*                    checked={selectedModerators.includes(moderator) || moderator == userId}*/}
+                {/*                    onChange={() => handleUserSelection(moderator, false)}*/}
+                {/*                />*/}
+                {/*            ))}*/}
+                {/*    </div>*/}
+                {/*</Form.Group>*/}
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="success" onClick={Post} disabled={!startDateValidity || !endDateValidity || start === null || end === null} >
@@ -454,7 +507,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     if (Timezone == "") {
         Timezone = defaultTimeZone;
     }
-    console.log(Timezone);
+
     return (
         <Modal show={show} onHide={onClose}>
             <Modal.Header style={{
@@ -552,9 +605,6 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
                         The connections selected here are not added as moderators
                     </div>
                 </Modal.Title>
-
-             
-                
 
             </Modal.Header>
             <Modal.Body>
