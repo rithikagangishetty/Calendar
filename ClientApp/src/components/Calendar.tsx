@@ -15,7 +15,7 @@ import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModa
 
 
 
-type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
+type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | "noevent"|'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
 interface RouteParams {
     id: string;
 }
@@ -151,10 +151,18 @@ const CalendarApp: FC = () => {
                 Reminder: false,
            }).then((response) => {
                eventId = response.data;
-               setShowCreateModal(false);
-               onClose();
-                setCurrentTaskType('eventadded');
-                setShowModal(true);
+               if (eventId != "noevent") {
+                   setShowCreateModal(false);
+                   onClose();
+                   setCurrentTaskType('eventadded');
+                   setShowModal(true);
+               }
+               else {
+                   setShowCreateModal(false);
+                   onClose();
+                   setCurrentTaskType('noevent');
+                   setShowModal(true);
+               }
 
 
 
@@ -162,26 +170,28 @@ const CalendarApp: FC = () => {
             }).catch((error) => {
                 alert("error in post " + error)
             });
+        if (eventId != "noevent") {
 
-        axios.post(`${baseUrl}/User/sendmail`,
-            {
-                _id: eventId,
-                UserEmail: id,
-                EventName: titleInput,
-                Moderator: selectedModerators,
-                Connections: (priv ? selectedConnections : userConnections),
-                StartDate: startDate,
-                EndDate: endDate,
-                Delete: false,
-                priv:priv,
-                Subject: "Event is Created",
-                Body: `An event titled '${titleInput}' has been created.
+            axios.post(`${baseUrl}/User/sendmail`,
+                {
+                    _id: eventId,
+                    UserEmail: id,
+                    EventName: titleInput,
+                    Moderator: selectedModerators,
+                    Connections: (priv ? selectedConnections : userConnections),
+                    StartDate: startDate,
+                    EndDate: endDate,
+                    Delete: false,
+                    priv: priv,
+                    Subject: "Event is Created",
+                    Body: `An event titled '${titleInput}' has been created.
                 The start time of the event is '${startDate}' and ends at '${endDate}'.`,
-            }).then(() => {
-               // alert("email sent");
-            }).catch((error) => {
-               // alert("error in mail " + error)
-            });
+                }).then(() => {
+                    // alert("email sent");
+                }).catch((error) => {
+                    // alert("error in mail " + error)
+                });
+        }
 
     };
         /// <summary>

@@ -7,7 +7,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 
-type TaskType = 'login' | 'signup'  | "noemail" | 'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
+type TaskType = 'login' | 'signup' | "noemail" | 'noevent' |'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
 interface MyModalProps {
     show: boolean;
     onClose: () => void;
@@ -93,6 +93,9 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     }
     else if (taskType === 'valid') {
         message = 'Please enter a valid Email.';
+    }
+    else if (taskType === 'noevent') {
+        message = "The event could not be created because the selected Moderators / Connections are not available at the scheduled time.";
     }
     else if (taskType === 'eventclash') {
         message = 'The event cannot be edited to the selected time as it clashes with other events.';
