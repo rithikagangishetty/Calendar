@@ -7,7 +7,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 
-type TaskType = 'login' | 'signup' | "noemail" | 'noevent' |'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
+type TaskType = 'login' | 'monthpast'| 'signup' | "noemail" | 'noevent' |'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast';
 interface MyModalProps {
     show: boolean;
     onClose: () => void;
@@ -109,6 +109,10 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     
     else if (taskType === 'noedit') {
         message = 'You can not Delete/Edit this event.';
+    }
+    else if (taskType === 'monthpast') {
+        message =
+            "Event creation is not permitted in the month view after 00:00 as it spans the whole day. To create an event on the same day, kindly switch to the week view.";
     }
     else if (taskType === 'eventedited') {
         message = 'Event Edited Successfully.';

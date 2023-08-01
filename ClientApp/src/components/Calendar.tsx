@@ -1,5 +1,5 @@
 ﻿import { FC, useState, useEffect } from 'react'
-import { Calendar, Event, momentLocalizer, EventProps } from 'react-big-calendar'
+import { Calendar, Event, momentLocalizer, View } from 'react-big-calendar'
 import moment from 'moment';
 import React from 'react';
 import 'moment-timezone'; 
@@ -15,7 +15,7 @@ import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModa
 
 
 
-type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | "noevent"|'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
+type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'monthpast' | "noevent"|'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
 interface RouteParams {
     id: string;
 }
@@ -51,6 +51,11 @@ const CalendarApp: FC = () => {
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
+    const [currentView, setCurrentView] = useState<View>('month');
+
+    const handleViewChange = (view: View) => {
+        setCurrentView(view);
+    };
     const currentDate = moment();
  
 
@@ -426,13 +431,23 @@ const CalendarApp: FC = () => {
     const handleSelectSlot = (event: any) => {
         const selectedDate = moment(event.start);
        
-
+        const isSameDay = selectedDate.isSame(currentDate, 'day');
+        console.log(isSameDay);
         const isPastEvent = selectedDate.isBefore(currentDate);
 
-        if (isPastEvent) {
+        if (isPastEvent && !isSameDay) {
             setCurrentTaskType('past');
             setShowModal(true);
             // Event is in the past, disable edit and delete options
+            return;
+        }
+
+       // const isSameDay = selectedDate.isSame(currentDate, 'day');
+        
+
+        if (isSameDay && isPastEvent && currentView == "month") {
+            setCurrentTaskType('monthpast');
+            setShowModal(true);
             return;
         }
        
@@ -738,6 +753,7 @@ const CalendarApp: FC = () => {
                   
                   
                 }}
+                onView={handleViewChange} 
                 popup={true}
                 style={{ height: '80vh' }}
                 step={15}
