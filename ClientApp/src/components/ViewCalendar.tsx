@@ -559,17 +559,6 @@ const CalendarPage: React.FC = () => {
                                 timeStyle: 'medium'
                             })}</p>
                         )}
-
-                        {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
-                            <div>
-                                <p><strong>Connections:</strong></p>
-                                <ul>
-                                    {deleteEvent.Connections.map((connection: string, index: any) => (
-                                        <li key={index}>{connection}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
                         {deleteEvent.Moderator && deleteEvent.Moderator.length > 0 && (
                             <>
                                 <p><strong>Moderators:</strong></p>
@@ -580,6 +569,17 @@ const CalendarPage: React.FC = () => {
                                 </ul>
                             </>
                         )}
+                        {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
+                            <div>
+                                <p><strong>Connections:</strong></p>
+                                <ul>
+                                    {deleteEvent.Connections.map((connection: string, index: any) => (
+                                        <li key={index}>{connection}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                        
                         <div style={{
                             display: "flex",
                             justifyContent: "center",

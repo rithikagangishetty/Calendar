@@ -29,71 +29,7 @@ namespace Calenderwebapp.Controllers
            
            // _userSupervisor.SimulateConcurrentRequests().Wait();
         }
-        //  [HttpGet("getallevents")]
-        //  //[Route("getallevents")]
-        //  public async Task<List<UserDetails>> GetEvents(string id)
-        //  {
 
-        //      var result = await _userSupervisor.GetEvents(id);
-        //      return result;
-        //  }
-        //  [HttpGet("getconnectionevents")]
-        //  //[Route("getconnectionevents")]
-        //  public async Task<List<UserDetails>> GetViewEvents(string id, string connectionId)
-        //  {
-        //      var result = await _userSupervisor.GetViewEvents(id, connectionId);
-        //      Console.WriteLine(result);
-        //      return result;
-        //  }
-        //  [HttpGet("getevent")]
-        ////  [Route("getevent")]
-        //  public async Task<ActionResult<UserDetails>> GetEvent(string id)
-        //  {
-        //      var events = await _userSupervisor.GetEvent(id);
-
-
-        //      return events;
-        //  }
-        //  [HttpPost("post")]
-        // // [Route("post")]
-        //  public async Task<string> Post(UserDetails newUser)
-        //  {
-
-        //      var id= await _userSupervisor.Post(newUser);
-
-        //      return id;
-        //  }
-
-        //  [HttpPost("sendmail")]
-        // // [Route("sendmail")]
-        //  public async Task<ActionResult> SendMailAsync(EmailDetails id)
-        //  {
-        //      await _userSupervisor.SendMailAsync(id);
-        //      return Ok();
-        //  }
-        //  [HttpPut]
-
-        //  public async Task<IActionResult> Update(UserDetails updatedUser)
-        //  {
-
-        //     var user=  await _userSupervisor.Update(updatedUser);
-        //      if (user is null)
-        //      {
-        //          return NotFound();
-        //      }
-
-        //      return NoContent();
-        //  }
-        //  [HttpDelete]
-
-        //  public async Task<UserDetails> Delete(string id, string userId)
-        //  {
-
-        //   var user=   await _userSupervisor.Delete(id,userId);
-        //      return user; 
-
-
-        //  }
 
         [HttpGet("getallevents")]
         public async Task<ActionResult<List<UserDetails>>> GetEvents(string id)
@@ -104,13 +40,17 @@ namespace Calenderwebapp.Controllers
             }
 
             var result = await _userSupervisor.GetEvents(id);
-            if (result == null || result.Count == 0)
+            if (!result.Any())
             {
-                return NotFound();
+               
+                return new List<UserDetails>();
             }
+
+            
 
             return result;
         }
+
 
         [HttpGet("getconnectionevents")]
         public async Task<ActionResult<List<UserDetails>>> GetViewEvents(string id, string connectionId)
@@ -121,9 +61,10 @@ namespace Calenderwebapp.Controllers
             }
 
             var result = await _userSupervisor.GetViewEvents(id, connectionId);
-            if (result == null || result.Count == 0)
+            if (!result.Any())
             {
-                return NotFound();
+
+                return new List<UserDetails>();
             }
 
             return result;

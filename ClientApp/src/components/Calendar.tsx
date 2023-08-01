@@ -603,21 +603,7 @@ const CalendarApp: FC = () => {
             />
         );
     };
-    //const renderEmailCheckbox = (connection: string, defaultChecked: boolean) => {
-    //    const isDisabled = selectedModerators.includes(connection);
-
-    //    return (
-    //        <Form.Check
-    //            key={connection}
-    //            type="checkbox"
-    //            id={connection}
-    //            label={connection}
-    //            checked={selectedConnections.includes(connection) || defaultChecked}
-    //            onChange={() => handleUserSelection(connection, true)}
-    //            disabled={isDisabled}
-    //        />
-    //    );
-    //};
+    
 
         ///<summary>
        ///For the private post the user needs to select connection/moderator which is done using this function
@@ -783,16 +769,7 @@ const CalendarApp: FC = () => {
                             })}</p>
                         )}
                         
-                        {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
-                            <div>
-                                <p><strong>Connections:</strong></p>
-                                <ul>
-                                    {deleteEvent.Connections.map((connection: string, index: any) => (
-                                        <li key={index}>{connection}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
+                     
                         {deleteEvent.Moderator && deleteEvent.Moderator.length > 0 && (
                             <>
                                 <p><strong>Moderators:</strong></p>
@@ -802,6 +779,17 @@ const CalendarApp: FC = () => {
                                     ))}
                                 </ul>
                             </>
+                        )}
+
+                        {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
+                            <div>
+                                <p><strong>Connections:</strong></p>
+                                <ul>
+                                    {deleteEvent.Connections.map((connection: string, index: any) => (
+                                        <li key={index}>{connection}</li>
+                                    ))}
+                                </ul>
+                            </div>
                         )}
                         <div style={{
                             display: "flex",
