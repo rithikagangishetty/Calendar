@@ -11,7 +11,7 @@ import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import styled from 'styled-components';
-import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, DeleteModal } from './Modal';
+import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, EventModal } from './Modal';
 
 
 
@@ -41,12 +41,15 @@ const CalendarApp: FC = () => {
     const [startDate, setStart] = useState<Date>(new Date());
     const [endDate, setEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
+    const [showEventModal, setShowEventModal] = useState(false);
     const history = useHistory();
     const [priv, setPrivate] = useState<boolean>(false);
     const baseUrl = process.env.REACT_APP_URL;
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
     const [deleteUserEmail, setDeleteUserEmail] = useState<string>('');
     const [selectedConnections, setSelectedConnections] = useState<string[]>([]);
+    const [connect, setConnect] = useState<string[]>([]);
+    const [moder, setModer] = useState<string[]>([]);
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
     const [validationError, setValidationError] = useState('');
@@ -132,6 +135,9 @@ const CalendarApp: FC = () => {
         ///Once all the events are obtained using setEvents all the events will be updated and will be shown in calendar page
         ///this function will be called everytime when the variables in the useEffect block changes
         /// </summary>
+   
+
+
     async function Post() {
 
         
@@ -155,18 +161,27 @@ const CalendarApp: FC = () => {
                 TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
                 Reminder: false,
            }).then((response) => {
-               eventId = response.data;
-               if (eventId != "noevent" && eventId!="eventclash") {
+               eventId = response.data._id;
+               setModer(response.data.moderator);
+               setConnect(response.data.connections);
+               
+               if (eventId != "noevent" && eventId != "eventclash" && eventId != 'someevent') {
                    setShowCreateModal(false);
                    onClose();
                    setCurrentTaskType('eventadded');
                    setShowModal(true);
                }
-               else {
+               else if (eventId == "noevent") {
                    setShowCreateModal(false);
                    onClose();
                    setCurrentTaskType('noevent');
                    setShowModal(true);
+               }
+               else {
+                   setShowCreateModal(false);
+                   onClose();
+                   setShowEventModal(true);
+
                }
 
 
@@ -175,7 +190,7 @@ const CalendarApp: FC = () => {
             }).catch((error) => {
                 alert("error in post " + error)
             });
-        if (eventId != "noevent") {
+        if (eventId != "noevent" && eventId != "eventclash" && eventId != "someevent") {
 
             axios.post(`${baseUrl}/User/sendmail`,
                 {
@@ -905,6 +920,44 @@ const CalendarApp: FC = () => {
                
                
             />
+            <div>
+                <Modal show={showEventModal} onHide={() => setShowEventModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Event Creation Error</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                            <strong> Cannot create event. Some moderators/connections shown below are unavailable at the scheduled time. Try a private event, excluding them.</strong></p>
+                        
+
+                        {moder && moder.length > 0  && (
+                            <>
+                                <p><strong>Moderators:</strong></p>
+                                <ul>
+                                    {moder.map((moderator: any, index: any) => (
+                                        <li key={index}>{moderator}</li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+                        {connect && connect.length > 0 && (
+                            <>
+                                <p><strong>Connections:</strong></p>
+                                <ul>
+                                    {connect.map((connection: any, index: any) => (
+                                        <li key={index}>{connection}</li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+                </Modal.Body>
+                <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowEventModal(false)}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+                </Modal>
+            </div>
            
         </div >
     );

@@ -35,6 +35,14 @@ interface SelectEmailModalProps {
    renderEmailCheckbox: (connection: string) => JSX.Element;
     
 }
+interface EventModalProps {
+    show: boolean;
+    onHide: () => void;
+    
+    connections: any;
+    moderators: any;
+
+}
 
 
 
@@ -631,7 +639,35 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
     );
 };
 
-
+export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators, connections }) => {
+    var rex = connections;
+    console.log(connections);
+    return (
+        <Modal show={show} onHide={onHide}>
+            <Modal.Header closeButton>
+                <Modal.Title>Event Creation Error</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <p>
+                    The event cannot be created as the following moderator/connections are not available at the schedule time:
+                </p>
+                <ul>
+                    {moderators.map((moderator:any) => (
+                        <li key={moderator}>Moderator: {moderator}</li>
+                    ))}
+                    {connections.map((connection:any) => (
+                        <li key={connection}>Connection: {connection}</li>
+                    ))}
+                </ul>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onHide}>
+                    Close
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
+}
 
 
 export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, onDelete, isPast, start, end, moderator, title, connections, event }) => {

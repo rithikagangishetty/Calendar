@@ -108,7 +108,7 @@ namespace Calenderwebapp.Controllers
         /// <returns></returns>
 
         [HttpPost("post")]
-        public async Task<ActionResult<string>> Post(UserDetails newUser)
+        public async Task<ActionResult<UserDetails>> Post(UserDetails newUser)
         {
             if (newUser == null)
             {
