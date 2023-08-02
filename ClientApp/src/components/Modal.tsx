@@ -111,8 +111,7 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
         message = 'You can not Delete/Edit this event.';
     }
     else if (taskType === 'monthpast') {
-        message =
-            "Event creation is not permitted in the month view after 00:00 as it spans the whole day. To create an event on the same day, kindly switch to the week view.";
+        message = "Event creation is not permitted in the month view after 00:00 as it spans the whole day. To create an event on the same day, kindly switch to the week view.";
     }
     else if (taskType === 'eventedited') {
         message = 'Event Edited Successfully.';
@@ -202,6 +201,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     
 
 }) => {
+
     const [startDateValidity, setStartDateValidity] = useState(true);
     const [endDateValidity, setEndDateValidity] = useState(true);
     if (selectedTimezone == "") {
@@ -210,9 +210,29 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     moment.tz.setDefault(selectedTimezone);
     
     const currentTime = moment();
-    useEffect(() => {
-       
+   // var startDate = new Date(start);
+    //var endDate = new Date(end);
+    const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
+    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(selectedTimezone); // Initialize with an empty string
+    const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
+    const timeOffset: number = defaultOffset - selectedOffset;
 
+    useEffect(() => {
+        
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        const prevTimezoneOffset = moment.tz(start, prevSelectedTimezone).utcOffset();
+        const currentTimezoneOffset = moment.tz(start, selectedTimezone).utcOffset();
+        const timeOffset = prevTimezoneOffset - currentTimezoneOffset;
+        // Adjust the minutes based on the timeOffset
+        startDate.setMinutes(start.getMinutes() - timeOffset);
+        endDate.setMinutes(end.getMinutes() - timeOffset);
+
+        // Update the state variables with adjusted dates
+        setStart(startDate);
+        setEnd(endDate);
+        setPrevSelectedTimezone(selectedTimezone);
+   
     }, [selectedTimezone]);
 
 
@@ -267,9 +287,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
         return year1 === year2 && month1 === month2 && day1 === day2;
     }
-    const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
-    const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
-    const timeOffset: number = defaultOffset - selectedOffset;
+   
   
     function OnCloseFunc() {
         setStart(null);
@@ -442,30 +460,14 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                     <div>
                         <Form.Check
                             type="checkbox"
-                            label={`${userId} (creator)`}
+                            label={userId}
                             checked={creator}
                             onChange={handleCreatorChange}
                             disabled={selectedModerators.includes(userId)}
                         />
                     </div>
                 </Form.Group>
-                {/*<Form.Group controlId="eventEmails">*/}
-                {/*    <Form.Label><strong>Select the Moderators</strong></Form.Label>*/}
-                {/*    <div>*/}
-                {/*        {connections.length > 0 &&*/}
-                {/*            connections.map((moderator) => (*/}
-                {/*                <Form.Check*/}
-                {/*                    key={moderator}*/}
-                {/*                    type="checkbox"*/}
-                {/*                    label={moderator === userId ? `${moderator} (creator)` : moderator}*/}
-
-                {/*                    value={selectedModerators}*/}
-                {/*                    checked={selectedModerators.includes(moderator) || moderator == userId}*/}
-                {/*                    onChange={() => handleUserSelection(moderator, false)}*/}
-                {/*                />*/}
-                {/*            ))}*/}
-                {/*    </div>*/}
-                {/*</Form.Group>*/}
+                
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="success" onClick={Post} disabled={!startDateValidity || !endDateValidity || start === null || end === null} >

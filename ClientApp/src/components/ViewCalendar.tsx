@@ -617,7 +617,7 @@ const CalendarPage: React.FC = () => {
             )}
             <EditEventModal
                 handleTimezoneChange={handleTimezoneChange}
-                selectedTimezone={defaultTimeZone}
+                selectedTimezone={selectedTimezone}
                 userId={deleteUserEmail}
                 creator={creator}
                 setPrivate={setPrivate}

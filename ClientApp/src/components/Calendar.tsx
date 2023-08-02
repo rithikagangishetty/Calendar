@@ -432,7 +432,7 @@ const CalendarApp: FC = () => {
         const selectedDate = moment(event.start);
        
         const isSameDay = selectedDate.isSame(currentDate, 'day');
-        console.log(isSameDay);
+       
         const isPastEvent = selectedDate.isBefore(currentDate);
 
         if (isPastEvent && !isSameDay) {
@@ -872,7 +872,7 @@ const CalendarApp: FC = () => {
                 userId={deleteUserEmail}
                 creator={creator }
                 setPrivate={setPrivate}
-                selectedTimezone={defaultTimeZone}
+                selectedTimezone={selectedTimezone}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
                 onClose={handleClose}
