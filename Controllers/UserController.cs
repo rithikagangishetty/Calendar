@@ -30,7 +30,11 @@ namespace Calenderwebapp.Controllers
            // _userSupervisor.SimulateConcurrentRequests().Wait();
         }
 
-
+        /// <summary>
+        /// It gets all the events based on the id of the user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("getallevents")]
         public async Task<ActionResult<List<UserDetails>>> GetEvents(string id)
         {
@@ -50,7 +54,12 @@ namespace Calenderwebapp.Controllers
 
             return result;
         }
-
+        /// <summary>
+        /// It gets all the events  where id is a part of in the connection Id events and vice versa.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="connectionId"></param>
+        /// <returns></returns>
 
         [HttpGet("getconnectionevents")]
         public async Task<ActionResult<List<UserDetails>>> GetViewEvents(string id, string connectionId)
@@ -69,6 +78,12 @@ namespace Calenderwebapp.Controllers
 
             return result;
         }
+        /// <summary>
+        /// Gets the document with the event id 
+        /// It will change the moderator and connection from objectId to email Ids
+        /// </summary>
+        /// <param name="id">It is the event id</param>
+        /// <returns>The modified event</returns>
 
         [HttpGet("getevent")]
         public async Task<ActionResult<UserDetails>> GetEvent(string id)
@@ -86,6 +101,11 @@ namespace Calenderwebapp.Controllers
 
             return events;
         }
+        /// <summary>
+        /// API call for adding a new event.
+        /// </summary>
+        /// <param name="newUser"></param>
+        /// <returns></returns>
 
         [HttpPost("post")]
         public async Task<ActionResult<string>> Post(UserDetails newUser)
@@ -104,7 +124,11 @@ namespace Calenderwebapp.Controllers
 
             return id;
         }
-
+        /// <summary>
+        /// This will send emails after edit/create/delete is done.
+        /// </summary>
+        /// <param name="emailDetails"></param>
+        /// <returns></returns>
         [HttpPost("sendmail")]
         public async Task<ActionResult> SendMailAsync(EmailDetails emailDetails)
         {
@@ -116,6 +140,11 @@ namespace Calenderwebapp.Controllers
             await _userSupervisor.SendMailAsync(emailDetails);
             return Ok();
         }
+        /// <summary>
+        /// API call to update the existing document/event.
+        /// </summary>
+        /// <param name="updatedUser"></param>
+        /// <returns></returns>
 
         [HttpPut]
         public async Task<IActionResult> Update(UserDetails updatedUser)
@@ -137,7 +166,12 @@ namespace Calenderwebapp.Controllers
 
             return NoContent();
         }
-
+        /// <summary>
+        /// This deletes the existing event if the user is moderator/creator or else just removes the user as part of the event.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         [HttpDelete]
         public async Task<ActionResult<UserDetails>> Delete(string id, string userId)
         {

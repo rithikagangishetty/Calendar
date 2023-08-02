@@ -210,8 +210,6 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     moment.tz.setDefault(selectedTimezone);
     
     const currentTime = moment();
-   // var startDate = new Date(start);
-    //var endDate = new Date(end);
     const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
     const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(selectedTimezone); // Initialize with an empty string
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();

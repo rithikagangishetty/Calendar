@@ -156,7 +156,7 @@ const CalendarApp: FC = () => {
                 Reminder: false,
            }).then((response) => {
                eventId = response.data;
-               if (eventId != "noevent") {
+               if (eventId != "noevent" && eventId!="eventclash") {
                    setShowCreateModal(false);
                    onClose();
                    setCurrentTaskType('eventadded');

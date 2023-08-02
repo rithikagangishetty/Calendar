@@ -15,6 +15,11 @@ namespace Calenderwebapp.Controllers
         {
             _loginSupervisor = loginSupervisor;
         }
+        /// <summary>
+        /// This API call is to check whether the entered emailId is present in the Database or not
+        /// </summary>
+        /// <param name="userData"></param>
+        /// <returns></returns>
         [HttpPost("login")]
        
         public IActionResult Login(Connections userData)
@@ -27,6 +32,11 @@ namespace Calenderwebapp.Controllers
                 return NotFound();
             }
         }
+        /// <summary>
+        /// If the email is not present it will create a new document with the given user data.
+        /// </summary>
+        /// <param name="userData"></param>
+        /// <returns></returns>
         [HttpPost("signup")]
        
         public  ActionResult<Connections> Signup(Connections userData)
