@@ -474,37 +474,30 @@ const CalendarApp: FC = () => {
         const isPastEvent = selectedDate.isBefore(currentDate);
         const past = selectedDate.isBefore(currentDate);
         
-        if (isPastEvent) {
-            setCurrentTaskType('past');
-            setShowModal(true);
-            // Event is in the past, disable edit and delete options
-            return;
-        }
+       
         if (isSameDay && isPastEvent && currentView == "month") {
             setCurrentTaskType('monthpast');
             setShowModal(true);
             return;
         }
-       // const isSameDay = selectedDate.isSame(currentDate, 'day');
-        
+        // const isSameDay = selectedDate.isSame(currentDate, 'day');
 
-     
-       
-        setValidationError('');
 
-       
-        
-            if (overlap(event))
-            {
+        else if (!isPastEvent) {
+
+            setValidationError('');
+
+
+
+            if (overlap(event)) {
 
                 setCurrentTaskType('overlap');
                 setShowModal(true);
                 return;
             }
-           
 
-            else
-            {
+
+            else {
 
 
                 setStart(event.start);
@@ -512,8 +505,7 @@ const CalendarApp: FC = () => {
                 setShowCreateModal(true);
 
 
-                if (titleInput.trim() !== '')
-                {
+                if (titleInput.trim() !== '') {
 
 
 
@@ -532,11 +524,17 @@ const CalendarApp: FC = () => {
                     setEvents([...events, newEvent]);
 
                 }
-              
+
 
 
             }
-        
+        }
+       else {
+            setCurrentTaskType('past');
+            setShowModal(true);
+            // Event is in the past, disable edit and delete options
+            return;
+        }
 
     };
     ///This function is for the displaying of the title, start and end times when scrolled over an event.
