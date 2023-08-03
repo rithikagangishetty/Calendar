@@ -315,7 +315,7 @@ const CalendarApp: FC = () => {
                 setSelectedConnections(newEvent.Connections);
                 setPrivate(newEvent.priv);
                 setDeleteUserEmail(newEvent.UserId);
-
+                setSelectedTimezone(newEvent.TimeZone);
                 
 
                 

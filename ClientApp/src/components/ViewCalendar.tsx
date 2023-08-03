@@ -29,6 +29,7 @@ const CalendarPage: React.FC = () => {
     const [deleteUserEmail, setDeleteUserEmail] = useState<string>('');
     const [Edit, setEdit] = useState<boolean>(false);
     const [events, setEvents] = useState<Event[]>([]);
+    
     const [connections, setConnections] = useState<Array<string>>([]);
     const [showModal, setShowModal] = useState(false);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
@@ -198,6 +199,7 @@ const CalendarPage: React.FC = () => {
                 setSelectedConnections(newEvent.Connections);
                 setPrivate(newEvent.priv);
                 setDeleteUserEmail(newEvent.UserId);
+                setSelectedTimezone(newEvent.TimeZone)
             })
             .catch((error) => {
                 alert(error);

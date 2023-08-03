@@ -215,6 +215,9 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     if (selectedTimezone == "") {
         selectedTimezone = defaultTimeZone;
     }
+    if (selectedTimezone != "") {
+        console.log(selectedTimezone);
+    }
     moment.tz.setDefault(selectedTimezone);
     
     const currentTime = moment();
@@ -229,10 +232,10 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         const endDate = new Date(end);
         const prevTimezoneOffset = moment.tz(start, prevSelectedTimezone).utcOffset();
         const currentTimezoneOffset = moment.tz(start, selectedTimezone).utcOffset();
-        const timeOffset = prevTimezoneOffset - currentTimezoneOffset;
+        const timeOff = prevTimezoneOffset - currentTimezoneOffset;
         // Adjust the minutes based on the timeOffset
-        startDate.setMinutes(start.getMinutes() - timeOffset);
-        endDate.setMinutes(end.getMinutes() - timeOffset);
+        startDate.setMinutes(start.getMinutes() - timeOff);
+        endDate.setMinutes(end.getMinutes() - timeOff);
 
         // Update the state variables with adjusted dates
         setStart(startDate);
