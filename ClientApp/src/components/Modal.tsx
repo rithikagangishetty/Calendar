@@ -358,7 +358,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     };
     const timeInterval = 15;
     return (
-        <Modal show={show} onHide={OnCloseFunc}>
+        <Modal show={show} onHide={OnCloseFunc} >
             <Modal.Header style={{
                 display: "flex",
                 justifyContent: "center",
@@ -441,6 +441,21 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                   
                 </Form.Group>
                 <br />
+                <Form.Group controlId="eventCreator">
+                    <Form.Label>
+                        <strong>Creator of the Event</strong>
+                    </Form.Label>
+                   
+                        <Form.Check
+                            type="checkbox"
+                            label={userId}
+                            checked={creator}
+                            onChange={handleCreatorChange}
+                            disabled={selectedModerators.includes(userId)}
+                        />
+                   
+                </Form.Group>
+                <br />
                 <Form.Group controlId="eventEmails">
                     <Form.Label><strong>Select the Moderators</strong></Form.Label>
                     <div>
@@ -458,21 +473,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                             ))}
                     </div>
                 </Form.Group>
-                <br />
-                <Form.Group controlId="eventCreator">
-                    <Form.Label>
-                        <strong>Creator of the Event</strong>
-                    </Form.Label>
-                    <div>
-                        <Form.Check
-                            type="checkbox"
-                            label={userId}
-                            checked={creator}
-                            onChange={handleCreatorChange}
-                            disabled={selectedModerators.includes(userId)}
-                        />
-                    </div>
-                </Form.Group>
+                
                 
             </Modal.Body>
             <Modal.Footer>

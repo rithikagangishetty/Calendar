@@ -341,7 +341,7 @@ const CalendarApp: FC = () => {
     async function EditEvent(Priv:boolean) {
        
         var users;
-        
+        var eventId;
        
         for (var _event of events) {
             // Check if the event overlaps with any existing event
@@ -379,36 +379,59 @@ const CalendarApp: FC = () => {
             priv: Priv,
             TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
             Reminder: false,
-        }).then(() => {
+        }).then((response) => {
            
             
-            setCurrentTaskType('eventedited');
-            setShowModal(true);
-            setShowEditModal(false);
-            setShowDeleteModal(false);
-            onClose();
-            setEdit(false);
+            
+            eventId = response.data._id;
+            setModer(response.data.moderator);
+            setConnect(response.data.connections);
+
+            if (eventId != "noevent" && eventId != "eventclash" && eventId != 'someevent') {
+                setShowEditModal(false);
+                setShowDeleteModal(false);
+                onClose();
+                setEdit(false);
+                setCurrentTaskType('eventedited');
+                setShowModal(true);
+            }  
+            else if (eventId == "noevent") {
+                setShowEditModal(false);
+                setShowDeleteModal(false);
+                onClose();
+                setCurrentTaskType('noevent');
+                setShowModal(true);
+                setEdit(false);
+            }
+            else {
+                setShowEditModal(false);
+                setShowDeleteModal(false);
+                onClose();
+                setShowEventModal(true);
+                setEdit(false);
+
+            }
         }).catch((error) => { alert(error); });
-
-        await axios.post(`${baseUrl}/User/sendmail`,
-            {
-                _id: deleteEventId,
-                UserEmail: id,
-                EventName: titleInput,
-                Moderator: selectedModerators,
-                Connections: (Priv ? selectedConnections : users),
-                StartDate: startDate,
-                EndDate: endDate,
-                priv: Priv,
-                Delete:false,
-                Subject: "Event is Edited",
-                Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startDate}' and ends at '${endDate}'.`,
-            }).then(() => {
-             //   alert("email sent");
-            }).catch((error) => {
-              //  alert("error in mail " + error)
-            });
-
+        if (eventId != "noevent" && eventId != "eventclash" && eventId != "someevent") {
+            await axios.post(`${baseUrl}/User/sendmail`,
+                {
+                    _id: deleteEventId,
+                    UserEmail: id,
+                    EventName: titleInput,
+                    Moderator: selectedModerators,
+                    Connections: (Priv ? selectedConnections : users),
+                    StartDate: startDate,
+                    EndDate: endDate,
+                    priv: Priv,
+                    Delete: false,
+                    Subject: "Event is Edited",
+                    Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startDate}' and ends at '${endDate}'.`,
+                }).then(() => {
+                    //   alert("email sent");
+                }).catch((error) => {
+                    //  alert("error in mail " + error)
+                });
+        }
     };
         /// <summary>
         ///This function checks if there are any overlaps with the provided start and end times with all the events.
@@ -927,7 +950,7 @@ const CalendarApp: FC = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <p>
-                            <strong> Cannot create event. Some moderators/connections shown below are unavailable at the scheduled time. Try a private event, excluding them.</strong></p>
+                            <strong> Cannot create/edit event. Some moderators/connections shown below are unavailable at the scheduled time. Try a private event, excluding them.</strong></p>
                         
 
                         {moder && moder.length > 0  && (

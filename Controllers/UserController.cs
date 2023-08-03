@@ -147,7 +147,7 @@ namespace Calenderwebapp.Controllers
         /// <returns></returns>
 
         [HttpPut]
-        public async Task<IActionResult> Update(UserDetails updatedUser)
+        public async Task<ActionResult<UserDetails>> Update(UserDetails updatedUser)
         {
             if (updatedUser == null)
             {
@@ -157,14 +157,14 @@ namespace Calenderwebapp.Controllers
             {
                 return BadRequest("Invalid End Date/Time of the event");
             }
-            var user = await _userSupervisor.Update(updatedUser/*,userId*/);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            var user = await _userSupervisor.Update(updatedUser);
+            //if (user == null)
+            //{
+            //    return NotFound();
+            //}
            
 
-            return NoContent();
+            return user;
         }
         /// <summary>
         /// This deletes the existing event if the user is moderator/creator or else just removes the user as part of the event.
