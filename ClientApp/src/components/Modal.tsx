@@ -641,32 +641,47 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
 };
 
 export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators, connections }) => {
-    var rex = connections;
-    console.log(connections);
+    
     return (
-        <Modal show={show} onHide={onHide}>
-            <Modal.Header closeButton>
-                <Modal.Title>Event Creation Error</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <p>
-                    The event cannot be created as the following moderator/connections are not available at the schedule time:
-                </p>
-                <ul>
-                    {moderators.map((moderator:any) => (
-                        <li key={moderator}>Moderator: {moderator}</li>
-                    ))}
-                    {connections.map((connection:any) => (
-                        <li key={connection}>Connection: {connection}</li>
-                    ))}
-                </ul>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={onHide}>
-                    Close
-                </Button>
-            </Modal.Footer>
-        </Modal>
+        <div>
+            <Modal show={show} onHide={onHide}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Event Creation Error</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        <strong> Cannot create/edit event. Some moderators/connections shown below are unavailable at the scheduled time. Try a private event, excluding them.</strong></p>
+
+
+                    {moderators && moderators.length > 0 && (
+                        <>
+                            <p><strong>Moderators:</strong></p>
+                            <ul>
+                                {moderators.map((moderator: any, index: any) => (
+                                    <li key={index}>{moderator}</li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
+                    {connections && connections.length > 0 && (
+                        <>
+                            <p><strong>Connections:</strong></p>
+                            <ul>
+                                {connections.map((connection: any, index: any) => (
+                                    <li key={index}>{connection}</li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={onHide}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </div>
+
     );
 }
 

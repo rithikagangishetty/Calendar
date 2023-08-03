@@ -9,7 +9,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
-import MyModal, { DeleteModal, EditEventModal, SelectEmailModal } from './Modal';
+import MyModal, { EventModal, EditEventModal, SelectEmailModal } from './Modal';
 import styled from 'styled-components';
 
 
@@ -21,7 +21,7 @@ interface RouteParams {
 
 const StyledDiv = styled.div`
   text-align: center;`;
-type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'eventedited' | 'editpast' | 'eventclash'|'noedit'; // Define the possible task types
+type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'noevent'|'past' | 'eventedited' | 'editpast' | 'eventclash'|'noedit'; // Define the possible task types
 const CalendarPage: React.FC = () => {
     const localizer = momentLocalizer(moment);
     const { id, connectionId } = useParams<RouteParams>();
@@ -39,6 +39,9 @@ const CalendarPage: React.FC = () => {
     const [titleInput, setTitleInput] = useState<string>('');
     const [startdate, setStart] = useState<Date>(new Date());
     const [enddate, setEnd] = useState<Date>(new Date());
+    const [connect, setConnect] = useState<string[]>([]);
+    const [moder, setModer] = useState<string[]>([]);
+    const [showEventModal, setShowEventModal] = useState(false);
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [priv, setPrivate] = useState<boolean>();
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
@@ -214,7 +217,7 @@ const CalendarPage: React.FC = () => {
     async function EditEvent(Priv: boolean) {
 
         var users;
-
+        var eventId;
 
         for (var _event of events) {
             // Check if the event overlaps with any existing event
@@ -252,15 +255,36 @@ const CalendarPage: React.FC = () => {
             priv: Priv,
             TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
             Reminder: false,
-        }).then(() => {
+        }).then((response) => {
 
+            eventId = response.data._id;
+            setModer(response.data.moderator);
+            setConnect(response.data.connections);
+            if (eventId != "noevent" && eventId != "eventclash" && eventId != 'someevent') {
 
-            setCurrentTaskType('eventedited');
-            setShowModal(true);
-            setShowEditModal(false);
-            setShowDeleteModal(false);
-            onClose();
-            setEdit(false);
+                setCurrentTaskType('eventedited');
+                setShowModal(true);
+                setShowEditModal(false);
+                setShowDeleteModal(false);
+                onClose();
+                setEdit(false);
+            }
+            else if (eventId == "noevent") {
+                setShowEditModal(false);
+                setShowDeleteModal(false);
+                onClose();
+                setCurrentTaskType('noevent');
+                setShowModal(true);
+                setEdit(false);
+            }
+            else {
+                setShowEditModal(false);
+                setShowDeleteModal(false);
+                onClose();
+                setShowEventModal(true);
+                setEdit(false);
+
+            }
         }).catch((error) => { alert(error); });
 
         await axios.post(`${baseUrl}/User/sendmail`,
@@ -651,6 +675,12 @@ const CalendarPage: React.FC = () => {
                 connections={connections}
                 renderEmailCheckbox={renderEmailCheckbox}
 
+            />
+            <EventModal
+                show={showEventModal}
+                onHide={() => setShowEventModal(false)}
+                moderators={moder}
+                connections={connect}
             />
         </div>
     );

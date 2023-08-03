@@ -472,22 +472,23 @@ const CalendarApp: FC = () => {
         const isSameDay = selectedDate.isSame(currentDate, 'day');
        
         const isPastEvent = selectedDate.isBefore(currentDate);
-
-        if (isPastEvent && !isSameDay) {
+        const past = selectedDate.isBefore(currentDate);
+        
+        if (isPastEvent) {
             setCurrentTaskType('past');
             setShowModal(true);
             // Event is in the past, disable edit and delete options
             return;
         }
-
-       // const isSameDay = selectedDate.isSame(currentDate, 'day');
-        
-
         if (isSameDay && isPastEvent && currentView == "month") {
             setCurrentTaskType('monthpast');
             setShowModal(true);
             return;
         }
+       // const isSameDay = selectedDate.isSame(currentDate, 'day');
+        
+
+     
        
         setValidationError('');
 
@@ -943,44 +944,13 @@ const CalendarApp: FC = () => {
                
                
             />
-            <div>
-                <Modal show={showEventModal} onHide={() => setShowEventModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Event Creation Error</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p>
-                            <strong> Cannot create/edit event. Some moderators/connections shown below are unavailable at the scheduled time. Try a private event, excluding them.</strong></p>
-                        
-
-                        {moder && moder.length > 0  && (
-                            <>
-                                <p><strong>Moderators:</strong></p>
-                                <ul>
-                                    {moder.map((moderator: any, index: any) => (
-                                        <li key={index}>{moderator}</li>
-                                    ))}
-                                </ul>
-                            </>
-                        )}
-                        {connect && connect.length > 0 && (
-                            <>
-                                <p><strong>Connections:</strong></p>
-                                <ul>
-                                    {connect.map((connection: any, index: any) => (
-                                        <li key={index}>{connection}</li>
-                                    ))}
-                                </ul>
-                            </>
-                        )}
-                </Modal.Body>
-                <Modal.Footer>
-                        <Button variant="secondary" onClick={() => setShowEventModal(false)}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-                </Modal>
-            </div>
+            <EventModal
+                show={showEventModal}
+                onHide={() => setShowEventModal(false)}
+                moderators={moder}
+                connections={connect}
+            />
+           
            
         </div >
     );
