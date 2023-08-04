@@ -52,6 +52,7 @@ const CalendarApp: FC = () => {
     const [moder, setModer] = useState<string[]>([]);
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
+    const [deleteTimezone, setDeleteTimezone] = React.useState<string>('');
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentView, setCurrentView] = useState<View>('month');
@@ -77,8 +78,9 @@ const CalendarApp: FC = () => {
 
     // Handles timezone selection change
     const handleTimezoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedTimezone(event.target.value);
+        setDeleteTimezone(event.target.value);
     };
+   
 
     const onClose = () => {
         setTitleInput("");
@@ -315,7 +317,7 @@ const CalendarApp: FC = () => {
                 setSelectedConnections(newEvent.Connections);
                 setPrivate(newEvent.priv);
                 setDeleteUserEmail(newEvent.UserId);
-                setSelectedTimezone(newEvent.TimeZone);
+                setDeleteTimezone(newEvent.TimeZone);
                 
 
                 
@@ -377,7 +379,7 @@ const CalendarApp: FC = () => {
             EndDate: endDate,
             Connections: (Priv ? selectedConnections : users),
             priv: Priv,
-            TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
+            TimeZone: (deleteTimezone == "") ? defaultTimeZone : deleteTimezone,
             Reminder: false,
         }).then((response) => {
            
@@ -909,7 +911,7 @@ const CalendarApp: FC = () => {
                 userId={deleteUserEmail}
                 creator={creator }
                 setPrivate={setPrivate}
-                selectedTimezone={selectedTimezone}
+                selectedTimezone={deleteTimezone}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
                 onClose={handleClose}

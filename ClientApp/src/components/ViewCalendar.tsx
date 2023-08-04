@@ -29,7 +29,7 @@ const CalendarPage: React.FC = () => {
     const [deleteUserEmail, setDeleteUserEmail] = useState<string>('');
     const [Edit, setEdit] = useState<boolean>(false);
     const [events, setEvents] = useState<Event[]>([]);
-    
+    const [deleteTimezone, setDeleteTimezone] = React.useState<string>('');
     const [connections, setConnections] = useState<Array<string>>([]);
     const [showModal, setShowModal] = useState(false);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
@@ -69,7 +69,10 @@ const CalendarPage: React.FC = () => {
         moment.tz.setDefault();
     }, [ showModal, selectedTimezone]);
 
-
+    /// <summary>
+    /// Will get the Email Id of the user
+    
+    /// </summary>
     function GetEmail() {
         axios.get(`${baseUrl}/Connection/get/`, { params: { id: connectionId } }).then((response) => {
 
@@ -79,6 +82,10 @@ const CalendarPage: React.FC = () => {
         });
 
     }
+    /// <summary>
+    /// Gets all the events that connectionId and id are part in together.
+
+    /// </summary>
     
     const getEvents = () => {
 
@@ -126,7 +133,7 @@ const CalendarPage: React.FC = () => {
 
     // Handle timezone selection change
     const handleTimezoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedTimezone(event.target.value);
+        setDeleteTimezone(event.target.value);
     };
         /// <summary>
         /// DeleteEvent will delete the event based on the userId and event Id
@@ -199,7 +206,7 @@ const CalendarPage: React.FC = () => {
                 setSelectedConnections(newEvent.Connections);
                 setPrivate(newEvent.priv);
                 setDeleteUserEmail(newEvent.UserId);
-                setSelectedTimezone(newEvent.TimeZone)
+                setDeleteTimezone(newEvent.TimeZone)
             })
             .catch((error) => {
                 alert(error);
@@ -512,7 +519,7 @@ const CalendarPage: React.FC = () => {
                 <br/>
                     <label><strong> Select Timezone </strong></label>
                     <br />
-                    <select value={selectedTimezone} onChange={handleTimezoneChange}>
+                    <select value={selectedTimezone} onChange={(event) => setSelectedTimezone(event.target.value)}>
                         <option value=""> {defaultTimeZone}</option>
                         {timezones.map((timezone) => (
 
@@ -643,7 +650,7 @@ const CalendarPage: React.FC = () => {
             )}
             <EditEventModal
                 handleTimezoneChange={handleTimezoneChange}
-                selectedTimezone={selectedTimezone}
+                selectedTimezone={deleteTimezone}
                 userId={deleteUserEmail}
                 creator={creator}
                 setPrivate={setPrivate}
