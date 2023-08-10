@@ -1,18 +1,28 @@
 ﻿
-import { FC, useState, useEffect } from 'react'
-import { Calendar, Event, momentLocalizer } from 'react-big-calendar'
+import { useState, useEffect } from 'react';
+import { Calendar, Event, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import React from 'react';
-import 'moment-timezone'; `1`
-import 'react-big-calendar/lib/css/react-big-calendar.css'
+import 'moment-timezone'; 
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import MyModal, { EventModal, EditEventModal, SelectEmailModal } from './Modal';
 import styled from 'styled-components';
 
-
+const BackButton = styled.button`
+  position: absolute;
+  top: 20px;
+  left: 20px; /* Adjust the left value to position the button */
+  padding: 10px 20px;
+  background-color: #e74c3c; /* Change this to your desired background color */
+  color: white; /* Change this to your desired text color */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+`;
 
 interface RouteParams {
     id: string;
@@ -20,7 +30,8 @@ interface RouteParams {
 }
 
 const StyledDiv = styled.div`
-  text-align: center;`;
+ text-align: center;`;
+
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'noevent'|'past' | 'eventedited' | 'editpast' | 'eventclash'|'noedit'; // Define the possible task types
 const CalendarPage: React.FC = () => {
     const localizer = momentLocalizer(moment);
@@ -39,6 +50,7 @@ const CalendarPage: React.FC = () => {
     const [deleteEvent, setDeleteEvent] = useState<Event>();
     const [titleInput, setTitleInput] = useState<string>('');
     const [startdate, setStart] = useState<Date>(new Date());
+    const history = useHistory();
     const [enddate, setEnd] = useState<Date>(new Date());
     const [connect, setConnect] = useState<string[]>([]);
     const [moder, setModer] = useState<string[]>([]);
@@ -61,6 +73,9 @@ const CalendarPage: React.FC = () => {
 
         setShowModal(false);
     };
+    function goBack() {
+        history.goBack();
+    }
     useEffect(() => {
 
         getEvents();
@@ -82,6 +97,13 @@ const CalendarPage: React.FC = () => {
         });
 
     }
+    const calendarContainerStyle = {
+        height: "90vh",
+        background: "white",
+        width: "2000px",
+        paddingTop: "40px",
+        paddingLeft: "55px"
+    };
     /// <summary>
     /// Gets all the events that connectionId and id are part in together.
 
@@ -308,7 +330,7 @@ const CalendarPage: React.FC = () => {
                 priv: Priv,
                 Delete: false,
                 Subject: "Event is Edited",
-                Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startDate}' and ends at '${endDate}'.`,
+                Body: `An event titled '${titleInput}' has been created.The start time of the event is '${startdate}' and ends at '${enddate}'.`,
             }).then(() => {
                 //   alert("email sent");
             }).catch((error) => {
@@ -506,8 +528,8 @@ const CalendarPage: React.FC = () => {
    
 
     return (
-        <div>
-            <div>
+        <div style={{ paddingTop: '20px', height: '80%', overflow: 'hidden', paddingBottom: '20px' }} >
+          
                 <div>
                     <StyledDiv>
                     <h4><strong>
@@ -516,8 +538,8 @@ const CalendarPage: React.FC = () => {
                     </StyledDiv>
                 </div>
                 <StyledDiv>
-                <br/>
-                    <label><strong> Select Timezone </strong></label>
+                    <br />
+                    <label style={{ fontSize: '20px', fontWeight: 'bold', paddingBottom:"20px" }}> Select Timezone </label>
                     <br />
                     <select value={selectedTimezone} onChange={(event) => setSelectedTimezone(event.target.value)}>
                         <option value=""> {defaultTimeZone}</option>
@@ -528,7 +550,11 @@ const CalendarPage: React.FC = () => {
                             </option>
                         ))}
                 </select> </StyledDiv>
-               
+                <div>
+                    <BackButton onClick={goBack}>
+                        Back
+                    </BackButton>
+                </div>
                 <div >
                     <br />
                     <strong>
@@ -538,6 +564,7 @@ const CalendarPage: React.FC = () => {
                     </strong>
                 </div>
                 <br />
+                <div style={calendarContainerStyle}>
                 <Calendar
                 
                     defaultView='month'
@@ -548,18 +575,17 @@ const CalendarPage: React.FC = () => {
                     tooltipAccessor={tooltipAccessor}
                     formats={eventFormats}
                     titleAccessor="title"
-
                     onSelectEvent={handleDelete}
                     components={{
                         event: CustomEventContent,
                     }}
-                    style={{ height: '80vh' }}
+                    style={{ height: '80vh', width: '1000px' }}
                     step={15}
 
                 />
+                </div>
 
-
-            </div>
+           
 
             {deleteEvent && (
                 <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>

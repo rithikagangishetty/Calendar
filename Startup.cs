@@ -35,21 +35,9 @@ namespace Calenderwebapp
 
             services.AddControllersWithViews();
             services.AddControllers();
-      //      var  = new LoggerConfiguration()
-      //.MinimumLevel.Debug()
-      //.WriteTo.File(filePath, rollingInterval: RollingInterval.Day)
-      //.CreateLogger();
-          
-            //       Log.Logger = new LoggerConfiguration()
-            //.MinimumLevel.Debug()
-            //.WriteTo.Console()
-            //.WriteTo.MongoDB("mongodb://localhost:27017/YourDatabase", collectionName: "logging")
-            //.CreateLogger();
-
-           // services.AddLogging(builder => builder.AddSerilog(Log.Logger));
-            // Add configuration
+    
             services.AddSingleton(Configuration);
-            // In production, the React files will be served from this directory
+            
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/build";
@@ -80,7 +68,7 @@ namespace Calenderwebapp
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action=Index}/");
             });
 
             app.UseSpa(spa =>

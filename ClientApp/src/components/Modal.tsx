@@ -225,7 +225,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(selectedTimezone); // Initialize with an empty string
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
     const timeOffset: number = defaultOffset - selectedOffset;
-
+    
     useEffect(() => {
         
         const startDate = new Date(start);
@@ -338,13 +338,8 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     }
    
     const minDate = currentTime.toDate();
-    //if (userId && userId.trim() !== '') {
-    //    // Assuming 'useremail' is a valid email address and is not an empty string
-    //    if (!connections.includes(userId)) {
-    //        // Add 'useremail' to 'connections' if it's not already present
-    //        connections.push(userId);
-    //    }
-    //}
+
+    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
 
     
     const endOfDay = moment(currentTime).endOf('day').toDate();
@@ -467,7 +462,15 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                                 <Form.Check
                                     key={moderator}
                                     type="checkbox"
-                                    label={ moderator}
+                                    //label={ moderator}
+                                    label={
+                                        <span
+                                            className="truncate"
+                                            onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                        >
+                                            {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                        </span>
+                                    }
                                     value={selectedModerators}
                                     checked={selectedModerators.includes(moderator)}
                                     onChange={() => handleUserSelection(moderator, false)}
@@ -525,6 +528,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     if (Timezone == "") {
         Timezone = defaultTimeZone;
     }
+    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
 
     return (
         <Modal show={show} onHide={onClose}>
@@ -563,13 +567,22 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                
                 <Form.Group controlId="eventEmails">
                     <Form.Label><strong>Select the Moderators</strong></Form.Label>
-                    <div>
+                    <div >
                         {connections.length > 0 &&
                             connections.map((moderator) => (
-                                <Form.Check
+                                <Form.Check 
+                               
                                     key={moderator}
                                     type="checkbox"
-                                    label={moderator}
+                                
+                                    label={
+                                        <span
+                                            className="truncate"
+                                            onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                        >
+                                            {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                        </span>
+                                    }
                                     checked={selectedModerators.includes(moderator)}
                                     onChange={() => handleUserSelection(moderator,false)}
                                 />
@@ -617,9 +630,8 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
                 alignItems: "center",
             }} >
                 <Modal.Title>
-                    Select Connections
-                    <br />
-                    <div style={{ fontSize: '14px', fontWeight: 'normal', textDecoration: 'underline' }}>
+                    <div style={{ textAlign: 'center' }}>Select Connections</div>
+                    <div style={{ fontSize: '14px', fontWeight: 'normal', textDecoration: 'underline', textAlign:'center' }}>
                         The connections selected here are not added as moderators
                     </div>
                 </Modal.Title>
@@ -635,7 +647,7 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
                 <Button variant="secondary" onClick={onClose}>
                     Cancel
                 </Button>
-                <Button variant="primary" onClick={onSaveSelectedConnections}>
+                <Button variant="success" onClick={onSaveSelectedConnections}>
                     Save
                 </Button>
             </Modal.Footer>
@@ -644,7 +656,8 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
 };
 
 export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators, connections }) => {
-    
+    const [expandedConnection, setExpandedConnection] = useState<string | null>(null);
+    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
     return (
         <div>
             <Modal show={show} onHide={onHide}>
@@ -661,7 +674,14 @@ export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators
                             <p><strong>Moderators:</strong></p>
                             <ul>
                                 {moderators.map((moderator: any, index: any) => (
-                                    <li key={index}>{moderator}</li>
+                                    <li key={index}>
+                                        <span
+                                            className="truncate"
+                                            onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                        >
+                                            {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                        </span>
+                                    </li>
                                 ))}
                             </ul>
                         </>
@@ -671,7 +691,12 @@ export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators
                             <p><strong>Connections:</strong></p>
                             <ul>
                                 {connections.map((connection: any, index: any) => (
-                                    <li key={index}>{connection}</li>
+                                    <li key={index}> <span
+                                        className="truncate"
+                                        onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
+                                    >
+                                        {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
+                                    </span></li>
                                 ))}
                             </ul>
                         </>

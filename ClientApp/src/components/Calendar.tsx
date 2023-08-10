@@ -1,26 +1,38 @@
-﻿import { FC, useState, useEffect } from 'react'
+﻿import { FC, useState, useEffect, useRef } from 'react'
 import { Calendar, Event, momentLocalizer, View } from 'react-big-calendar'
 import moment from 'moment';
 import React from 'react';
+import { useParams, useHistory } from "react-router-dom";
 import 'moment-timezone'; 
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import { useHistory, useParams } from 'react-router-dom'
+import styled from 'styled-components';
 import axios from 'axios';
 import './NavMenu.css';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import styled from 'styled-components';
 import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, EventModal } from './Modal';
 
-
+const BackButton = styled.button`
+  position: absolute;
+  top: 20px;
+  left: 20px; /* Adjust the left value to position the button */
+  padding: 10px 20px;
+  background-color: #e74c3c; /* Change this to your desired background color */
+  color: white; /* Change this to your desired text color */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+`;
 
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'monthpast' | "noevent"|'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
 interface RouteParams {
     id: string;
 }
 const StyledDiv = styled.div`
-  text-align: center;`;
+
+  text-align: center;`; 
+
 
 const CalendarApp: FC = () => {
     const localizer = momentLocalizer(moment);
@@ -57,19 +69,24 @@ const CalendarApp: FC = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentView, setCurrentView] = useState<View>('month');
 
-    const handleViewChange = (view: View) => {
-        setCurrentView(view);
-    };
-    const currentDate = moment();
- 
-
+   
+    const calendarRef = useRef<Calendar | null>(null);
+   const currentDate = moment();
+    function goBack() {
+        history.goBack();
+    }
+    
     useEffect(() => {
 
         getEvents();
         GetConnections();
+        if (selectedTimezone) {
+            moment.tz.setDefault(selectedTimezone); // Set the default timezone
+            setCurrentView(currentView); // Trigger a re-render to apply the new timezone settings
+        }
 
-        moment.tz.setDefault();
-    }, [selectedTimezone, showModal]);
+        /* moment.tz.setDefault();*/
+    }, [selectedTimezone, showModal, currentView]);
 
    
 
@@ -84,7 +101,7 @@ const CalendarApp: FC = () => {
 
     const onClose = () => {
         setTitleInput("");
-        setStart(currentDate.toDate());
+       setStart(currentDate.toDate());
         setSelectedConnections([]);
         setSelectedModerators([]);
         setEnd(currentDate.toDate());
@@ -474,12 +491,21 @@ const CalendarApp: FC = () => {
         const isSameDay = selectedDate.isSame(currentDate, 'day');
        
         const isPastEvent = selectedDate.isBefore(currentDate);
-        const past = selectedDate.isBefore(currentDate);
         
-       
         if (isSameDay && isPastEvent && currentView == "month") {
             setCurrentTaskType('monthpast');
             setShowModal(true);
+            return;
+        }
+        if (!isSameDay && isPastEvent && currentView == "month") {
+            setCurrentTaskType('past');
+            setShowModal(true);
+            return;
+        }
+        else if (isPastEvent && currentView!="month") {
+            setCurrentTaskType('past');
+            setShowModal(true);
+            // Event is in the past, disable edit and delete options
             return;
         }
         // const isSameDay = selectedDate.isSame(currentDate, 'day');
@@ -488,9 +514,6 @@ const CalendarApp: FC = () => {
         else if (!isPastEvent) {
 
             setValidationError('');
-
-
-
             if (overlap(event)) {
 
                 setCurrentTaskType('overlap');
@@ -498,10 +521,7 @@ const CalendarApp: FC = () => {
                 return;
             }
 
-
             else {
-
-
                 setStart(event.start);
                 setEnd(event.end);
                 setShowCreateModal(true);
@@ -531,12 +551,7 @@ const CalendarApp: FC = () => {
 
             }
         }
-       else {
-            setCurrentTaskType('past');
-            setShowModal(true);
-            // Event is in the past, disable edit and delete options
-            return;
-        }
+      
 
     };
     ///This function is for the displaying of the title, start and end times when scrolled over an event.
@@ -601,7 +616,11 @@ const CalendarApp: FC = () => {
         else {
             setValidationError('');
             setPrivate(true);
-            
+            if (edit) {
+                setShowEditModal(false);
+            } else {
+                setShowCreateModal(false);
+            }
             setShowEmailModal(true);
         }
     }
@@ -609,8 +628,10 @@ const CalendarApp: FC = () => {
         ///When the user wants to edit the function this will be called, it enables the edit modal pop up and makes edit variable true.
         ///</summary>
  function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
-        setEdit(true);
-        setShowEditModal(true);
+     //check this
+     setShowDeleteModal(false);
+     setEdit(true);
+     setShowEditModal(true);
        }
         ///<summary>
         ///When the user clicks on any event this function is called.
@@ -625,13 +646,7 @@ const CalendarApp: FC = () => {
        setIsPast(isPastEvent);
        if (!event.Moderator.includes(id) && event.UserId != id) {
 
-
-
-
            setIsPast(true);
-
-
-
        }
       
        setDeleteEventId(event._id);
@@ -642,11 +657,29 @@ const CalendarApp: FC = () => {
     };
     const handleClose = () => {
         setShowCreateModal(false);
-        setShowEditModal(false);
+        
         onClose();
       
     }
-   
+    const onCloseEdit = () => {
+        setShowEmailModal(false);
+        if (!edit) {
+            
+            setShowCreateModal(true);
+}
+        onClose();
+
+    }
+    const onCloseDelete = () => {
+        setShowEditModal(false);
+         setShowDeleteModal(true);
+          onClose();
+       
+        
+
+    }
+    const [expandedConnection, setExpandedConnection] = useState<string | null>(null);
+
    ///<summary>
     ///This is the checkbox for the connections in the event details
     ///To avoid adding the same user twice as connection and moderator this function is used.
@@ -660,7 +693,15 @@ const CalendarApp: FC = () => {
                 key={connection}
                 type="checkbox"
                 id={connection}
-                label={connection}
+                
+                label={
+                    <span
+                        className="truncate"
+                        onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
+                    >
+                        {expandedConnection === connection ? connection : (connection.length > 0 ? `${connection.slice(0, 50)}...` : connection)}
+                    </span>
+                }
                 checked={selectedConnections.includes(connection)}
                 onChange={() => handleUserSelection(connection,true)}
                 disabled={isDisabled}
@@ -702,25 +743,27 @@ const CalendarApp: FC = () => {
         end: moment.max(events.map(event => moment(event.end))).toDate(),
     };
 
+
+
     const handleNavigate = (date: Date) => {
         // Prevent navigation to a date outside the allEventsRange
+      
         if (date < allEventsRange.start) {
             date = allEventsRange.start;
         } else if (date > allEventsRange.end) {
             date = allEventsRange.end;
         }
+
+        // Update the view along with the date checks
+        
     };
-    const views = {
-        month: true,
-        week: true,
-        day: true,
-        agenda: true,
-       // allEvents: { component: AllEventsView },
-};
+   
+    
         ///<summary>
         ///This is for the private post to make sure the user selects alteast one other user as connection/moderator.
         ///If the edit is true editevent is called else post is called
         ///</summary>
+ 
     const handleSaveSelectedConnections = () => {
         if (selectedModerators.length === 0 && selectedConnections.length === 0) {
             setValidationError('Please select at least one moderator or connection.');
@@ -742,13 +785,26 @@ const CalendarApp: FC = () => {
         }
     };
 
+    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
 
-
+    const calendarContainerStyle = {
+        height: "90vh",
+        background: "white",
+        width: "2000px",
+        paddingTop: "40px",
+        paddingLeft: "55px"
+    };
 
     return (
-        <div >
+         
+        <div style={{ paddingTop: '20px', height: '80%', overflow: 'hidden', paddingBottom: '20px'}} >
+
+            <br />
             <StyledDiv>
-            <label><strong> Select Timezone </strong></label>
+                <label style={{ fontSize: '30px', fontWeight: 'bold', paddingBottom: "10px" }}> Welcome To Your Calendar Page </label>
+                <br/>
+                <label style={{ fontSize: '20px', fontWeight: 'bold', paddingBottom: "10px" }}> Select Timezone </label>
+               
             <br/>
                 <select value={selectedTimezone} onChange={(event)=>setSelectedTimezone(event.target.value)}>
                 <option value=""> {defaultTimeZone}</option>
@@ -760,20 +816,43 @@ const CalendarApp: FC = () => {
                 ))}
                 </select>
             </StyledDiv>
-           
+            <div>
+                <BackButton onClick={goBack}>
+                    Back
+                </BackButton>
+            </div>
             <div >
                 <br />
                 <strong>
                     <StyledDiv>
-                    Click an event to edit/delete,In the week/day view
-                    drag the mouse over the calendar
-                        to select a date/time range.<br/>
-                        In the month view the event will be created for the entire day.
+                        {currentView != 'agenda' && (
+                            <span>
+                                Click an event to edit or delete
+                            </span>
+                        )}
+                        {currentView === 'agenda' && (
+                            <span>
+                                All events spanning the month are displayed here.
+                            </span>
+                        )}
+                  
+                        <br />
+                        {currentView === 'month' && (
+                            <span>
+                              The event will be created for the entire day i.e., 24 hours.
+                            </span>
+                        )}
+                        {(currentView === 'week' || currentView=== "day") && (
+                            <span>
+                                To create an event, drag the mouse over the preferred time range on the calendar.
+                            </span>
+                        )}
                     </StyledDiv>
                 </strong>
             </div>
             
             <br />
+            <div style={calendarContainerStyle}>
             <Calendar
                 selectable
                 defaultView='month'
@@ -786,17 +865,21 @@ const CalendarApp: FC = () => {
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}
                 tooltipAccessor={tooltipAccessor}
-                onNavigate={handleNavigate}
+                onNavigate={handleNavigate}   
+                onView={newView => setCurrentView(newView)}
+                 ref={calendarRef}
+                  
                 components={{
                     event: CustomEventContent,
                   
                   
                 }}
-                onView={handleViewChange} 
-                popup={true}
-                style={{ height: '80vh' }}
+                
+                    popup={true}
+                    style={{ height: '80vh', width: '1000px', backgroundColor:"white" }}
                 step={15}
-            />
+                />
+            </div>
           
             {currentTaskType && (
                 <MyModal show={showModal} onClose={()=>setShowModal(false)} taskType={currentTaskType} />
@@ -835,23 +918,37 @@ const CalendarApp: FC = () => {
                         )}
                         
                      
+                        
                         {deleteEvent.Moderator && deleteEvent.Moderator.length > 0 && (
                             <>
                                 <p><strong>Moderators:</strong></p>
                                 <ul>
-                                    {deleteEvent.Moderator.map((moderator: any, index: any) => (
-                                        <li key={index}>{moderator}</li>
+                                    {deleteEvent.Moderator.map((moderator: string, index: number) => (
+                                        <li key={index} >
+                                            <span
+                                                className="truncate"
+                                                onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                            >
+                                                {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                            </span>
+                                        </li>
                                     ))}
                                 </ul>
                             </>
                         )}
+
 
                         {deleteEvent.Connections && deleteEvent.Connections.length > 0 && (
                             <div>
                                 <p><strong>Connections:</strong></p>
                                 <ul>
                                     {deleteEvent.Connections.map((connection: string, index: any) => (
-                                        <li key={index}>{connection}</li>
+                                        <li key={index}> <span
+                                            className="truncate"
+                                            onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
+                                        >
+                                            {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
+                                        </span></li>
                                     ))}
                                 </ul>
                             </div>
@@ -914,7 +1011,7 @@ const CalendarApp: FC = () => {
                 selectedTimezone={deleteTimezone}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
-                onClose={handleClose}
+                onClose={onCloseDelete}
                 onPost={handlePost}
                 setCreator={setCreator}
                 onPrivatePost={handlePrivatePost}
@@ -936,7 +1033,7 @@ const CalendarApp: FC = () => {
             <SelectEmailModal
                 
                 show={showEmailModal}
-                onClose={() => setShowEmailModal(false)}
+                onClose={onCloseEdit}
                 onSaveSelectedConnections={handleSaveSelectedConnections}
                 validationError={validationError}
                 connections={connections}

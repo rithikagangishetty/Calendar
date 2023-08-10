@@ -17,26 +17,18 @@ builder.Services.AddSpaStaticFiles(configuration =>
 {
     configuration.RootPath = "ClientApp/build";
 });
-string filePath = Path.Combine("C:\\Users\\GANGISHETTY RITHIKA\\Downloads", "log.txt");
 
-var _logger = new LoggerConfiguration()
-.MinimumLevel.Debug()
-     .WriteTo.File(filePath, rollingInterval: RollingInterval.Day)
-     .CreateLogger();
 
-builder.Logging.AddSerilog(_logger);
+
 builder.Services.AddScoped<ILoginSupervisor, LoginSupervisor>();
 builder.Services.AddScoped<IUserSupervisor, UserSupervisor>();
 builder.Services.AddScoped<IConnectionSupervisor, ConnectionSupervisor>();
 builder.Services.AddScoped<IConnections, Connection>();
 builder.Services.AddSingleton<Connection>();
-//builder.Services.AddScoped<ConnectionSupervisor>();
 builder.Services.AddScoped<IUser, User>();
 builder.Services.AddSingleton<User>();
-//builder.Services.AddScoped<UserSupervisor>();
 builder.Services.AddScoped<ILogin, Login>();
 builder.Services.AddSingleton<Login>();
-//builder.Services.AddScoped<LoginSupervisor>();
 var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -49,7 +41,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
         name: "default",
-        pattern: "{controller}/{action=Index}/{id?}");
+        pattern: "{controller}/{action=Index}/");
 });
 app.UseSpa(spa =>
 {

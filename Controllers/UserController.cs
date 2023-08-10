@@ -62,7 +62,7 @@ namespace Calenderwebapp.Controllers
         /// <returns></returns>
 
         [HttpGet("getconnectionevents")]
-        public async Task<ActionResult<List<UserDetails>>> GetViewEvents(string id, string connectionId)
+        public async Task<ActionResult<List<UserDetails>>> GetView(string id, string connectionId)
         {
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(connectionId))
             {
