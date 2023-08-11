@@ -147,7 +147,7 @@ function Login() {
     const handleFormSubmit = (event: FormEvent) => {
         event.preventDefault();
         
-        if (validateEmail(EmailId)) {
+        if (/*validateEmail(EmailId)*/ true) {
             axios.post(`${baseUrl}/Login/login`, {
                 _id: "",
                 EmailId: EmailId,

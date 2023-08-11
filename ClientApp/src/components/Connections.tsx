@@ -65,7 +65,7 @@ function Connections() {
       
     };
 
-    //UseEffect renders the Get() function whenever a change is occured which can be obtained by currentTaskType.
+    //UseEffect renders the Get() and GetAll() function whenever a change is occured which can be obtained by currentTaskType.
     useEffect(() => {
         Get();
         GetAll();
@@ -290,15 +290,15 @@ function Connections() {
                         </div>
                         </form>
                         <hr style={{ borderTop: "1px solid black", margin: "20px 0" }} />
-                    <div style={{ textAlign: "center" ,paddingTop: "10px" ,paddingBottom:"10px"}}> {/* Centered container for the label */}
-                        <label style={{ fontSize: "20px", fontWeight: "bold" }}>Your Connections</label>
+                        <div style={{ textAlign: "center",  paddingTop: "10px", paddingBottom: "10px" }}> {/* Centered container for the label */}
+                            <label style={{ fontSize: "20px", fontWeight: "bold", textAlign:"center" }}>Your Connections</label>
                     </div>
                         {emailIds.length > 0 && (
                             <table className="CustomTable" style={{ ...styles.table, tableLayout: 'fixed', borderCollapse: 'collapse'}}>
                                 <colgroup>
-                                    <col style={{ width: '50%' }} /> {/* Adjust the column widths as needed */}
-                                    <col style={{ width: '25%' }} />
-                                    <col style={{ width: '25%' }} />
+                                    <col style={{ width: '60%' }} /> {/* Adjust the column widths as needed */}
+                                    <col style={{ width: '20%' }} />
+                                    <col style={{ width: '20%' }} />
                                 </colgroup>
                             <tbody>
                                     {emailIds.map((email, index) => (

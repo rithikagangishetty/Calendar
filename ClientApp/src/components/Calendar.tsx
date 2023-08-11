@@ -11,7 +11,7 @@ import './NavMenu.css';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, EventModal } from './Modal';
+import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, EventModal, DeleteConfirmModal } from './Modal';
 
 const BackButton = styled.button`
   position: absolute;
@@ -48,7 +48,9 @@ const CalendarApp: FC = () => {
     const [deleteEventId, setDeleteEventId] = useState<string>('');
     const [deleteEventUserId, setDeleteEventUserId] = useState<string>('');
     const [deleteEvent, setDeleteEvent] = useState<Event>();
+
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [confirmationModal, setConfirmationModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
     const [startDate, setStart] = useState<Date>(new Date());
     const [endDate, setEnd] = useState<Date>(new Date());
@@ -106,6 +108,10 @@ const CalendarApp: FC = () => {
         setSelectedModerators([]);
         setEnd(currentDate.toDate());
         setPrivate(false);
+    }
+    const DeleteEventConfirm = () => {
+        setConfirmationModal(true);
+        setShowDeleteModal(false);
     }
     //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -276,7 +282,8 @@ const CalendarApp: FC = () => {
          connection = response.data.connections;
          dateStart = response.data.startDate;
          dateEnd = response.data.endDate;
-         setShowDeleteModal(false);
+            setShowDeleteModal(false);
+            setConfirmationModal(false);
          setCurrentTaskType('eventdeleted');
             setShowModal(true);
 
@@ -670,6 +677,11 @@ const CalendarApp: FC = () => {
         onClose();
 
     }
+    const onCloseConfirm = () => {
+        setConfirmationModal(false);
+        setShowDeleteModal(true);
+
+    }
     const onCloseDelete = () => {
         setShowEditModal(false);
          setShowDeleteModal(true);
@@ -972,7 +984,7 @@ const CalendarApp: FC = () => {
                                 Edit
                             </Button>
                         )}
-                        <Button variant="danger" onClick={DeleteEvent}>
+                        <Button variant="danger" onClick={DeleteEventConfirm}>
                             Delete
                         </Button>
                         <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
@@ -1046,6 +1058,11 @@ const CalendarApp: FC = () => {
                 onHide={() => setShowEventModal(false)}
                 moderators={moder}
                 connections={connect}
+            />
+            <DeleteConfirmModal
+                show={confirmationModal}
+                onClose={onCloseConfirm}
+                onDelete={DeleteEvent}
             />
            
            

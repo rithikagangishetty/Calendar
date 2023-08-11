@@ -43,6 +43,13 @@ interface EventModalProps {
     moderators: any;
 
 }
+interface DeleteConfirmProps {
+    show: boolean;
+    onClose: () => void;
+    onDelete: (event: any) => void;
+    
+
+}
 
 
 
@@ -661,7 +668,7 @@ export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators
     return (
         <div>
             <Modal show={show} onHide={onHide}>
-                <Modal.Header closeButton>
+                <Modal.Header >
                     <Modal.Title>Event Creation Error</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -755,7 +762,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, 
                     </div>
                     )}
 
-                {/* Add more event details here */}
+               
                     <p><strong>Are you sure you want to delete/edit this event?</strong></p>
             </Modal.Body>
             )}
@@ -775,6 +782,29 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, 
 
       
     );
+};
+
+
+export const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({ show, onClose,onDelete}) => {
+
+    return (
+        <Modal show={show} onHide={onClose}>
+            <Modal.Header >
+                <Modal.Title className="text-center">Delete Confirmation</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="text-center"><strong>Are you sure you want to delete?</strong></Modal.Body>
+            <Modal.Footer>
+               
+                <Button variant="danger" onClick={onDelete}>
+                    Yes
+                </Button>
+                <Button variant="secondary" onClick={onClose}>
+                    No
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
+       
 };
 
 
