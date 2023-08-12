@@ -653,11 +653,12 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
                 {validationError && <div className="text-danger">{validationError}</div>}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={onClose}>
-                    Cancel
-                </Button>
+               
                 <Button variant="success" onClick={onSaveSelectedConnections}>
                     Save
+                </Button>
+                <Button variant="secondary" onClick={onClose}>
+                    Cancel
                 </Button>
             </Modal.Footer>
         </Modal>

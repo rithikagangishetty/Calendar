@@ -9,7 +9,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
-import MyModal, { EventModal, EditEventModal, SelectEmailModal } from './Modal';
+import MyModal, { EventModal, EditEventModal, SelectEmailModal, DeleteConfirmModal } from './Modal';
 import styled from 'styled-components';
 
 const BackButton = styled.button`
@@ -39,6 +39,7 @@ const CalendarPage: React.FC = () => {
     const [creator, setCreator] = useState<boolean>(true);
     const [deleteUserEmail, setDeleteUserEmail] = useState<string>('');
     const [Edit, setEdit] = useState<boolean>(false);
+    const [confirmationModal, setConfirmationModal] = useState(false);
     const [events, setEvents] = useState<Event[]>([]);
     const [deleteTimezone, setDeleteTimezone] = React.useState<string>('');
     const [connections, setConnections] = useState<Array<string>>([]);
@@ -51,6 +52,7 @@ const CalendarPage: React.FC = () => {
     const [titleInput, setTitleInput] = useState<string>('');
     const [startdate, setStart] = useState<Date>(new Date());
     const history = useHistory();
+    const [initialTimezone, setInitialTimezone] = React.useState<string>('');
     const [enddate, setEnd] = useState<Date>(new Date());
     const [connect, setConnect] = useState<string[]>([]);
     const [moder, setModer] = useState<string[]>([]);
@@ -73,6 +75,15 @@ const CalendarPage: React.FC = () => {
 
         setShowModal(false);
     };
+    const DeleteEventConfirm = () => {
+        setConfirmationModal(true);
+        setShowDeleteModal(false);
+    }
+    const onCloseConfirm = () => {
+        setConfirmationModal(false);
+        setShowDeleteModal(true);
+
+    }
     function goBack() {
         history.goBack();
     }
@@ -169,29 +180,31 @@ const CalendarPage: React.FC = () => {
         var eventName;
         var Moderator;
         var Connection;
-        var _start;
-        var _end;
+     var dateStart;
+     var deleteId;
+        var dateEnd;
      axios.delete(`${baseUrl}/User/`, { params: { id: deleteEventId, userId: connectionId } }).then((response) => {
             eventName = response.data.eventName;
             Moderator = response.data.moderator;
             Connection = response.data.connections;
-            _start = response.data.startDate;
-            _end = response.data.endDate;
+            dateStart = response.data.startDate;
+         dateEnd = response.data.endDate;
+         deleteId = response.data.userId;
             setCurrentTaskType('eventdeleted');
             setShowModal(true);
-
+         setConfirmationModal(false);
             setShowDeleteModal(false);
         }).catch((error) => { alert(error); });
      axios.post(`${baseUrl}/User/sendmail`,
             {
                 _id: deleteEventId,
-                UserEmail: UserId,
+                UserEmail: deleteId,
                 EventName: eventName,
                 Moderator: Moderator,
                 Connections: Connection,
-                StartDate: _start,
+                StartDate: dateStart,
                 Delete: true,
-                EndDate: _end,
+                EndDate: dateEnd,
                 Subject: "Event is Deleted",
                 Body: `An event titled '${eventName}' has been deleted.`,
             }).then(() => {
@@ -228,7 +241,8 @@ const CalendarPage: React.FC = () => {
                 setSelectedConnections(newEvent.Connections);
                 setPrivate(newEvent.priv);
                 setDeleteUserEmail(newEvent.UserId);
-                setDeleteTimezone(newEvent.TimeZone)
+                setDeleteTimezone(newEvent.TimeZone);
+                setInitialTimezone(newEvent.TimeZone);
             })
             .catch((error) => {
                 alert(error);
@@ -366,6 +380,14 @@ const CalendarPage: React.FC = () => {
             
         }
     }
+    const onCloseDelete = () => {
+        setShowEditModal(false);
+
+        onClose();
+
+
+
+    }
     ///<summary>
     ///The functioning is same as handlePost but this is called when the user creates a private post
     ///In the private post the user is allowed to choose the connections, so new modal will pop up where all the connections will be displayed
@@ -382,6 +404,9 @@ const CalendarPage: React.FC = () => {
         else {
             setValidationError('');
             setPrivate(true);
+            
+                setShowEditModal(false);
+            
             setShowEmailModal(true);
         }
     }
@@ -390,7 +415,7 @@ const CalendarPage: React.FC = () => {
         ///</summary>
     function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
 
-
+        setShowDeleteModal(false);
         setEdit(true);
         setShowEditModal(true);
 
@@ -658,7 +683,7 @@ const CalendarPage: React.FC = () => {
                                         Edit
                                     </Button>
                                 )}
-                                <Button variant="danger" onClick={DeleteEvent}>
+                                <Button variant="danger" onClick={DeleteEventConfirm}>
                                     Delete
                                 </Button>
                                 <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
@@ -675,7 +700,7 @@ const CalendarPage: React.FC = () => {
                 <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
             )}
             <EditEventModal
-                initialTimezone={deleteTimezone}
+                initialTimezone={initialTimezone}
                 handleTimezoneChange={handleTimezoneChange}
                 selectedTimezone={deleteTimezone}
                 userId={deleteUserEmail}
@@ -684,7 +709,7 @@ const CalendarPage: React.FC = () => {
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
                 show={showEditModal}
-                onClose={handleClose}
+                onClose={onCloseDelete}
                 onPost={handlePost}
                 setCreator={setCreator}
                 onPrivatePost={handlePrivatePost}
@@ -718,6 +743,12 @@ const CalendarPage: React.FC = () => {
                 moderators={moder}
                 connections={connect}
             />
+            <DeleteConfirmModal
+                show={confirmationModal}
+                onClose={onCloseConfirm}
+                onDelete={DeleteEvent}
+            />
+
         </div>
     );
 };

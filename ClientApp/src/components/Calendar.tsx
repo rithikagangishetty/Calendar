@@ -307,7 +307,7 @@ const CalendarApp: FC = () => {
             }).then(() => {
               //  alert("email sent");
             }).catch((error) => {
-             //   alert("error in mail " + error)
+                alert("error in mail " + error)
                });
      
 
