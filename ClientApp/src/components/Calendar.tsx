@@ -67,6 +67,7 @@ const CalendarApp: FC = () => {
     const timezones = moment.tz.names();
     const [selectedTimezone, setSelectedTimezone] = React.useState<string>('');
     const [deleteTimezone, setDeleteTimezone] = React.useState<string>('');
+    const [initialTimezone, setInitialTimezone] = React.useState<string>('');
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentView, setCurrentView] = useState<View>('month');
@@ -342,6 +343,7 @@ const CalendarApp: FC = () => {
                 setPrivate(newEvent.priv);
                 setDeleteUserEmail(newEvent.UserId);
                 setDeleteTimezone(newEvent.TimeZone);
+                setInitialTimezone(newEvent.TimeZone);
                 
 
                 
@@ -684,7 +686,7 @@ const CalendarApp: FC = () => {
     }
     const onCloseDelete = () => {
         setShowEditModal(false);
-         setShowDeleteModal(true);
+        
           onClose();
        
         
@@ -774,8 +776,8 @@ const CalendarApp: FC = () => {
         ///<summary>
         ///This is for the private post to make sure the user selects alteast one other user as connection/moderator.
         ///If the edit is true editevent is called else post is called
-        ///</summary>
- 
+    ///</summary>
+   
     const handleSaveSelectedConnections = () => {
         if (selectedModerators.length === 0 && selectedConnections.length === 0) {
             setValidationError('Please select at least one moderator or connection.');
@@ -1015,6 +1017,7 @@ const CalendarApp: FC = () => {
 
             />
             <EditEventModal
+                initialTimezone={initialTimezone}
                 handleTimezoneChange={handleTimezoneChange}
                 show={showEditModal}
                 userId={deleteUserEmail}

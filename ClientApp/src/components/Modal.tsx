@@ -76,6 +76,7 @@ interface EditEventModalProps {
     creator: boolean;
     setSelectedModerators: (moderators: string[]) => void;
     onClose: () => void;
+
     onPost: (event: any) => void;
     onPrivatePost: (event: any) => void;
     validationError: string;
@@ -92,6 +93,7 @@ interface EditEventModalProps {
     handleUserSelection: (user: string, connect: boolean) => void;
     handleTimezoneChange: (event: any) => void;
     selectedTimezone: any;
+    initialTimezone: any;
     defaultTimeZone: any;
     timezones: any;
     priv: any;
@@ -198,6 +200,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     validationError,
     titleInput,
     start,
+    initialTimezone,
     setPrivate,
     userId,
     end,
@@ -222,19 +225,17 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     if (selectedTimezone == "") {
         selectedTimezone = defaultTimeZone;
     }
-    if (selectedTimezone != "") {
-        console.log(selectedTimezone);
-    }
+   
     moment.tz.setDefault(selectedTimezone);
     
     const currentTime = moment();
     const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
-    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(""); // Initialize with an empty string
+    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(initialTimezone); // Initialize with an empty string
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
     const timeOffset: number = defaultOffset - selectedOffset;
-    
+    console.log(initialTimezone);
     useEffect(() => {
-        setPrevSelectedTimezone(selectedTimezone);
+        setPrevSelectedTimezone(initialTimezone);
         const startDate = new Date(start);
         const endDate = new Date(end);
         const prevTimezoneOffset = moment.tz(start, prevSelectedTimezone).utcOffset();
@@ -310,6 +311,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         setEnd(null);
         onTitleInputChange("");
         onClose();
+        setPrevSelectedTimezone(initialTimezone);
     }
     var  minTime = new Date(
             currentTime.year(),

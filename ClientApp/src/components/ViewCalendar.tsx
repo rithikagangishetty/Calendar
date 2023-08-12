@@ -675,6 +675,7 @@ const CalendarPage: React.FC = () => {
                 <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
             )}
             <EditEventModal
+                initialTimezone={deleteTimezone}
                 handleTimezoneChange={handleTimezoneChange}
                 selectedTimezone={deleteTimezone}
                 userId={deleteUserEmail}
