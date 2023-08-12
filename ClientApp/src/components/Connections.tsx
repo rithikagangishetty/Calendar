@@ -2,8 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 type TaskType = 'connectionadded' |"noemail"| 'connectiondeleted' |"valid"|'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
-import MyModal from './Modal';
+import MyModal,{ DeleteConfirmModal } from './Modal';
 import styled from 'styled-components';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import 'react-datepicker/dist/react-datepicker.css';
 interface RouteParams {
     id: string;
 
@@ -26,9 +29,11 @@ function Connections() {
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [connection, setConnection] = useState<string>("");
     const [emailIds, setEmailIds] = useState<Array<string>>([]);
+    const [email, setEmail] = useState<string>("");
     const [allEmails, setAllEmailIds] = useState<Array<string>>([]);
     const [userEmail, setUserEmail] = useState<string>('');
     const { id } = useParams<RouteParams>();
+    const [confirmationModal, setConfirmationModal] = useState(false);
     const history = useHistory();
     const baseUrl = process.env.REACT_APP_URL;
     
@@ -64,6 +69,11 @@ function Connections() {
         });
       
     };
+    const DeleteEventConfirm = (email: any) => {
+        setConfirmationModal(true);
+        setEmail(email);
+        
+    }
 
     //UseEffect renders the Get() and GetAll() function whenever a change is occured which can be obtained by currentTaskType.
     useEffect(() => {
@@ -129,7 +139,7 @@ function Connections() {
         /// <param name="email">Email Id of the connection</param>
 
     async function Delete(emailId: string) {
-
+        setConfirmationModal(false)
         await axios.delete(`${baseUrl}/Connection/delete/`, { params: { emailId: emailId, id: id } }).then((response) => {
            
             setCurrentTaskType('connectiondeleted');
@@ -322,7 +332,7 @@ function Connections() {
                                             <button
                                                 type="button"
                                                 className="btn btn-danger"
-                                                onClick={() => Delete(email)}
+                                                onClick={()=>DeleteEventConfirm(email)}
                                             >
                                                 Delete
                                             </button>
@@ -340,8 +350,33 @@ function Connections() {
 
                     </div>
                 </div>
-            </div></>
+               
+                <Modal show={confirmationModal} onHide={() => setConfirmationModal(false)}>
+                    <Modal.Header style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                        <Modal.Title> <strong>Delete Confirmation </strong></Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                        <p>          <strong> Are you sure you want to delete?</strong></p>   </Modal.Body>
+                    <Modal.Footer>
 
+                        <Button variant="danger" onClick={()=>Delete(email)}>
+                            Yes
+                        </Button>
+                        <Button variant="secondary" onClick={() => setConfirmationModal(false)}>
+                            No
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            </div></>
+             
     );
        
 }

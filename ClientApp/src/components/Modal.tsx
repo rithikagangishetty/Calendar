@@ -229,12 +229,12 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     
     const currentTime = moment();
     const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
-    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(selectedTimezone); // Initialize with an empty string
+    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(""); // Initialize with an empty string
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
     const timeOffset: number = defaultOffset - selectedOffset;
     
     useEffect(() => {
-        
+        setPrevSelectedTimezone(selectedTimezone);
         const startDate = new Date(start);
         const endDate = new Date(end);
         const prevTimezoneOffset = moment.tz(start, prevSelectedTimezone).utcOffset();
@@ -789,10 +789,19 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({ show, onClose
 
     return (
         <Modal show={show} onHide={onClose}>
-            <Modal.Header >
-                <Modal.Title className="text-center">Delete Confirmation</Modal.Title>
+            <Modal.Header style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
+                <Modal.Title> <strong>Delete Confirmation </strong></Modal.Title>
             </Modal.Header>
-            <Modal.Body className="text-center"><strong>Are you sure you want to delete?</strong></Modal.Body>
+            <Modal.Body style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
+                <p>          <strong> Are you sure you want to delete?</strong></p>   </Modal.Body>
             <Modal.Footer>
                
                 <Button variant="danger" onClick={onDelete}>
