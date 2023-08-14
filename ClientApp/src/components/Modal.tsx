@@ -374,14 +374,14 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 <Modal.Title>Edit Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Group controlId="eventTitle">
+                <Form.Group controlId="eventTitle" className="title">
                     <Form.Label><strong>Title</strong></Form.Label>
                     <Form.Control
                         type="text"
                         value={titleInput}
                         onChange={(e) => onTitleInputChange(e.target.value)}
                         isInvalid={validationError !== ''}
-
+                        /*style={{ width: '300px' }}*/
 
 
                     />
@@ -600,7 +600,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 </Form.Group>
                 <br />
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Button variant="success" onClick={onPost}>
                     Create Public Event
                 </Button>
@@ -611,6 +611,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     Cancel
                 </Button>
             </Modal.Footer>
+            
         </Modal>
     );
 };
@@ -689,7 +690,7 @@ export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators
                                             className="truncate"
                                             onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
                                         >
-                                            {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                            {expandedModerator === moderator ? moderator : (moderator.length > 70 ? `${moderator.slice(0, 70)}...` : moderator)}
                                         </span>
                                     </li>
                                 ))}

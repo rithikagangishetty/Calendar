@@ -16,7 +16,7 @@ namespace Calenderwebapp.Controllers
 
 
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     public class UserController : Controller
     {
        
@@ -34,8 +34,8 @@ namespace Calenderwebapp.Controllers
         /// It gets all the events based on the id of the user
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("getallevents")]
+        /// <returns>list of the obtained events</returns>
+        [HttpGet]
         public async Task<ActionResult<List<UserDetails>>> GetEvents(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -59,9 +59,9 @@ namespace Calenderwebapp.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <param name="connectionId"></param>
-        /// <returns></returns>
+        /// <returns>List of the events</returns>
 
-        [HttpGet("getconnectionevents")]
+        [HttpGet]
         public async Task<ActionResult<List<UserDetails>>> GetView(string id, string connectionId)
         {
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(connectionId))
@@ -69,7 +69,7 @@ namespace Calenderwebapp.Controllers
                 return BadRequest("Invalid id or connectionId parameters.");
             }
 
-            var result = await _userSupervisor.GetViewEvents(id, connectionId);
+            var result = await _userSupervisor.GetView(id, connectionId);
             if (!result.Any())
             {
 
@@ -85,7 +85,7 @@ namespace Calenderwebapp.Controllers
         /// <param name="id">It is the event id</param>
         /// <returns>The modified event</returns>
 
-        [HttpGet("getevent")]
+        [HttpGet]
         public async Task<ActionResult<UserDetails>> GetEvent(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -105,9 +105,9 @@ namespace Calenderwebapp.Controllers
         /// API call for adding a new event.
         /// </summary>
         /// <param name="newUser"></param>
-        /// <returns></returns>
+        /// <returns>returns the details of the event</returns>
 
-        [HttpPost("post")]
+        [HttpPost]
         public async Task<ActionResult<UserDetails>> Post(UserDetails newUser)
         {
             if (newUser == null)
@@ -129,22 +129,22 @@ namespace Calenderwebapp.Controllers
         /// </summary>
         /// <param name="emailDetails"></param>
         /// <returns></returns>
-        [HttpPost("sendmail")]
-        public async Task<ActionResult> SendMailAsync(EmailDetails emailDetails)
+        [HttpPost]
+        public async Task<ActionResult> SendMail(EmailDetails emailDetails)
         {
             if (emailDetails == null)
             {
                 return BadRequest("Invalid email data.");
             }
 
-            await _userSupervisor.SendMailAsync(emailDetails);
+            await _userSupervisor.SendMail(emailDetails);
             return Ok();
         }
         /// <summary>
         /// API call to update the existing document/event.
         /// </summary>
         /// <param name="updatedUser"></param>
-        /// <returns></returns>
+        /// <returns>returns the details of the event</returns>
 
         [HttpPut]
         public async Task<ActionResult<UserDetails>> Update(UserDetails updatedUser)
@@ -158,10 +158,7 @@ namespace Calenderwebapp.Controllers
                 return BadRequest("Invalid End Date/Time of the event");
             }
             var user = await _userSupervisor.Update(updatedUser);
-            //if (user == null)
-            //{
-            //    return NotFound();
-            //}
+          
            
 
             return user;
@@ -171,7 +168,7 @@ namespace Calenderwebapp.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <returns>returns the details of the event</returns>
         [HttpDelete]
         public async Task<ActionResult<UserDetails>> Delete(string id, string userId)
         {

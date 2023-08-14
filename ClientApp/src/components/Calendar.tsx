@@ -13,17 +13,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, EventModal, DeleteConfirmModal } from './Modal';
 
-const BackButton = styled.button`
-  position: absolute;
-  top: 20px;
-  left: 20px; /* Adjust the left value to position the button */
-  padding: 10px 20px;
-  background-color: #e74c3c; /* Change this to your desired background color */
-  color: white; /* Change this to your desired text color */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-`;
+
 
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'monthpast' | "noevent"|'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
 interface RouteParams {
@@ -48,7 +38,7 @@ const CalendarApp: FC = () => {
     const [deleteEventId, setDeleteEventId] = useState<string>('');
     const [deleteEventUserId, setDeleteEventUserId] = useState<string>('');
     const [deleteEvent, setDeleteEvent] = useState<Event>();
-
+    const [userEmail, setUserEmail] = useState<string>('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [confirmationModal, setConfirmationModal] = useState(false);
     const [titleInput, setTitleInput] = useState<string>('');
@@ -73,7 +63,7 @@ const CalendarApp: FC = () => {
     const [currentView, setCurrentView] = useState<View>('month');
 
    
-    const calendarRef = useRef<Calendar | null>(null);
+   
    const currentDate = moment();
     function goBack() {
         history.goBack();
@@ -84,12 +74,13 @@ const CalendarApp: FC = () => {
         getEvents();
         GetConnections();
         if (selectedTimezone) {
-            moment.tz.setDefault(selectedTimezone); // Set the default timezone
-            setCurrentView(currentView); // Trigger a re-render to apply the new timezone settings
+            moment.tz.setDefault(selectedTimezone);
+            setCurrentView(currentView); 
         }
-
-        /* moment.tz.setDefault();*/
-    }, [selectedTimezone, showModal, currentView]);
+       
+        
+    }, [selectedTimezone, showModal, currentView, showEditModal]);
+    
 
    
 
@@ -104,7 +95,7 @@ const CalendarApp: FC = () => {
 
     const onClose = () => {
         setTitleInput("");
-       setStart(currentDate.toDate());
+        setStart(currentDate.toDate());
         setSelectedConnections([]);
         setSelectedModerators([]);
         setEnd(currentDate.toDate());
@@ -124,7 +115,7 @@ const CalendarApp: FC = () => {
         /// </summary>
        
     const getEvents = () => {
-        axios.get(`${baseUrl}/User/getallevents`, { params: { id: id } }).then((response) => {
+        axios.get(`${baseUrl}/User/GetEvents`, { params: { id: id } }).then((response) => {
            
                 const event = response.data.map((training: any) => {
 
@@ -169,12 +160,12 @@ const CalendarApp: FC = () => {
         
         var userConnections;
         var eventId;
-        await axios.get('https://localhost:44373/Connection/get', { params: { id: id } }).then((response) => {
+        await axios.get(`${baseUrl}/Connection/GetUser`, { params: { id: id } }).then((response) => {
 
             userConnections = response.data.connection;
 
         }).catch((error) => { alert("error in get " + error) });
-        await axios.post(`${baseUrl}/User/post`,
+        await axios.post(`${baseUrl}/User/Post`,
             {
                 _id: '',
                 UserId: id,
@@ -218,7 +209,7 @@ const CalendarApp: FC = () => {
             });
         if (eventId != "noevent" && eventId != "eventclash" && eventId != "someevent") {
 
-            axios.post(`${baseUrl}/User/sendmail`,
+            axios.post(`${baseUrl}/User/SendMail`,
                 {
                     _id: eventId,
                     UserEmail: id,
@@ -245,8 +236,8 @@ const CalendarApp: FC = () => {
         ///this function will be called everytime when the variables in the useEffect block changes
         /// </summary>
     function GetConnections() {
-        axios.get(`${baseUrl}/Connection/getemail`, { params: { id: id } }).then((response) => {
-            
+        axios.get(`${baseUrl}/Connection/GetEmail`, { params: { id: id } }).then((response) => {
+            setUserEmail(response.data.emailId);
             setConnections(response.data.connection);
             var res = response.data.connection;
             if (res.length == 0) {
@@ -275,7 +266,7 @@ const CalendarApp: FC = () => {
       var connection;
       var dateStart;
       var dateEnd;
-        await axios.delete(`${baseUrl}/User/`, { params: { id: deleteEventId, userId: id } }).then((response) => {
+        await axios.delete(`${baseUrl}/User/Delete`, { params: { id: deleteEventId, userId: id } }).then((response) => {
 
 
          eventName = response.data.eventName;
@@ -291,7 +282,7 @@ const CalendarApp: FC = () => {
          
          onClose();
         }).catch((error) => { alert(error); });
-        axios.post(`${baseUrl}/User/sendmail`,
+        axios.post(`${baseUrl}/User/SendMail`,
             {
                 _id: deleteEventId,
                 UserEmail: id,
@@ -319,7 +310,7 @@ const CalendarApp: FC = () => {
    async function  showEmails(event: any) {
        
         await axios
-            .get(`${baseUrl}/User/getevent`, { params: { id: event._id } })
+            .get(`${baseUrl}/User/GetEvent`, { params: { id: event._id } })
             .then((response) => {
                 const newEvent = {
                     title: response.data.eventName,
@@ -390,13 +381,13 @@ const CalendarApp: FC = () => {
             }
         }
  
-        await axios.get(`${baseUrl}/Connection/get`, { params: { id: deleteEventUserId } }).then((response) => {
+        await axios.get(`${baseUrl}/Connection/GetUser`, { params: { id: deleteEventUserId } }).then((response) => {
 
             users = response.data.connection;
             
         }).catch((error) => { alert("error in get " + error) });
        
-        await axios.put(`${baseUrl}/User/`, {
+        await axios.put(`${baseUrl}/User/Update`, {
             _id: deleteEventId,
             UserId: (creator)?deleteEventUserId:id,
             EventName: titleInput,
@@ -441,7 +432,7 @@ const CalendarApp: FC = () => {
             }
         }).catch((error) => { alert(error); });
         if (eventId != "noevent" && eventId != "eventclash" && eventId != "someevent") {
-            await axios.post(`${baseUrl}/User/sendmail`,
+            await axios.post(`${baseUrl}/User/SendMail`,
                 {
                     _id: deleteEventId,
                     UserEmail: id,
@@ -566,7 +557,7 @@ const CalendarApp: FC = () => {
     ///This function is for the displaying of the title, start and end times when scrolled over an event.
     const CustomEventContent = ({ event }: any) => (
         <div>
-            <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{event.title}</div>
+            <div style={{ fontSize: '13px', fontWeight: 'bold', textAlign: 'center' }}>{event.title}</div>
             <div style={{ fontSize: '13px' }}>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
         </div>
     );
@@ -666,7 +657,6 @@ const CalendarApp: FC = () => {
     };
     const handleClose = () => {
         setShowCreateModal(false);
-        
         onClose();
       
     }
@@ -713,7 +703,7 @@ const CalendarApp: FC = () => {
                         className="truncate"
                         onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
                     >
-                        {expandedConnection === connection ? connection : (connection.length > 0 ? `${connection.slice(0, 50)}...` : connection)}
+                        {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
                     </span>
                 }
                 checked={selectedConnections.includes(connection)}
@@ -802,11 +792,11 @@ const CalendarApp: FC = () => {
     const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
 
     const calendarContainerStyle = {
-        height: "90vh",
+        height: "80vh",
         background: "white",
-        width: "2000px",
-        paddingTop: "40px",
-        paddingLeft: "55px"
+        width: "90%",
+        padding:"10px"
+       
     };
 
     return (
@@ -815,7 +805,7 @@ const CalendarApp: FC = () => {
 
             <br />
             <StyledDiv>
-                <label style={{ fontSize: '30px', fontWeight: 'bold', paddingBottom: "10px" }}> Welcome To Your Calendar Page </label>
+                <label style={{ fontSize: '28px', fontWeight: 'bold', paddingBottom: "10px" }}> Welcome To Your Calendar Page,{userEmail}! </label>
                 <br/>
                 <label style={{ fontSize: '20px', fontWeight: 'bold', paddingBottom: "10px" }}> Select Timezone </label>
                
@@ -831,9 +821,10 @@ const CalendarApp: FC = () => {
                 </select>
             </StyledDiv>
             <div>
-                <BackButton onClick={goBack}>
+                <button className="back-button" onClick={goBack}>
                     Back
-                </BackButton>
+                </button>
+
             </div>
             <div >
                 <br />
@@ -866,7 +857,7 @@ const CalendarApp: FC = () => {
             </div>
             
             <br />
-            <div style={calendarContainerStyle}>
+            <div className="calendarContainerStyle">
             <Calendar
                 selectable
                 defaultView='month'
@@ -881,7 +872,7 @@ const CalendarApp: FC = () => {
                 tooltipAccessor={tooltipAccessor}
                 onNavigate={handleNavigate}   
                 onView={newView => setCurrentView(newView)}
-                 ref={calendarRef}
+
                   
                 components={{
                     event: CustomEventContent,
@@ -890,7 +881,7 @@ const CalendarApp: FC = () => {
                 }}
                 
                     popup={true}
-                    style={{ height: '80vh', width: '1000px', backgroundColor:"white" }}
+                    style={calendarContainerStyle}
                 step={15}
                 />
             </div>

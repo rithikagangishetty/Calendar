@@ -8,7 +8,7 @@ namespace Calenderwebapp.Controllers
     
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     public class LoginController : Controller
     {
         private readonly ILoginSupervisor _loginSupervisor;
@@ -31,10 +31,11 @@ namespace Calenderwebapp.Controllers
         /// </summary>
         /// <param name="userData"></param>
         /// <returns></returns>
-        [HttpPost("login")]
+        [HttpPost]
        
         public IActionResult Login(Connections userData)
         {
+           
             var user = _loginSupervisor.login(userData);
             if (user != null)
             { return Ok(user); }
@@ -48,7 +49,7 @@ namespace Calenderwebapp.Controllers
         /// </summary>
         /// <param name="userData"></param>
         /// <returns></returns>
-        [HttpPost("signup")]
+        [HttpPost]
        
         public  ActionResult<Connections> Signup(Connections userData)
         {

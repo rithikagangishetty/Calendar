@@ -77,7 +77,7 @@ function Home() {
     /// </summary>
     function GetEmail()
     {
-        axios.get(`${baseUrl}/Connection/get/`, { params: { id: id } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/GetUser/`, { params: { id: id } }).then((response) => {
 
            
             console.log(response.data);
@@ -105,9 +105,10 @@ function Home() {
                 </Button>
            
                 </ButtonContainer>
-                <BackButton onClick={goBack}>
+                <button className="back-button" onClick={goBack}>
                     Back
-                </BackButton>
+                </button>
+
             </ConnectionContainer>
         
             

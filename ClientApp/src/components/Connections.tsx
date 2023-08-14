@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 type TaskType = 'connectionadded' |"noemail"| 'connectiondeleted' |"valid"|'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
-import MyModal,{ DeleteConfirmModal } from './Modal';
+import MyModal from './Modal';
 import styled from 'styled-components';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -12,17 +12,7 @@ interface RouteParams {
 
 
 }
-const BackButton = styled.button`
-  position: absolute;
-  top: 20px;
-  left: 20px; /* Adjust the left value to position the button */
-  padding: 10px 20px;
-  background-color: #e74c3c; /* Change this to your desired background color */
-  color: white; /* Change this to your desired text color */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-`;
+
 function Connections() {
     const [showModal, setShowModal] = useState(false);
     const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
@@ -30,6 +20,8 @@ function Connections() {
     const [connection, setConnection] = useState<string>("");
     const [emailIds, setEmailIds] = useState<Array<string>>([]);
     const [email, setEmail] = useState<string>("");
+    
+
     const [allEmails, setAllEmailIds] = useState<Array<string>>([]);
     const [userEmail, setUserEmail] = useState<string>('');
     const { id } = useParams<RouteParams>();
@@ -57,7 +49,7 @@ function Connections() {
     const handleViewCalendar = (email: string) =>
     {
         var connectionId: string;
-        axios.get(`${baseUrl}/Connection/getid/`, { params: { email: email } }).then((response) =>
+        axios.get(`${baseUrl}/Connection/GetId/`, { params: { email: email } }).then((response) =>
         {
             connectionId = response.data._id;
             history.push(`/Home/Connections/calendar/${id}/${connectionId}`);
@@ -93,7 +85,7 @@ function Connections() {
         
     function Get() {
         var emails: any;
-        axios.get(`${baseUrl}/Connection/getemail/`, { params: { id: id } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/GetEmail/`, { params: { id: id } }).then((response) => {
 
             emails = response.data.connection;
             setUserEmail(response.data.emailId);
@@ -122,7 +114,7 @@ function Connections() {
         /// </summary>
     function GetAll() {
         var emails;
-        axios.get(`${baseUrl}/Connection/getall/`, ).then((response) => {
+        axios.get(`${baseUrl}/Connection/Get/`, ).then((response) => {
             emails = response.data;
             if (emails.length > 0) {
                 setAllEmailIds(emails)
@@ -140,7 +132,7 @@ function Connections() {
 
     async function Delete(emailId: string) {
         setConfirmationModal(false)
-        await axios.delete(`${baseUrl}/Connection/delete/`, { params: { emailId: emailId, id: id } }).then((response) => {
+        await axios.delete(`${baseUrl}/Connection/Delete/`, { params: { emailId: emailId, id: id } }).then((response) => {
            
             setCurrentTaskType('connectiondeleted');
             setShowModal(true);
@@ -187,7 +179,7 @@ function Connections() {
         var Id;
         var Emailid;
 
-        await axios.get(`${baseUrl}/Connection/get/`, { params: { id: id } }).then((response) => {
+        await axios.get(`${baseUrl}/Connection/GetUser/`, { params: { id: id } }).then((response) => {
            
             Id = response.data._id;
             Emailid = response.data.emailId;
@@ -203,7 +195,7 @@ function Connections() {
            
 
         });
-        await axios.put(`${baseUrl}/Connection/update`,
+        await axios.put(`${baseUrl}/Connection/Update`,
             {
 
                 _id: Id,
@@ -252,6 +244,7 @@ function Connections() {
         },
         form: {
             marginBottom: "20px",
+            
         },
         table: {
             width: "100%",
@@ -262,16 +255,19 @@ function Connections() {
         },
 
     };
-
-
+  
+    // Merge responsive styles into main styles
+   
     return (
        
         <>
             <div style={styles.main }>
             <div>
-                <BackButton onClick={goBack}>
-                    Back
-                </BackButton>
+               
+                    <button className="back-button" onClick={goBack}>
+                        Back
+                    </button>
+
             </div>
 
             <div >
@@ -279,22 +275,35 @@ function Connections() {
                 <div style={styles.content}>
 
 
-                    <form style={styles.form}>
-                        <div style={{ textAlign: "center" }}>
-                            <label style={{ fontSize: "20px" }}><strong>Add a New Connection</strong></label>
-                        </div>
-                        <br/>
-                        <input
-                            type="text"
-                            className="formControl"
-                            id="emailid"
-                            value={connection}
-                            placeholder={"Add Email of the required connection"}
-                            onChange={(event) => {
-                                setConnection(event.target.value);
-                                }} />
-                            <div style={{ textAlign: "right", paddingRight:"40px" }}>
-                        <button className="btn btn-primary mt-4" onClick={Update}>
+                        <form style={styles.form}>
+                            <div className="style">
+                                <label style={{ fontSize: '28px', fontWeight: 'bold', paddingBottom: "10px" }}> Welcome To Your Connections Page,  {userEmail}! </label>
+                                <br/>
+                            
+                            </div>
+                            <div className="style">
+                                <label style={{ fontSize: '20px', fontWeight: 'bold', paddingBottom: "10px", textAlign: "center" }}>Add a New Connection</label>
+                               
+
+                            </div>
+                            
+                       
+                       
+                            <div  style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                <input
+                                    type="text"
+                                    className="formControl"
+                                    id="emailid"
+                                    value={connection}
+                                    placeholder="Add Email of the required connection"
+                                    onChange={(event) => {
+                                        setConnection(event.target.value);
+                                    }}
+                                />
+                            </div>
+
+                            <div style={{ textAlign: "center" }}>
+                        <button className="btn btnPrimary mt-4" onClick={Update}>
                             Add Connection
                             </button>
                         </div>
@@ -304,13 +313,13 @@ function Connections() {
                             <label style={{ fontSize: "20px", fontWeight: "bold", textAlign:"center" }}>Your Connections</label>
                     </div>
                         {emailIds.length > 0 && (
-                            <table className="CustomTable" style={{ ...styles.table, tableLayout: 'fixed', borderCollapse: 'collapse'}}>
+                            <table className="CustomTable" style={{ ...styles.table, tableLayout: 'fixed', borderCollapse: 'collapse' }}>
                                 <colgroup>
                                     <col style={{ width: '60%' }} /> {/* Adjust the column widths as needed */}
                                     <col style={{ width: '20%' }} />
                                     <col style={{ width: '20%' }} />
                                 </colgroup>
-                            <tbody>
+                                <tbody>
                                     {emailIds.map((email, index) => (
                                         <tr key={email}>
                                             <td
@@ -319,29 +328,29 @@ function Connections() {
                                             >
                                                 {email}
                                             </td>
-                                        <td className="customTableCell" style={{ textAlign: "center" }}>
-                                            <button
-                                                type="button"
-                                                className="btn btn-success"
-                                                onClick={() => handleViewCalendar(email)}
-                                            >
-                                                View Calendar
-                                            </button>
-                                        </td>
-                                        <td className="customTableCell" style={{ textAlign: "center" }}>
-                                            <button
-                                                type="button"
-                                                className="btn btn-danger"
-                                                onClick={()=>DeleteEventConfirm(email)}
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
+                                            <td className="customTableCell" style={{ textAlign: "center" }}>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-success"
+                                                    onClick={() => handleViewCalendar(email)}
+                                                >
+                                                    View Calendar
+                                                </button>
+                                            </td>
+                                            <td className="customTableCell" style={{ textAlign: "center" }}>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger"
+                                                    onClick={() => DeleteEventConfirm(email)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
 
                     {currentTaskType && (
                         <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />

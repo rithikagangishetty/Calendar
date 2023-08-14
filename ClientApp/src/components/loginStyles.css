@@ -2,7 +2,7 @@
 
 
 
-body {
+/*body {
     background-color: #D3D3D3;
      background-image: url("C:\Users\GANGISHETTY RITHIKA\Downloads\17973908.jpg");
     background-repeat: no-repeat;
@@ -28,8 +28,8 @@ body {
 }
 
     .CustomTable tbody tr td + td {
-        border-left: none; /* Remove the border between columns */
-    }
+        border-left: none;*/ /* Remove the border between columns */
+    /*}
 
 
 .login-container {
@@ -37,9 +37,9 @@ body {
     justify-content: flex-end;
     align-items: center;
     height: 100vh;
-    padding-left:200px;
+    padding-left:200px;*/
   /*  background-color: #D3D3D3;*/
-}
+/*}
 .truncate {
     white-space: normal;
     cursor: pointer;
@@ -137,25 +137,238 @@ body {
 
     .modal-container.hide {
         display: none;
-    }
+    }*/
 /* Styling for the connections page container */
-.connections-container {
+/*.connections-container {
     text-align: center;
     padding-top: 150px;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
+}*/
 
 /* Styling for the buttons */
+/*.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}*/
+
+    /* Increase the length of the buttons */
+    /*.button-container button {
+        margin: 0 10px;
+        padding: 10px 20px;
+    }*/
+
+
+
+
+/* loginStyles.css */
+
+body {
+    background-color: transparent;
+    background-image: url("C:\Users\GANGISHETTY RITHIKA\Downloads\17973908.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 0; /* Reset default body margin */
+    
+}
+.customTableCell {
+    padding: 5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+    .customTableCell.expanded {
+        white-space: normal;
+        word-break: break-all;
+    }
+
+.CustomTable {
+    border-collapse: collapse;
+    padding: 5px;
+    width: 100%;
+}
+.calendarContainerStyle {
+    height: 90vh;background: white; 
+    width: 100%;
+    padding-top: 40px; 
+    padding-left: 55px;
+}
+
+
+
+.CustomTable tbody tr td + td {
+    border-left: none; /* Remove the border between columns */
+}
+.truncate {
+    white-space: normal;
+    cursor: pointer;
+    word-break: break-all;
+}
+.login-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 100vh; /* Instead of height: 100vh */
+    padding: 20px; /* Use padding instead of padding-left */
+    background-color: transparent;
+}
+
+
+
+.my-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    max-width: 600px;
+    width: 100%; /* Use relative width for responsiveness */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: floralwhite;
+  
+}
+
+/* Improve font sizing for readability on smaller screens */
+.my-heading-1 {
+    font-weight: bold;
+    font-size: 28px;
+    color: #0056b3;
+    font-family: Calibri, sans-serif;
+}
+
+.my-heading-2 {
+    font-weight: bold;
+    font-size: 24px;
+    color: #333;
+    font-family: Calibri, sans-serif;
+}
+
+/* Set a max-width for better readability on larger screens */
+.form-control {
+    width: 400px;
+    text-align:center;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+    margin-bottom: 10px;
+}
+.formControl {
+    width: 600px;
+    padding: 12px;
+    font-size: 16px;
+    justify-content:center;
+    border: 1px solid #ccc;
+    text-align: center;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+@media (max-width: 768px) {
+    .form-control,
+    .formControl, .btn-primary ,.connections-container , .button-container ,.CustomTable ,.customTableCell ,.expanded ,.hide ,.login-container , .modal-container , .my-form
+    , .my-heading-1 ,.my-heading-2 ,.truncate ,.btnPrimary {
+        max-width: 100%; 
+        width:100%;/* Allow the input to take the full available width on smaller screens */
+        
+    }
+}
+@media (max-width:300px) {
+    .calendarContainerStyle {
+        height: 100%;
+        background: white;
+        width:10%
+       
+    }
+}
+
+.btn-primary {
+    width: 100%; /* Make the button full width */
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
+
+.btnPrimary {
+    width: 200px; /* Make the button full width */
+    padding: 10px;
+    font-size: 18px;
+    justify-content: flex-end;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Make the modal overlay responsive */
+.modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+    .modal-container.hide {
+        display: none;
+    }
+/* Update connections page container styles for responsiveness */
+.connections-container {
+    text-align: center;
+    padding: 50px 0; /* Add more space for smaller screens */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.style{
+    margin-bottom:20px;
+    font-size:20px;
+    text-align:center;
+}
+
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #e74c3c;
+    border: none;
+    color:white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Update button styles for responsiveness */
 .button-container {
     display: flex;
     justify-content: center;
     margin-top: 20px;
 }
 
-    /* Increase the length of the buttons */
     .button-container button {
-        margin: 0 10px;
-        padding: 10px 20px;
+        margin: 0 5px; /* Reduce margins for smaller screens */
+        padding: 8px 15px; /* Adjust padding for smaller buttons */
     }

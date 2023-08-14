@@ -7,114 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './loginStyles.css';
 import styled from 'styled-components';
 type TaskType = 'login' | 'signup' | 'valid';
-const ResetDefaults = styled.div`
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
-`;
 
-const BodyContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #D3D3D3;
-`;
-
-const CustomTableCell = styled.div`
-  word-break: break-all;
-`;
-
-const LoginContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #D3D3D3;
-`;
-
-const LoginForm = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  max-width: 600px;
-  width: 120%;
-  height: 500px;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: floralwhite;
-`;
-
-const MyHeading1 = styled.h1`
-  font-weight: bold;
-  font-size: 40px;
-  color: #0056b3;
-  font-family: Calibri;
-`;
-
-const MyHeading2 = styled.h2`
-  font-weight: bold;
-  font-size: 30px;
-  color: #333;
-  font-family: Calibri;
-`;
-
-const TextCenter = styled.div`
-  text-align: center;
-  font-family: Arial;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 20px;
-`;
-
-const FormControl = styled.input`
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-  color: #333;
-
-  &:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-`;
-
-const PrimaryButton = styled.button`
-  width: 150px;
-  padding: 5px;
-  font-size: 18px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: #fff;
-  cursor: pointer;
-`;
-
-const ConnectionsContainer = styled.div`
-  text-align: center;
-  padding-top: 150px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-
-  /* Increase the length of the buttons */
-  button {
-    margin: 0 10px;
-    padding: 10px 20px;
-  }
-`;
 function Login() {
     const [EmailId, setEmailId] = useState<string>('');
     const history = useHistory();
@@ -147,8 +40,8 @@ function Login() {
     const handleFormSubmit = (event: FormEvent) => {
         event.preventDefault();
         
-        if (/*validateEmail(EmailId)*/ true) {
-            axios.post(`${baseUrl}/Login/login`, {
+        if (validateEmail(EmailId)) {
+            axios.post(`${baseUrl}/Login/Login`, {
                 _id: "",
                 EmailId: EmailId,
                 Connection: []
@@ -157,8 +50,9 @@ function Login() {
                 setId(response.data._id);
                 setCurrentTaskType('login');
                 setShowModal(true);
-            }).catch((error) => {
-                axios.post(`${baseUrl}/Login/signup`, {
+            }).catch(() => {
+                
+                axios.post(`${baseUrl}/Login/Signup`, {
                     _id: "",
                     EmailId: EmailId,
                     Connection: []
@@ -198,6 +92,7 @@ function Login() {
                         className="form-control"
                         placeholder="Enter your Email"
                         value={EmailId}
+                       
                         onChange={(event) => setEmailId(event.target.value)}
                     />
                 </div>

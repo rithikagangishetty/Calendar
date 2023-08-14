@@ -13,7 +13,7 @@ using MongoDB.Driver;
 namespace Calenderwebapp.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     public class ConnectionController : Controller
     {
        
@@ -27,8 +27,8 @@ namespace Calenderwebapp.Controllers
         /// </summary>
         /// <param name="_id"></param>
         /// <returns></returns>
-        [HttpGet("get")]
-        public async Task<ActionResult<Connections>> GetEmailId(string id)
+        [HttpGet]
+        public async Task<ActionResult<Connections>> GetUser(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -46,7 +46,7 @@ namespace Calenderwebapp.Controllers
         /// All the documents in the database are called
         /// </summary>
         /// <returns>List of all the email Ids</returns>
-        [HttpGet("getall")]
+        [HttpGet]
         public async Task<ActionResult<List<string>>> Get()
         {
             var res = await _connectionSupervisor.Get();
@@ -62,7 +62,7 @@ namespace Calenderwebapp.Controllers
         /// </summary>
         /// <param name="email">email Id of the user</param>
         /// <returns>The user document</returns>
-        [HttpGet("getid")]
+        [HttpGet]
         public async Task<ActionResult<Connections>> GetId(string email)
         {
             if (string.IsNullOrEmpty(email))
@@ -84,7 +84,7 @@ namespace Calenderwebapp.Controllers
         /// <param name="_id">user id</param>
         /// <returns>Same document but the connections array with emailIds</returns>
 
-        [HttpGet("getemail")]
+        [HttpGet]
        
         public async Task<ActionResult<Connections>> GetEmail(string id)
         {
@@ -112,10 +112,10 @@ namespace Calenderwebapp.Controllers
             }
             await _connectionSupervisor.Post(newConnection);
 
-            return CreatedAtAction(nameof(GetEmailId), new { id = newConnection._id }, newConnection);
+            return CreatedAtAction(nameof(Get), new { id = newConnection._id }, newConnection);
 
         }
-        [HttpPut("update")]
+        [HttpPut]
         /// <summary>
        ///Updates the user's connections
         /// </summary>
@@ -137,7 +137,7 @@ namespace Calenderwebapp.Controllers
         /// <param name="emailId">The emailId of the connection user wants to remove</param>
         /// <param name="_id">Object id of the user document</param>
         /// <returns></returns>
-        [HttpDelete("delete")]
+        [HttpDelete]
        
         public async Task<IActionResult> Delete(string emailId, string id)
         {

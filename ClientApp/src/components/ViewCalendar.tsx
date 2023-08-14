@@ -12,17 +12,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import MyModal, { EventModal, EditEventModal, SelectEmailModal, DeleteConfirmModal } from './Modal';
 import styled from 'styled-components';
 
-const BackButton = styled.button`
-  position: absolute;
-  top: 20px;
-  left: 20px; /* Adjust the left value to position the button */
-  padding: 10px 20px;
-  background-color: #e74c3c; /* Change this to your desired background color */
-  color: white; /* Change this to your desired text color */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-`;
+
 
 interface RouteParams {
     id: string;
@@ -100,7 +90,7 @@ const CalendarPage: React.FC = () => {
     
     /// </summary>
     function GetEmail() {
-        axios.get(`${baseUrl}/Connection/get/`, { params: { id: connectionId } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/GetUser/`, { params: { id: connectionId } }).then((response) => {
 
 
             console.log(response.data);
@@ -109,11 +99,11 @@ const CalendarPage: React.FC = () => {
 
     }
     const calendarContainerStyle = {
-        height: "90vh",
+        height: "80vh",
         background: "white",
-        width: "2000px",
-        paddingTop: "40px",
-        paddingLeft: "55px"
+        width: "90%",
+        padding: "10px"
+
     };
     /// <summary>
     /// Gets all the events that connectionId and id are part in together.
@@ -124,7 +114,7 @@ const CalendarPage: React.FC = () => {
 
 
 
-        axios.get(`${baseUrl}/User/getconnectionevents`, { params: { id: id, connectionId: connectionId } }).then((response) => {
+        axios.get(`${baseUrl}/User/GetView`, { params: { id: id, connectionId: connectionId } }).then((response) => {
             const event = response.data.map((training: any) => {
                 return {
                     _id: training._id,
@@ -154,7 +144,7 @@ const CalendarPage: React.FC = () => {
     ///this function will be called everytime when the variables in the useEffect block changes
     /// </summary>
     function GetConnections() {
-        axios.get(`${baseUrl}/Connection/getemail`, { params: { id: connectionId } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/GetEmail`, { params: { id: connectionId } }).then((response) => {
 
             setConnections(response.data.connection);
         }).catch((error) => {
@@ -183,7 +173,7 @@ const CalendarPage: React.FC = () => {
      var dateStart;
      var deleteId;
         var dateEnd;
-     axios.delete(`${baseUrl}/User/`, { params: { id: deleteEventId, userId: connectionId } }).then((response) => {
+     axios.delete(`${baseUrl}/User/Delete`, { params: { id: deleteEventId, userId: connectionId } }).then((response) => {
             eventName = response.data.eventName;
             Moderator = response.data.moderator;
             Connection = response.data.connections;
@@ -195,7 +185,7 @@ const CalendarPage: React.FC = () => {
          setConfirmationModal(false);
             setShowDeleteModal(false);
         }).catch((error) => { alert(error); });
-     axios.post(`${baseUrl}/User/sendmail`,
+     axios.post(`${baseUrl}/User/SendMail`,
             {
                 _id: deleteEventId,
                 UserEmail: deleteId,
@@ -219,7 +209,7 @@ const CalendarPage: React.FC = () => {
     function showEmails(event: any) {
 
         axios
-            .get(`${baseUrl}/User/getevent`, { params: { id: event._id } })
+            .get(`${baseUrl}/User/GetEvent`, { params: { id: event._id } })
             .then((response) => {
                 const newEvent = {
                     title: response.data.eventName,
@@ -283,13 +273,13 @@ const CalendarPage: React.FC = () => {
             }
         }
 
-        await axios.get(`${baseUrl}/Connection/get`, { params: { id: UserId } }).then((response) => {
+        await axios.get(`${baseUrl}/Connection/GetUser`, { params: { id: UserId } }).then((response) => {
 
             users = response.data.connection;
 
         }).catch((error) => { alert("error in get " + error) });
 
-        await axios.put(`${baseUrl}/User/`, {
+        await axios.put(`${baseUrl}/User/Update`, {
             _id: deleteEventId,
             UserId: (creator) ? UserId : id,
             EventName: titleInput,
@@ -332,7 +322,7 @@ const CalendarPage: React.FC = () => {
             }
         }).catch((error) => { alert(error); });
 
-        await axios.post(`${baseUrl}/User/sendmail`,
+        await axios.post(`${baseUrl}/User/SendMail`,
             {
                 _id: deleteEventId,
                 UserEmail: id,
@@ -576,9 +566,10 @@ const CalendarPage: React.FC = () => {
                         ))}
                 </select> </StyledDiv>
                 <div>
-                    <BackButton onClick={goBack}>
-                        Back
-                    </BackButton>
+                <button className="back-button" onClick={goBack}>
+                    Back
+                </button>
+
                 </div>
                 <div >
                     <br />
@@ -589,7 +580,7 @@ const CalendarPage: React.FC = () => {
                     </strong>
                 </div>
                 <br />
-                <div style={calendarContainerStyle}>
+            <div className="calendarContainerStyle">
                 <Calendar
                 
                     defaultView='month'
@@ -604,7 +595,7 @@ const CalendarPage: React.FC = () => {
                     components={{
                         event: CustomEventContent,
                     }}
-                    style={{ height: '80vh', width: '1000px' }}
+                    style={calendarContainerStyle}
                     step={15}
 
                 />
