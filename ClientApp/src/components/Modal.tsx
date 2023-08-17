@@ -231,23 +231,17 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     const currentTime = moment();
     const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
-   
+    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(selectedTimezone);
     const timeOffset: number = defaultOffset - selectedOffset;
    
     useEffect(() => {
+
         if (show) {
             const currentTime = moment();
-            const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
-
-            let timeOffset: number;
-
-            if (selectedTimezone === defaultTimeZone) {
-                const initialOffset: number = moment.tz(currentTime, initialTimezone).utcOffset();
-                timeOffset = initialOffset - defaultOffset; // Add the time offset
-            } else {
-                const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
-                timeOffset = defaultOffset - selectedOffset; // Subtract the time offset
-            }
+            const prevTimezoneOffset = moment.tz(start, prevSelectedTimezone).utcOffset();
+            const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
+            const timeOffset:number = prevTimezoneOffset - selectedOffset; 
+            
 
             if (start && end) {
                 const startDate = new Date(start);
@@ -258,7 +252,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 setEnd(endDate);
             }
 
-           
+            setPrevSelectedTimezone(selectedTimezone);
         }
     }, [show, selectedTimezone]);
 
@@ -323,6 +317,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
   
     function OnCloseFunc() {
         onTitleInputChange("");
+        setPrevSelectedTimezone(defaultTimeZone);
         onClose();      
     }
    
