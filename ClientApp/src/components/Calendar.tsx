@@ -47,8 +47,6 @@ const CalendarApp: FC = () => {
     const [titleInput, setTitleInput] = useState<string>('');
     const [startDate, setStart] = useState<Date>(new Date());
     const [endDate, setEnd] = useState<Date>(new Date());
-    const [initialStart, setInitialStart] = useState<Date>(new Date());
-    const [initialEnd, setInitialEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [showEventModal, setShowEventModal] = useState(false);
     const navigate = useNavigate();
@@ -65,7 +63,6 @@ const CalendarApp: FC = () => {
     const [initialTimezone, setInitialTimezone] = React.useState<string>('');
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
-  /*  const [cancel, setCancel] = useState(false);*/
     const [currentView, setCurrentView] = useState<View>('month');
 
    const currentDate = moment();
@@ -333,14 +330,12 @@ const CalendarApp: FC = () => {
                 setTitleInput(newEvent.title);
                 setStart(new Date(newEvent.start));
                 setEnd(new Date(newEvent.end));
-                setInitialStart(new Date(newEvent.start));
-                setInitialEnd(new Date(newEvent.end));
-                //setCancel(false);
+                
                 setSelectedModerators(newEvent.Moderator);
                 setSelectedConnections(newEvent.Connections);
                 setPrivate(newEvent.priv);
                 setDeleteUserEmail(newEvent.UserId);
-                setDeleteTimezone(defaultTimeZone);
+                setDeleteTimezone(newEvent.TimeZone);
                 setInitialTimezone(newEvent.TimeZone);
                 
 
@@ -1000,6 +995,7 @@ const CalendarApp: FC = () => {
            
             <CreateEventModal
                 show={showCreateModal}
+                
                 onClose={handleClose}
                 onPost={handlePost}
                 onPrivatePost={handlePrivatePost}
@@ -1016,15 +1012,11 @@ const CalendarApp: FC = () => {
 
             />
             <EditEventModal
-                
-               
-               
                 initialTimezone={initialTimezone}
                 handleTimezoneChange={handleTimezoneChange}
                 show={showEditModal}
                 userId={deleteUserEmail}
-                creator={creator }
-               
+                creator={creator}
                 selectedTimezone={deleteTimezone}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}

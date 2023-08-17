@@ -722,7 +722,6 @@ const CalendarPage: React.FC = () => {
                 selectedTimezone={deleteTimezone}
                 userId={deleteUserEmail}
                 creator={creator}
-               
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
                 show={showEditModal}

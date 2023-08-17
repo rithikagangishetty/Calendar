@@ -74,16 +74,12 @@ interface CreateEventModalProps {
 interface EditEventModalProps {
     show: boolean;
     creator: boolean;
-   
-   
     setSelectedModerators: (moderators: string[]) => void;
     onClose: () => void;
-   
     onPost: (event: any) => void;
     onPrivatePost: (event: any) => void;
     validationError: string;
     start: Date;
-   
     userId: any;
     setCreator: (value: any) => void;
     end: Date;
@@ -198,13 +194,12 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     show,
     onClose,
     creator,
-    
+    initialTimezone,
     onPost,
     onPrivatePost,
     validationError,
     titleInput,
     start,
-   
     userId,
     end,
     setStart,
@@ -227,42 +222,46 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     const [startDateValidity, setStartDateValidity] = useState(true);
     const [endDateValidity, setEndDateValidity] = useState(true);
     
-   // console.log(initialTimezone);
+   
     if (selectedTimezone == "") {
         selectedTimezone = defaultTimeZone;
     }
    
     moment.tz.setDefault(selectedTimezone);
-    
     const currentTime = moment();
     const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
-    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(defaultTimeZone); // Initialize with an empty string
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
    
     const timeOffset: number = defaultOffset - selectedOffset;
    
     useEffect(() => {
-        
-        const startDate = new Date(start);
-        const endDate = new Date(end);
-        const prevTimezoneOffset = moment.tz(start, prevSelectedTimezone).utcOffset();
-        const currentTimezoneOffset = moment.tz(start, selectedTimezone).utcOffset();
-        const timeOff = prevTimezoneOffset - currentTimezoneOffset;
-        // Adjust the minutes based on the timeOffset
-        startDate.setMinutes(start.getMinutes() - timeOff);
-        endDate.setMinutes(end.getMinutes() - timeOff);
+        if (show) {
+            const currentTime = moment();
+            const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
 
-        // Update the state variables with adjusted dates
-        setStart(startDate);
-        setEnd(endDate);
-        
-            setPrevSelectedTimezone(selectedTimezone);
-       
-      
-    }, [selectedTimezone]);
+            let timeOffset: number;
 
+            if (selectedTimezone === defaultTimeZone) {
+                const initialOffset: number = moment.tz(currentTime, initialTimezone).utcOffset();
+                timeOffset = initialOffset - defaultOffset; // Add the time offset
+            } else {
+                const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
+                timeOffset = defaultOffset - selectedOffset; // Subtract the time offset
+            }
 
-  
+            if (start && end) {
+                const startDate = new Date(start);
+                const endDate = new Date(end);
+                startDate.setMinutes(start.getMinutes() - timeOffset);
+                endDate.setMinutes(end.getMinutes() - timeOffset);
+                setStart(startDate);
+                setEnd(endDate);
+            }
+
+           
+        }
+    }, [show, selectedTimezone]);
+
 
    
 
@@ -291,6 +290,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
+      
         onPost(event);
        
     }
@@ -303,6 +303,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
+       
         onPrivatePost(event);
         
     }
@@ -321,13 +322,8 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
    
   
     function OnCloseFunc() {
-        setPrevSelectedTimezone(defaultTimeZone);
-        
         onTitleInputChange("");
-        onClose();
-
-        
-      
+        onClose();      
     }
    
     var  minTime = new Date(
