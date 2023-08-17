@@ -286,6 +286,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         setEnd(end);
       
         onPost(event);
+        setPrevSelectedTimezone(defaultTimeZone);
        
     }
    
@@ -297,7 +298,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
-       
+        setPrevSelectedTimezone(defaultTimeZone);
         onPrivatePost(event);
         
     }
