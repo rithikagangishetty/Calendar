@@ -237,7 +237,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     useEffect(() => {
 
         if (show) {
-            const currentTime = moment();
+            
             const prevTimezoneOffset = moment.tz(start, prevSelectedTimezone).utcOffset();
             const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
             const timeOffset:number = prevTimezoneOffset - selectedOffset; 
@@ -272,7 +272,6 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     const setStartDate = (date: Date) => {
         setEndDateValidity(end > date);
         setStartDateValidity(date !== null && date < end);
-        
         setStart(date);
     };
     function Post(event: any) 
@@ -284,7 +283,6 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
-      
         onPost(event);
         setPrevSelectedTimezone(defaultTimeZone);
        
@@ -298,8 +296,8 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         onTitleInputChange(titleInput);
         setStart(start);
         setEnd(end);
-        setPrevSelectedTimezone(defaultTimeZone);
         onPrivatePost(event);
+        setPrevSelectedTimezone(defaultTimeZone);
         
     }
            
