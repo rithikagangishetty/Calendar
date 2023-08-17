@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as React from 'react';
-import { useParams, useHistory, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import styled from 'styled-components';
 
 
@@ -43,8 +43,10 @@ const BackButton = styled.button`
   cursor: pointer;
 `;
 function Home() {
-    const { id } = useParams<RouteParams>();
-    const history = useHistory();
+   // const { id } = useParams<RouteParams>();
+    const params = useParams();
+    const id = params.id;
+    const navigate = useNavigate();
     const [EmailId, setEmailId] = React.useState<string>("");
     const baseUrl = process.env.REACT_APP_URL;
 
@@ -58,19 +60,19 @@ function Home() {
     /// Used for storing the before page information
     /// </summary>
     function goBack() {
-        history.goBack();
+        navigate(-1);
     }
     /// <summary>
     /// Once the user clicks on connection page button it takes to the connection page.
     /// </summary>
     function connect() {
-        history.push(`/Home/Connections/${id}`);
+        navigate(`/Home/Connections/${id}`);
     }
      /// <summary>
     /// Once the user clicks on calendar page button it takes to the calendar page.
     /// </summary>
     function calendar() {
-        history.push(`/Home/Calendar/${id}`);
+        navigate(`/Home/Calendar/${id}`);
     }
    /// <summary>
     /// This function gets the email ID of the user entered.
@@ -80,7 +82,7 @@ function Home() {
         axios.get(`${baseUrl}/Connection/GetUser/`, { params: { id: id } }).then((response) => {
 
            
-            console.log(response.data);
+            
             setEmailId(response.data.emailId);
         });
 

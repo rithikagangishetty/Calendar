@@ -23,7 +23,7 @@ builder.Services.AddSpaStaticFiles(configuration =>
 builder.Services.AddScoped<ILoginSupervisor, LoginSupervisor>();
 builder.Services.AddScoped<IUserSupervisor, UserSupervisor>();
 builder.Services.AddScoped<IConnectionSupervisor, ConnectionSupervisor>();
-builder.Services.AddScoped<IConnections, Connection>();
+builder.Services.AddScoped<IConnection, Connection>();
 builder.Services.AddSingleton<Connection>();
 builder.Services.AddScoped<IUser, User>();
 builder.Services.AddSingleton<User>();

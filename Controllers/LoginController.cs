@@ -33,7 +33,7 @@ namespace Calenderwebapp.Controllers
         /// <returns></returns>
         [HttpPost]
        
-        public IActionResult Login(Connections userData)
+        public IActionResult Login(ConnectionDetails userData)
         {
            
             var user = _loginSupervisor.login(userData);
@@ -51,7 +51,7 @@ namespace Calenderwebapp.Controllers
         /// <returns></returns>
         [HttpPost]
        
-        public  ActionResult<Connections> Signup(Connections userData)
+        public  ActionResult<ConnectionDetails> Signup(ConnectionDetails userData)
         {
             var valid = IsValidEmail(userData.EmailId);
             if (userData == null||!valid)

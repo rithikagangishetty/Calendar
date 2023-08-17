@@ -1,8 +1,8 @@
 ﻿
-import { useState, useEffect } from 'react';
+import {FC, useState, useEffect } from 'react';
 import { Calendar, Event, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import React from 'react';
 import 'moment-timezone'; 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -25,7 +25,10 @@ const StyledDiv = styled.div`
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'noevent'|'past' | 'eventedited' | 'editpast' | 'eventclash'|'noedit'; // Define the possible task types
 const CalendarPage: React.FC = () => {
     const localizer = momentLocalizer(moment);
-    const { id, connectionId } = useParams<RouteParams>();
+    /*  const { id, connectionId } = useParams<RouteParams>();*/
+    const  params = useParams();
+    const connectionId = params.connectionId;
+    const id = params.id;
     const [creator, setCreator] = useState<boolean>(true);
     const [deleteUserEmail, setDeleteUserEmail] = useState<string>('');
     const [Edit, setEdit] = useState<boolean>(false);
@@ -41,7 +44,7 @@ const CalendarPage: React.FC = () => {
     const [deleteEvent, setDeleteEvent] = useState<Event>();
     const [titleInput, setTitleInput] = useState<string>('');
     const [startdate, setStart] = useState<Date>(new Date());
-    const history = useHistory();
+    const navigate = useNavigate();
     const [initialTimezone, setInitialTimezone] = React.useState<string>('');
     const [enddate, setEnd] = useState<Date>(new Date());
     const [connect, setConnect] = useState<string[]>([]);
@@ -75,8 +78,9 @@ const CalendarPage: React.FC = () => {
 
     }
     function goBack() {
-        history.goBack();
+        navigate(-1);
     }
+
     useEffect(() => {
 
         getEvents();
@@ -93,7 +97,7 @@ const CalendarPage: React.FC = () => {
         axios.get(`${baseUrl}/Connection/GetUser/`, { params: { id: connectionId } }).then((response) => {
 
 
-            console.log(response.data);
+            
             setEmailId(response.data.emailId);
         });
 
@@ -117,7 +121,7 @@ const CalendarPage: React.FC = () => {
         axios.get(`${baseUrl}/User/GetView`, { params: { id: id, connectionId: connectionId } }).then((response) => {
             const event = response.data.map((training: any) => {
                 return {
-                    _id: training._id,
+                    Id: training.id,
                     title: training.eventName,
                     start: new Date(training.startDate),
                     end: new Date(training.endDate),
@@ -187,7 +191,7 @@ const CalendarPage: React.FC = () => {
         }).catch((error) => { alert(error); });
      axios.post(`${baseUrl}/User/SendMail`,
             {
-                _id: deleteEventId,
+                Id: deleteEventId,
                 UserEmail: deleteId,
                 EventName: eventName,
                 Moderator: Moderator,
@@ -209,7 +213,7 @@ const CalendarPage: React.FC = () => {
     function showEmails(event: any) {
 
         axios
-            .get(`${baseUrl}/User/GetEvent`, { params: { id: event._id } })
+            .get(`${baseUrl}/User/GetEvent`, { params: { id: event.Id } })
             .then((response) => {
                 const newEvent = {
                     title: response.data.eventName,
@@ -219,7 +223,7 @@ const CalendarPage: React.FC = () => {
                     UserId: response.data.userId,
                     Connections: response.data.connections,
                     priv: response.data.priv,
-                    _id: response.data._id,
+                    Id: response.data.id,
                     TimeZone:response.data.timeZone,
                     Reminder: response.data.reminder,
                 };
@@ -258,7 +262,7 @@ const CalendarPage: React.FC = () => {
             // Check if the event overlaps with any existing event
             if (_event.start !== undefined && _event.end !== undefined) {
 
-                if (_event._id != deleteEventId) {
+                if (_event.Id != deleteEventId) {
                     if (
                         (startdate >= _event.start && startdate < _event.end) ||
                         (enddate > _event.start && enddate <= _event.end) ||
@@ -280,7 +284,7 @@ const CalendarPage: React.FC = () => {
         }).catch((error) => { alert("error in get " + error) });
 
         await axios.put(`${baseUrl}/User/Update`, {
-            _id: deleteEventId,
+            Id: deleteEventId,
             UserId: (creator) ? UserId : id,
             EventName: titleInput,
             StartDate: startdate,
@@ -292,7 +296,7 @@ const CalendarPage: React.FC = () => {
             Reminder: false,
         }).then((response) => {
 
-            eventId = response.data._id;
+            eventId = response.data.id;
             setModer(response.data.moderator);
             setConnect(response.data.connections);
             if (eventId != "noevent" && eventId != "eventclash" && eventId != 'someevent') {
@@ -324,7 +328,7 @@ const CalendarPage: React.FC = () => {
 
         await axios.post(`${baseUrl}/User/SendMail`,
             {
-                _id: deleteEventId,
+                Id: deleteEventId,
                 UserEmail: id,
                 EventName: titleInput,
                 Moderator: selectedModerators,
@@ -448,7 +452,7 @@ const CalendarPage: React.FC = () => {
                 setIsPast(true);
             }
         
-        setDeleteEventId(event._id);
+        setDeleteEventId(event.Id);
         setUserId(event.UserId);
         showEmails(event);
         setShowDeleteModal(true);
@@ -470,7 +474,8 @@ const CalendarPage: React.FC = () => {
         onClose();
 
     }
-   
+    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
+    const [expandedConnection, setExpandedConnection] = useState<string | null>(null);
      ///<summary>
     ///This is the checkbox for the connections in the event details
     ///To avoid adding the same user twice as connection and moderator this function is used.
@@ -478,16 +483,24 @@ const CalendarPage: React.FC = () => {
     ///</summary>
    
     const renderEmailCheckbox = (connection: string) => {
-        const isDisabled = selectedModerators.includes(connection) || (connection == deleteUserEmail && creator);;
+        const isDisabled = selectedModerators.includes(connection) || (connection == deleteUserEmail && creator);
 
         return (
             <Form.Check
                 key={connection}
                 type="checkbox"
                 id={connection}
-                label={connection}
+
+                label={
+                    <span
+                        className="truncate"
+                        onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
+                    >
+                        {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
+                    </span>
+                }
                 checked={selectedConnections.includes(connection)}
-                onChange={() => handleUserSelection(connection,true)}
+                onChange={() => handleUserSelection(connection, true)}
                 disabled={isDisabled}
             />
         );
@@ -589,7 +602,8 @@ const CalendarPage: React.FC = () => {
                     startAccessor="start"
                     endAccessor="end"
                     tooltipAccessor={tooltipAccessor}
-                    formats={eventFormats}
+                   formats={eventFormats}
+                   
                     titleAccessor="title"
                     onSelectEvent={handleDelete}
                     components={{
@@ -638,8 +652,15 @@ const CalendarPage: React.FC = () => {
                             <>
                                 <p><strong>Moderators:</strong></p>
                                 <ul>
-                                    {deleteEvent.Moderator.map((moderator: any, index: any) => (
-                                        <li key={index}>{moderator}</li>
+                                    {deleteEvent.Moderator.map((moderator: string, index: number) => (
+                                        <li key={index} >
+                                            <span
+                                                className="truncate"
+                                                onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                            >
+                                                {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                            </span>
+                                        </li>
                                     ))}
                                 </ul>
                             </>
@@ -649,7 +670,12 @@ const CalendarPage: React.FC = () => {
                                 <p><strong>Connections:</strong></p>
                                 <ul>
                                     {deleteEvent.Connections.map((connection: string, index: any) => (
-                                        <li key={index}>{connection}</li>
+                                        <li key={index}> <span
+                                            className="truncate"
+                                            onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
+                                        >
+                                            {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
+                                        </span></li>
                                     ))}
                                 </ul>
                             </div>
@@ -696,7 +722,7 @@ const CalendarPage: React.FC = () => {
                 selectedTimezone={deleteTimezone}
                 userId={deleteUserEmail}
                 creator={creator}
-                setPrivate={setPrivate}
+               
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}
                 show={showEditModal}

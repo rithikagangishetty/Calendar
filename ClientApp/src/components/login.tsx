@@ -2,7 +2,7 @@
 import axios from 'axios';
 import MyModal from './Modal';
 import './NavMenu.css';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './loginStyles.css';
 import styled from 'styled-components';
@@ -10,8 +10,8 @@ type TaskType = 'login' | 'signup' | 'valid';
 
 function Login() {
     const [EmailId, setEmailId] = useState<string>('');
-    const history = useHistory();
-    const [_id, setId] = useState<string>("");
+    const navigate = useNavigate();
+    const [Id, setId] = useState<string>("");
     const [showModal, setShowModal] = useState(false);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [valid, setValid] = useState<boolean>(true);
@@ -21,10 +21,10 @@ function Login() {
     /// </summary>
     const handleCloseModal = () => {
         if (valid) {
-            history.push(`/Home/${_id}`);
+            navigate(`/Home/${Id}`);
             setShowModal(false);
         } else {
-            history.push(`/`);
+            navigate(`/`);
             setShowModal(false);
             setValid(true);
         }
@@ -42,23 +42,23 @@ function Login() {
         
         if (validateEmail(EmailId)) {
             axios.post(`${baseUrl}/Login/Login`, {
-                _id: "",
+                Id: "",
                 EmailId: EmailId,
                 Connection: []
             }).then((response) => {
 
-                setId(response.data._id);
+                setId(response.data.id);
                 setCurrentTaskType('login');
                 setShowModal(true);
             }).catch(() => {
                 
                 axios.post(`${baseUrl}/Login/Signup`, {
-                    _id: "",
+                    Id: "",
                     EmailId: EmailId,
                     Connection: []
                 }).then((response) => {
 
-                    setId(response.data._id);
+                    setId(response.data.id);
                     setCurrentTaskType('signup');
                     setShowModal(true);
                 }).catch((error) => {

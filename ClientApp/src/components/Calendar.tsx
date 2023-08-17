@@ -2,7 +2,7 @@
 import { Calendar, Event, momentLocalizer, View } from 'react-big-calendar'
 import moment from 'moment';
 import React from 'react';
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import 'moment-timezone'; 
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import styled from 'styled-components';
@@ -31,8 +31,11 @@ const CalendarApp: FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [creator, setCreator] = useState<boolean>(true);
     const [connections, setConnections] = useState<Array<string>>([]);
-    const { id } = useParams<RouteParams>();
+    /*  const { id } = useParams<RouteParams>();*/
+    const params = useParams();
+    const id = params.id;
     const [showModal, setShowModal] = useState(false);
+ 
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteEventId, setDeleteEventId] = useState<string>('');
@@ -44,9 +47,11 @@ const CalendarApp: FC = () => {
     const [titleInput, setTitleInput] = useState<string>('');
     const [startDate, setStart] = useState<Date>(new Date());
     const [endDate, setEnd] = useState<Date>(new Date());
+    const [initialStart, setInitialStart] = useState<Date>(new Date());
+    const [initialEnd, setInitialEnd] = useState<Date>(new Date());
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [showEventModal, setShowEventModal] = useState(false);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [priv, setPrivate] = useState<boolean>(false);
     const baseUrl = process.env.REACT_APP_URL;
     const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
@@ -60,13 +65,12 @@ const CalendarApp: FC = () => {
     const [initialTimezone, setInitialTimezone] = React.useState<string>('');
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
+  /*  const [cancel, setCancel] = useState(false);*/
     const [currentView, setCurrentView] = useState<View>('month');
 
-   
-   
    const currentDate = moment();
     function goBack() {
-        history.goBack();
+        navigate(-1);
     }
     
     useEffect(() => {
@@ -95,10 +99,10 @@ const CalendarApp: FC = () => {
 
     const onClose = () => {
         setTitleInput("");
-        setStart(currentDate.toDate());
+        //setCancel(true);
         setSelectedConnections([]);
         setSelectedModerators([]);
-        setEnd(currentDate.toDate());
+        setPrevSelectedTimezone(defaultTimeZone);
         setPrivate(false);
     }
     const DeleteEventConfirm = () => {
@@ -107,7 +111,7 @@ const CalendarApp: FC = () => {
     }
     //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
+    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(defaultTimeZone);
         /// <summary>
         /// getEvents will get all the events of the user based on the User id.
         ///Once all the events are obtained using setEvents all the events will be updated and will be shown in calendar page
@@ -120,7 +124,7 @@ const CalendarApp: FC = () => {
                 const event = response.data.map((training: any) => {
 
                     return {
-                        _id: training._id,
+                        Id: training.id,
                         title: training.eventName,
                         start: new Date(training.startDate),
                         end: new Date(training.endDate),
@@ -167,7 +171,7 @@ const CalendarApp: FC = () => {
         }).catch((error) => { alert("error in get " + error) });
         await axios.post(`${baseUrl}/User/Post`,
             {
-                _id: '',
+                Id: '',
                 UserId: id,
                 EventName: titleInput,
                 StartDate: startDate,
@@ -178,7 +182,7 @@ const CalendarApp: FC = () => {
                 TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
                 Reminder: false,
            }).then((response) => {
-               eventId = response.data._id;
+               eventId = response.data.id;
                setModer(response.data.moderator);
                setConnect(response.data.connections);
                
@@ -211,7 +215,7 @@ const CalendarApp: FC = () => {
 
             axios.post(`${baseUrl}/User/SendMail`,
                 {
-                    _id: eventId,
+                    Id: eventId,
                     UserEmail: id,
                     EventName: titleInput,
                     Moderator: selectedModerators,
@@ -243,7 +247,7 @@ const CalendarApp: FC = () => {
             if (res.length == 0) {
                 setCurrentTaskType('noconnections');
                 setShowModal(true);
-                history.push(`/Home/Connections/${id}`);
+                navigate(`/Home/Connections/${id}`);
             }
         }).catch((error) => {
             alert(error)
@@ -284,7 +288,7 @@ const CalendarApp: FC = () => {
         }).catch((error) => { alert(error); });
         axios.post(`${baseUrl}/User/SendMail`,
             {
-                _id: deleteEventId,
+                Id: deleteEventId,
                 UserEmail: id,
                 EventName: eventName,
                 Moderator: moderator,
@@ -310,7 +314,7 @@ const CalendarApp: FC = () => {
    async function  showEmails(event: any) {
        
         await axios
-            .get(`${baseUrl}/User/GetEvent`, { params: { id: event._id } })
+            .get(`${baseUrl}/User/GetEvent`, { params: { id: event.Id } })
             .then((response) => {
                 const newEvent = {
                     title: response.data.eventName,
@@ -320,7 +324,7 @@ const CalendarApp: FC = () => {
                     UserId: response.data.userId,
                     Connections: response.data.connections,
                     priv: response.data.priv,
-                    _id: response.data._id,
+                    Id: response.data.id,
                     TimeZone: response.data.timeZone,
                     Reminder: response.data.reminder,
                 };
@@ -329,11 +333,14 @@ const CalendarApp: FC = () => {
                 setTitleInput(newEvent.title);
                 setStart(new Date(newEvent.start));
                 setEnd(new Date(newEvent.end));
+                setInitialStart(new Date(newEvent.start));
+                setInitialEnd(new Date(newEvent.end));
+                //setCancel(false);
                 setSelectedModerators(newEvent.Moderator);
                 setSelectedConnections(newEvent.Connections);
                 setPrivate(newEvent.priv);
                 setDeleteUserEmail(newEvent.UserId);
-                setDeleteTimezone(newEvent.TimeZone);
+                setDeleteTimezone(defaultTimeZone);
                 setInitialTimezone(newEvent.TimeZone);
                 
 
@@ -366,7 +373,7 @@ const CalendarApp: FC = () => {
             // Check if the event overlaps with any existing event
             if (_event.start !== undefined && _event.end !== undefined) {
                 
-                if (_event._id != deleteEventId) {
+                if (_event.Id != deleteEventId) {
                     if (
                         (startDate >= _event.start && startDate < _event.end) ||
                         (endDate > _event.start && endDate <= _event.end) ||
@@ -388,7 +395,7 @@ const CalendarApp: FC = () => {
         }).catch((error) => { alert("error in get " + error) });
        
         await axios.put(`${baseUrl}/User/Update`, {
-            _id: deleteEventId,
+            Id: deleteEventId,
             UserId: (creator)?deleteEventUserId:id,
             EventName: titleInput,
             StartDate: startDate,
@@ -402,7 +409,7 @@ const CalendarApp: FC = () => {
            
             
             
-            eventId = response.data._id;
+            eventId = response.data.id;
             setModer(response.data.moderator);
             setConnect(response.data.connections);
 
@@ -434,7 +441,7 @@ const CalendarApp: FC = () => {
         if (eventId != "noevent" && eventId != "eventclash" && eventId != "someevent") {
             await axios.post(`${baseUrl}/User/SendMail`,
                 {
-                    _id: deleteEventId,
+                    Id: deleteEventId,
                     UserEmail: id,
                     EventName: titleInput,
                     Moderator: selectedModerators,
@@ -539,7 +546,7 @@ const CalendarApp: FC = () => {
                         UserId: id,
                         Connections: (priv ? selectedConnections : connections),
                         priv: priv,
-                        _id: "",
+                        Id: "",
                         TimeZone: (selectedTimezone == "") ? defaultTimeZone : selectedTimezone,
                         Reminder: false,
                     };
@@ -649,7 +656,7 @@ const CalendarApp: FC = () => {
            setIsPast(true);
        }
       
-       setDeleteEventId(event._id);
+       setDeleteEventId(event.Id);
        setDeleteEventUserId(event.UserId);
        showEmails(event);
 
@@ -865,8 +872,9 @@ const CalendarApp: FC = () => {
                 localizer={localizer}
                 startAccessor="start"
                 endAccessor="end"
-                formats={eventFormats}
-                titleAccessor="title"
+               formats={eventFormats}
+               titleAccessor="title"
+              
                 onSelectSlot={handleSelectSlot}
                 onSelectEvent={handleDelete}
                 tooltipAccessor={tooltipAccessor}
@@ -1008,12 +1016,15 @@ const CalendarApp: FC = () => {
 
             />
             <EditEventModal
+                
+               
+               
                 initialTimezone={initialTimezone}
                 handleTimezoneChange={handleTimezoneChange}
                 show={showEditModal}
                 userId={deleteUserEmail}
                 creator={creator }
-                setPrivate={setPrivate}
+               
                 selectedTimezone={deleteTimezone}
                 defaultTimeZone={defaultTimeZone}
                 timezones={timezones}

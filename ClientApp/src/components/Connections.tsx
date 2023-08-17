@@ -1,43 +1,32 @@
 ﻿import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 type TaskType = 'connectionadded' |"noemail"| 'connectiondeleted' |"valid"|'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
 import MyModal from './Modal';
-import styled from 'styled-components';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import 'react-datepicker/dist/react-datepicker.css';
-interface RouteParams {
-    id: string;
 
-
-}
 
 function Connections() {
     const [showModal, setShowModal] = useState(false);
-    const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
+    const [expandedEmail, setExpandedEmail] = useState<string | null>(null);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [connection, setConnection] = useState<string>("");
     const [emailIds, setEmailIds] = useState<Array<string>>([]);
     const [email, setEmail] = useState<string>("");
-    
-
     const [allEmails, setAllEmailIds] = useState<Array<string>>([]);
     const [userEmail, setUserEmail] = useState<string>('');
-    const { id } = useParams<RouteParams>();
+    const params = useParams();
+    const id = params.id;
     const [confirmationModal, setConfirmationModal] = useState(false);
-    const history = useHistory();
+    const navigate = useNavigate();
     const baseUrl = process.env.REACT_APP_URL;
+   
     
-    const toggleExpand = (index:number) => {
-        if (expandedEmail === index) {
-            setExpandedEmail(null);
-        } else {
-            setExpandedEmail(index);
-        }
-    };
+  
     function goBack() {
-        history.goBack();
+        navigate(-1);
     }
    
         /// <summary>
@@ -51,8 +40,8 @@ function Connections() {
         var connectionId: string;
         axios.get(`${baseUrl}/Connection/GetId/`, { params: { email: email } }).then((response) =>
         {
-            connectionId = response.data._id;
-            history.push(`/Home/Connections/calendar/${id}/${connectionId}`);
+            connectionId = response.data.id;
+            navigate(`/Home/Connections/calendar/${id}/${connectionId}`);
            
 
         }).catch((error) => {
@@ -181,7 +170,7 @@ function Connections() {
 
         await axios.get(`${baseUrl}/Connection/GetUser/`, { params: { id: id } }).then((response) => {
            
-            Id = response.data._id;
+            Id = response.data.id;
             Emailid = response.data.emailId;
           newConnections = response.data.connection;
             if (response.data.connection != null) {
@@ -191,14 +180,14 @@ function Connections() {
                 newConnections = [connection];
             }
         }).catch((error) => {
-            alert("error in getting the _id  " + error);
+            alert("error in getting the Id  " + error);
            
 
         });
         await axios.put(`${baseUrl}/Connection/Update`,
             {
 
-                _id: Id,
+                Id: Id,
                 EmailId: Emailid,
                 Connection: newConnections,
 
@@ -308,58 +297,55 @@ function Connections() {
                             </button>
                         </div>
                         </form>
-                        <hr style={{ borderTop: "1px solid black", margin: "20px 0" }} />
-                        <div style={{ textAlign: "center",  paddingTop: "10px", paddingBottom: "10px" }}> {/* Centered container for the label */}
-                            <label style={{ fontSize: "20px", fontWeight: "bold", textAlign:"center" }}>Your Connections</label>
-                    </div>
                         {emailIds.length > 0 && (
-                            <table className="CustomTable" style={{ ...styles.table, tableLayout: 'fixed', borderCollapse: 'collapse' }}>
-                                <colgroup>
-                                    <col style={{ width: '60%' }} /> {/* Adjust the column widths as needed */}
-                                    <col style={{ width: '20%' }} />
-                                    <col style={{ width: '20%' }} />
-                                </colgroup>
-                                <tbody>
-                                    {emailIds.map((email, index) => (
-                                        <tr key={email}>
-                                            <td
-                                                className={`customTableCell ${expandedEmail === index ? 'expanded' : ''}`}
-                                                onClick={() => toggleExpand(index)}
-                                            >
-                                                {email}
-                                            </td>
-                                            <td className="customTableCell" style={{ textAlign: "center" }}>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-success"
-                                                    onClick={() => handleViewCalendar(email)}
+                       <><hr style={{ borderTop: "1px solid black", margin: "20px 0" }} /><div style={{ textAlign: "center", paddingTop: "10px", paddingBottom: "10px" }}> {/* Centered container for the label */}
+                                <label style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center" }}>Your Connections</label>
+                            </div><table className="CustomTable" style={{ ...styles.table, tableLayout: 'fixed' /*, borderCollapse: 'collapse' */ }}>
+                                    <colgroup>
+                                        <col style={{ width: '60%' }} /> {/* Adjust the column widths as needed */}
+                                        <col style={{ width: '20%' }} />
+                                        <col style={{ width: '20%' }} />
+                                    </colgroup>
+                                    <tbody>
+                                        {emailIds.map((email, index) => (
+                                            <tr key={email}>
+
+                                                <td
+                                                    className="customTableCell"
+                                                    onClick={() => setExpandedEmail(expandedEmail == email ? null : email)}
                                                 >
-                                                    View Calendar
-                                                </button>
-                                            </td>
-                                            <td className="customTableCell" style={{ textAlign: "center" }}>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-danger"
-                                                    onClick={() => DeleteEventConfirm(email)}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                                    {expandedEmail == email ? email : (email.length > 50 ? `${email.slice(0, 50)}...` : email)}
+                                                </td>
+                                                <td className="customTableCell" style={{ textAlign: "center" }}>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-success"
+                                                        onClick={() => handleViewCalendar(email)}
+                                                    >
+                                                        View Calendar
+                                                    </button>
+                                                </td>
+                                                <td className="customTableCell" style={{ textAlign: "center" }}>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-danger"
+                                                        onClick={() => DeleteEventConfirm(email)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table></>
                         )}
+                    
 
-                    {currentTaskType && (
-                        <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
-                    )}
-
-
-                    </div>
+                   </div>
                 </div>
-               
+                {currentTaskType && (
+                    <MyModal show={showModal} onClose={handleCloseModal} taskType={currentTaskType} />
+                )}
                 <Modal show={confirmationModal} onHide={() => setConfirmationModal(false)}>
                     <Modal.Header style={{
                         display: "flex",
@@ -374,7 +360,7 @@ function Connections() {
                         alignItems: "center",
                     }}>
                         <p>          <strong> Are you sure you want to delete?</strong></p>   </Modal.Body>
-                    <Modal.Footer>
+                    <Modal.Footer style={{ display: 'flex', justifyContent: 'center' }}>
 
                         <Button variant="danger" onClick={()=>Delete(email)}>
                             Yes

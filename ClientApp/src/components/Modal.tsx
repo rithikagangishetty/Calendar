@@ -74,13 +74,16 @@ interface CreateEventModalProps {
 interface EditEventModalProps {
     show: boolean;
     creator: boolean;
+   
+   
     setSelectedModerators: (moderators: string[]) => void;
     onClose: () => void;
-
+   
     onPost: (event: any) => void;
     onPrivatePost: (event: any) => void;
     validationError: string;
     start: Date;
+   
     userId: any;
     setCreator: (value: any) => void;
     end: Date;
@@ -97,7 +100,7 @@ interface EditEventModalProps {
     defaultTimeZone: any;
     timezones: any;
     priv: any;
-    setPrivate:(value: boolean)=> void;
+   
    
    
    
@@ -195,13 +198,13 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     show,
     onClose,
     creator,
+    
     onPost,
     onPrivatePost,
     validationError,
     titleInput,
     start,
-    initialTimezone,
-    setPrivate,
+   
     userId,
     end,
     setStart,
@@ -216,12 +219,15 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     defaultTimeZone,
     timezones,
     priv,
+  
     
 
 }) => {
 
     const [startDateValidity, setStartDateValidity] = useState(true);
     const [endDateValidity, setEndDateValidity] = useState(true);
+    
+   // console.log(initialTimezone);
     if (selectedTimezone == "") {
         selectedTimezone = defaultTimeZone;
     }
@@ -230,12 +236,13 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     
     const currentTime = moment();
     const defaultOffset: number = moment.tz(currentTime, defaultTimeZone).utcOffset();
-    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(initialTimezone); // Initialize with an empty string
+    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(defaultTimeZone); // Initialize with an empty string
     const selectedOffset: number = moment.tz(currentTime, selectedTimezone).utcOffset();
+   
     const timeOffset: number = defaultOffset - selectedOffset;
-    console.log(initialTimezone);
+   
     useEffect(() => {
-        setPrevSelectedTimezone(initialTimezone);
+        
         const startDate = new Date(start);
         const endDate = new Date(end);
         const prevTimezoneOffset = moment.tz(start, prevSelectedTimezone).utcOffset();
@@ -248,9 +255,16 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
         // Update the state variables with adjusted dates
         setStart(startDate);
         setEnd(endDate);
-        setPrevSelectedTimezone(selectedTimezone);
-   
+        
+            setPrevSelectedTimezone(selectedTimezone);
+       
+      
     }, [selectedTimezone]);
+
+
+  
+
+   
 
 
 
@@ -307,12 +321,15 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
    
   
     function OnCloseFunc() {
-        setStart(null);
-        setEnd(null);
+        setPrevSelectedTimezone(defaultTimeZone);
+        
         onTitleInputChange("");
         onClose();
-        setPrevSelectedTimezone(initialTimezone);
+
+        
+      
     }
+   
     var  minTime = new Date(
             currentTime.year(),
             currentTime.month(),
@@ -374,95 +391,99 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 <Modal.Title>Edit Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Group controlId="eventTitle" className="title">
-                    <Form.Label><strong>Title</strong></Form.Label>
+
+                <Form.Group controlId="eventTitle" className="form-inline">
+                    <Form.Label className="form-label" ><strong>Title : </strong></Form.Label>
                     <Form.Control
                         type="text"
                         value={titleInput}
                         onChange={(e) => onTitleInputChange(e.target.value)}
                         isInvalid={validationError !== ''}
-                        /*style={{ width: '300px' }}*/
-
-
+                        style={{ width: '70%' }}
                     />
                     <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
                 </Form.Group>
-                <br />
-                <Form.Group>
-                    <div>
-                        <Form.Label><strong>Select Timezone:</strong></Form.Label>
-                        <br />
+                
+                <Form.Group className="form-inline">
+                    
+                    <Form.Label className="form-label"  ><strong>Select Timezone :</strong></Form.Label>
                         <select value={selectedTimezone} onChange={handleTimezoneChange}>
-                            <option value=""> {defaultTimeZone}</option>
+                            <option value="">{defaultTimeZone}</option>
                             {timezones.map((timezone: any) => (
-
                                 <option key={timezone} value={timezone}>
                                     {timezone}
                                 </option>
                             ))}
-                        </select> </div>
-                </Form.Group>
-                <br />
-                <Form.Group controlId="eventStart">
-                    <Form.Label><strong>Start Date and Time of the Event</strong></Form.Label>
-
-                    <DatePicker
-                        showTimeSelect
-                        timeFormat="HH:mm"
-                        minTime={minTime}
-                        selected={start || null}
-                        onChange={setStartDate}
-                        dateFormat="MM/dd/yyyy h:mm aa"
-                        placeholderText="Select start date and time"
-                        timeIntervals={timeInterval}
-                        timeInputLabel="Time:"
-                        maxTime={maxTime}
-                        minDate={minDate}
-                    
-                    />
+                        </select>
                    
                 </Form.Group>
-               <br/>
+               
+                
+                <Form.Group controlId="eventStart" className="form-inline">
+                    <div className="datetime-group">
+                        <div className="datetime-label">
+                            <Form.Label><strong>Start Date and Time :</strong></Form.Label>
+                        </div>
+                        <div className="datetime-picker">
+                            <DatePicker
+                                showTimeSelect
+                                timeFormat="HH:mm"
+                                minTime={minTime}
+                                selected={start || null}
+                                onChange={setStartDate}
+                                dateFormat="MM/dd/yyyy h:mm aa"
+                                placeholderText="Select Start Date and Time"
+                                timeIntervals={timeInterval}
+                                timeInputLabel="Time:"
+                                maxTime={maxTime}
+                                minDate={minDate}
+                            />
+                        </div>
+                    </div>
+                </Form.Group>
                 {(!startDateValidity || !endDateValidity) && (    <FormGroup>
                    
                     <div style={{ color: 'red' }}>Invalid Start/End date and time</div>
-                    <br />
+                    
                 </FormGroup>  )}
               
-                <Form.Group controlId="eventEnd">
-                    <Form.Label><strong>End Date and Time of the Event</strong></Form.Label>
-                    <DatePicker
-                        timeFormat="HH:mm"
-                        selected={end || null}
-                        onChange={setEndDate}
-                        minTime={endMinTime}
-                        timeInputLabel="Time:"
-                        dateFormat="MM/dd/yyyy h:mm aa"
-                        showTimeSelect
-                        timeIntervals={timeInterval}
-                        placeholderText="Select end date and time"
-                        maxTime={maxTime}
-                        minDate={minDate}
-
-                    />
-                  
+                <Form.Group controlId="eventEnd" className="form-inline">
+                    <div className="datetime-group">
+                        <div className="datetime-label">
+                            <Form.Label><strong>End Date and Time :</strong></Form.Label>
+                        </div>
+                        <div className="datetime-picker">
+                            <DatePicker
+                                timeFormat="HH:mm"
+                                selected={end || null}
+                                onChange={setEndDate}
+                                minTime={endMinTime}
+                                timeInputLabel="Time:"
+                                dateFormat="MM/dd/yyyy h:mm aa"
+                                showTimeSelect
+                                timeIntervals={timeInterval}
+                                placeholderText="Select End Date and Time"
+                                maxTime={maxTime}
+                                minDate={minDate}
+                            />
+                        </div>
+                    </div>
                 </Form.Group>
-                <br />
-                <Form.Group controlId="eventCreator">
-                    <Form.Label>
-                        <strong>Creator of the Event</strong>
+                <Form.Group controlId="eventCreator" className="form-inline">
+                    <Form.Label className="form-label">
+                        <strong>Creator of the Event : </strong>
                     </Form.Label>
-                   
-                        <Form.Check
-                            type="checkbox"
-                            label={userId}
-                            checked={creator}
-                            onChange={handleCreatorChange}
-                            disabled={selectedModerators.includes(userId)}
-                        />
-                   
+
+                    <Form.Check
+                        type="checkbox"
+                        label={userId}
+                        checked={creator}
+                        onChange={handleCreatorChange}
+                        disabled={selectedModerators.includes(userId)}
+                    />
+
                 </Form.Group>
-                <br />
+               
                 <Form.Group controlId="eventEmails">
                     <Form.Label><strong>Select the Moderators</strong></Form.Label>
                     <div>
@@ -549,17 +570,18 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                 <Modal.Title>Create Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Group controlId="eventTitle">
-                    <Form.Label><strong>Title</strong></Form.Label>
+                <Form.Group controlId="eventTitle" className="form-inline">
+                    <Form.Label className="form-label" ><strong>Title : </strong></Form.Label>
                     <Form.Control
                         type="text"
                         value={titleInput}
                         onChange={(e) => onTitleInputChange(e.target.value)}
                         isInvalid={validationError !== ''}
+                        style={{ width: '70%' }}
                     />
                     <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
                 </Form.Group>
-                <br />
+              
                 <p><strong>TimeZone:</strong> {Timezone}</p>
                     <p><strong>Start:</strong> {new Date(start).toLocaleString('en-US', {
                         timeZone: Timezone,
@@ -572,7 +594,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                         dateStyle: 'medium',
                         timeStyle: 'medium'
                     })}</p>
-                <br />
+              
                
                 <Form.Group controlId="eventEmails">
                     <Form.Label><strong>Select the Moderators</strong></Form.Label>
@@ -598,7 +620,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                             ))}
                     </div>
                 </Form.Group>
-                <br />
+                
             </Modal.Body>
             <Modal.Footer style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Button variant="success" onClick={onPost}>
@@ -653,7 +675,7 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
                 </Form>
                 {validationError && <div className="text-danger">{validationError}</div>}
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer style={{ display: 'flex', justifyContent: 'center' }}>
                
                 <Button variant="success" onClick={onSaveSelectedConnections}>
                     Save
@@ -806,7 +828,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({ show, onClose
                 alignItems: "center",
             }}>
                 <p>          <strong> Are you sure you want to delete?</strong></p>   </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer style={{ display: 'flex', justifyContent: 'center' }}>
                
                 <Button variant="danger" onClick={onDelete}>
                     Yes

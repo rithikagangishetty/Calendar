@@ -143,21 +143,21 @@ namespace Calenderwebapp.Controllers
         /// <summary>
         /// API call to update the existing document/event.
         /// </summary>
-        /// <param name="updatedUser"></param>
+        /// <param name="newUser"></param>
         /// <returns>returns the details of the event</returns>
 
         [HttpPut]
-        public async Task<ActionResult<UserDetails>> Update(UserDetails updatedUser)
+        public async Task<ActionResult<UserDetails>> Update(UserDetails newUser)
         {
-            if (updatedUser == null)
+            if (newUser == null)
             {
                 return BadRequest("Invalid user data.");
             }
-            if (DateTime.Parse(updatedUser.StartDate) >= DateTime.Parse(updatedUser.EndDate))
+            if (DateTime.Parse(newUser.StartDate) >= DateTime.Parse(newUser.EndDate))
             {
                 return BadRequest("Invalid End Date/Time of the event");
             }
-            var user = await _userSupervisor.Update(updatedUser);
+            var user = await _userSupervisor.Update(newUser);
           
            
 

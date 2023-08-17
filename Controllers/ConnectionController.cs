@@ -25,10 +25,10 @@ namespace Calenderwebapp.Controllers
         /// <summary>
         /// Takes object Id and returns email Id of the user
         /// </summary>
-        /// <param name="_id"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<Connections>> GetUser(string id)
+        public async Task<ActionResult<ConnectionDetails>> GetUser(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -63,7 +63,7 @@ namespace Calenderwebapp.Controllers
         /// <param name="email">email Id of the user</param>
         /// <returns>The user document</returns>
         [HttpGet]
-        public async Task<ActionResult<Connections>> GetId(string email)
+        public async Task<ActionResult<ConnectionDetails>> GetId(string email)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -81,12 +81,12 @@ namespace Calenderwebapp.Controllers
         /// This function takes the id of the user and converts the connections from objectid to emailId 
         /// which is further used for displaying in user connections page
         /// </summary>
-        /// <param name="_id">user id</param>
+        /// <param name="id">user id</param>
         /// <returns>Same document but the connections array with emailIds</returns>
 
         [HttpGet]
        
-        public async Task<ActionResult<Connections>> GetEmail(string id)
+        public async Task<ActionResult<ConnectionDetails>> GetEmail(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -102,32 +102,32 @@ namespace Calenderwebapp.Controllers
         /// <summary>
         /// API call for the new user that needs to be added
         /// </summary>
-        /// <param name="newConnection">new user</param>
+        /// <param name="user">new user</param>
         [HttpPost]
-        public async Task<IActionResult> Post(Connections newConnection)
+        public async Task<IActionResult> Post(ConnectionDetails user)
         {
-            if (newConnection == null)
+            if (user == null)
             {
                 return BadRequest("Invalid user data.");
             }
-            await _connectionSupervisor.Post(newConnection);
+            await _connectionSupervisor.Post(user);
 
-            return CreatedAtAction(nameof(Get), new { id = newConnection._id }, newConnection);
+            return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
 
         }
         [HttpPut]
         /// <summary>
        ///Updates the user's connections
         /// </summary>
-        /// <param name="updatedConnection"></param>
+        /// <param name="user"></param>
         /// <returns></returns>
-        public async Task<IActionResult> Update(Connections updatedConnection)
+        public async Task<IActionResult> Update(ConnectionDetails user)
         {
-            if (updatedConnection == null)
+            if (user == null)
             {
                 return BadRequest("Invalid user data.");
             }
-            await  _connectionSupervisor.Update(updatedConnection);
+            await  _connectionSupervisor.Update(user);
             return Ok();
             
         }
@@ -135,7 +135,7 @@ namespace Calenderwebapp.Controllers
         /// It deletes the selected connection in the user document
         /// </summary>
         /// <param name="emailId">The emailId of the connection user wants to remove</param>
-        /// <param name="_id">Object id of the user document</param>
+        /// <param name="id">Object id of the user document</param>
         /// <returns></returns>
         [HttpDelete]
        

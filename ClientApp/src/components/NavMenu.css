@@ -9,6 +9,17 @@
 .modal-title-center {
     text-align: center;
 }
+.rbc-header{
+    background:#79b8e4;
+}
+.rbc-events-container {
+    width:100% !important;
+}
+
+.rbc-addons-dnd .rbc-addons-dnd-drag-ghost {
+    display: none !important;
+}
+/* Hide the time intervals in the day header */
 
 
 html { font-size: 14px; }
