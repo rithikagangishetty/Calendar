@@ -13,19 +13,12 @@ import MyModal, { EventModal, EditEventModal, SelectEmailModal, DeleteConfirmMod
 import styled from 'styled-components';
 
 
-
-interface RouteParams {
-    id: string;
-    connectionId:string,
-}
-
 const StyledDiv = styled.div`
  text-align: center;`;
 
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'noevent'|'past' | 'eventedited' | 'editpast' | 'eventclash'|'noedit'; // Define the possible task types
 const CalendarPage: React.FC = () => {
     const localizer = momentLocalizer(moment);
-    /*  const { id, connectionId } = useParams<RouteParams>();*/
     const  params = useParams();
     const connectionId = params.connectionId;
     const id = params.id;

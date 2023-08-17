@@ -16,9 +16,7 @@ import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, EventModal
 
 
 type TaskType = 'eventadded' | 'eventdeleted' | 'overlap' | 'past' | 'monthpast' | "noevent"|'eventedited' | 'editpast' | 'eventclash' |"noconnections"; // Define the possible task types
-interface RouteParams {
-    id: string;
-}
+
 const StyledDiv = styled.div`
 
   text-align: center;`; 
