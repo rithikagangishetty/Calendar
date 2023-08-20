@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calenderwebapp", "Calenderw
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{57CDB6A6-AD1F-4BC5-A78E-61A771ACB558}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalendarDb", "..\CalendarDb\CalendarDb.csproj", "{9BB7DFA1-48F3-4757-8C35-7FF64442110E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalendarDb", "..\CalendarDb\CalendarDb.csproj", "{9BB7DFA1-48F3-4757-8C35-7FF64442110E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{2D013951-9A94-483F-884D-0B20F4A4BBAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "..\Main\Main.csproj", "{B956F183-4F22-45CB-B27C-E3255B7E959C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Main", "..\Main\Main.csproj", "{B956F183-4F22-45CB-B27C-E3255B7E959C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

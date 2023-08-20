@@ -141,7 +141,7 @@ const CalendarPage: React.FC = () => {
     ///this function will be called everytime when the variables in the useEffect block changes
     /// </summary>
     function GetConnections() {
-        axios.get(`${baseUrl}/Connection/GetEmail`, { params: { id: connectionId } }).then((response) => {
+        axios.get(`${baseUrl}/Connection/GetEmail`, { params: { id: id } }).then((response) => {
 
             setConnections(response.data.connection);
         }).catch((error) => {
@@ -467,15 +467,21 @@ const CalendarPage: React.FC = () => {
         onClose();
 
     }
-    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
-    const [expandedConnection, setExpandedConnection] = useState<string | null>(null);
-     ///<summary>
+    const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
+    const toggleExpand = (index: number) => {
+        if (expandedEmail === index) {
+            setExpandedEmail(null);
+        } else {
+            setExpandedEmail(index);
+        }
+    };
+    ///<summary>
     ///This is the checkbox for the connections in the event details
     ///To avoid adding the same user twice as connection and moderator this function is used.
     ///It checks the selectedModerators array, all the users present in the array are disabled to select in the connections pop up
     ///</summary>
    
-    const renderEmailCheckbox = (connection: string) => {
+    const renderEmailCheckbox = (connection: string,index:number) => {
         const isDisabled = selectedModerators.includes(connection) || (connection == deleteUserEmail && creator);
 
         return (
@@ -486,10 +492,11 @@ const CalendarPage: React.FC = () => {
 
                 label={
                     <span
-                        className="truncate"
-                        onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
+                        className={`truncated ${expandedEmail === index ? 'expanded' : ''}`}
+                        onClick={() => toggleExpand(index)}
+
                     >
-                        {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
+                        {connection}
                     </span>
                 }
                 checked={selectedConnections.includes(connection)}
@@ -648,10 +655,11 @@ const CalendarPage: React.FC = () => {
                                     {deleteEvent.Moderator.map((moderator: string, index: number) => (
                                         <li key={index} >
                                             <span
-                                                className="truncate"
-                                                onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                                className={`truncated ${expandedEmail === index ? 'expanded' : ''}`}
+                                                onClick={() => toggleExpand(index)}
+
                                             >
-                                                {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                                {moderator}
                                             </span>
                                         </li>
                                     ))}
@@ -664,10 +672,11 @@ const CalendarPage: React.FC = () => {
                                 <ul>
                                     {deleteEvent.Connections.map((connection: string, index: any) => (
                                         <li key={index}> <span
-                                            className="truncate"
-                                            onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
+                                            className={`truncated ${expandedEmail === index ? 'expanded' : ''}`}
+                                            onClick={() => toggleExpand(index)}
+
                                         >
-                                            {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
+                                            {connection}
                                         </span></li>
                                     ))}
                                 </ul>

@@ -682,14 +682,21 @@ const CalendarApp: FC = () => {
         
 
     }
-    const [expandedConnection, setExpandedConnection] = useState<string | null>(null);
+    const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
+    const toggleExpand = (index: number) => {
+        if (expandedEmail === index) {
+            setExpandedEmail(null);
+        } else {
+            setExpandedEmail(index);
+        }
+    };
 
    ///<summary>
     ///This is the checkbox for the connections in the event details
     ///To avoid adding the same user twice as connection and moderator this function is used.
     ///It checks the selectedModerators array, all the users present in the array are disabled to select in the connections pop up
     ///</summary>
-    const renderEmailCheckbox = (connection: string) => {
+    const renderEmailCheckbox = (connection: string,index:number) => {
         const isDisabled = selectedModerators.includes(connection) || (connection == deleteUserEmail && creator);
 
         return (
@@ -697,13 +704,15 @@ const CalendarApp: FC = () => {
                 key={connection}
                 type="checkbox"
                 id={connection}
-                
+                className="expand"
                 label={
+                   
                     <span
-                        className="truncate"
-                        onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
+                        className={`truncated ${expandedEmail === index ? 'expanded' : ''}`}
+                        onClick={() => toggleExpand(index)}
+
                     >
-                        {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
+                        {connection}
                     </span>
                 }
                 checked={selectedConnections.includes(connection)}
@@ -789,7 +798,7 @@ const CalendarApp: FC = () => {
         }
     };
 
-    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
+  
 
     const calendarContainerStyle = {
         height: "80vh",
@@ -892,7 +901,7 @@ const CalendarApp: FC = () => {
             )}
             
             {deleteEvent && (
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} className="expand" >
                     <Modal.Header style={{
                         display: "flex",
                         justifyContent: "center",
@@ -903,7 +912,7 @@ const CalendarApp: FC = () => {
                         
                 </Modal.Header>
 
-                    <Modal.Body >
+                    <Modal.Body className="expand" >
                         <p><strong>Title:</strong> {deleteEvent.title}</p>
                         <p><strong>Event Created by:</strong> {deleteEvent.UserId}</p>
                         <p><strong>Event Type:</strong> {deleteEvent.priv ? 'Private' : 'Public'}</p>
@@ -930,12 +939,14 @@ const CalendarApp: FC = () => {
                                 <p><strong>Moderators:</strong></p>
                                 <ul>
                                     {deleteEvent.Moderator.map((moderator: string, index: number) => (
-                                        <li key={index} >
+                                        <li key={index} className="expand" >
+                                           
                                             <span
-                                                className="truncate"
-                                                onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                                className={`truncated ${expandedEmail === index ? 'expanded' : ''}`}
+                                                onClick={() => toggleExpand(index)}
+
                                             >
-                                                {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                                {moderator}
                                             </span>
                                         </li>
                                     ))}
@@ -950,11 +961,12 @@ const CalendarApp: FC = () => {
                                 <ul>
                                     {deleteEvent.Connections.map((connection: string, index: any) => (
                                         <li key={index}> <span
-                                            className="truncate"
-                                            onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
-                                        >
-                                            {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
-                                        </span></li>
+                        className={`truncated ${expandedEmail === index ? 'expanded' : ''}`}
+                        onClick={() => toggleExpand(index)}
+
+                    >
+                        {connection}
+                    </span></li>
                                     ))}
                                 </ul>
                             </div>

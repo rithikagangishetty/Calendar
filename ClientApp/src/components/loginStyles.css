@@ -8,12 +8,30 @@ body {
     margin: 0; /* Reset default body margin */
     
 }
-.customTableCell {
+.left-aligned-input {
+    text-align: left;
+}
+.btn-success{
+    width:100%;
+}
+/*.customTableCell {
     padding: 10px;
     white-space: normal;
     word-break: break-all;
     background-color: white;
+}*/
+.customTableCell {
+    padding: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    background-color: white;
 }
+
+    .customTableCell.expanded {
+        white-space: normal;
+        word-break: break-all;
+    }
 
 .CustomTable {
     /*border-collapse: collapse;*/
@@ -55,7 +73,23 @@ body {
 .datetime-group {
     display: flex;
 }
+.truncated {
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    /*cursor: pointer;*/
+    width:425px;
+   
+}
 
+    .truncated.expanded {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    .expand{
+        width:100%;
+    }
 
 .datetime-label {
     margin-right: 10px; /* Add spacing between label and DatePicker */
@@ -114,7 +148,7 @@ body {
 /* Set a max-width for better readability on larger screens */
 .form-control {
     width: 400px;
-    text-align:center;
+   text-align:center;
     padding: 12px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -152,8 +186,16 @@ body {
     .calendarContainerStyle {
         height: 100%;
         background: white;
-        width:10%
+        width:100%;
        
+    }
+}
+@media (max-width: 768px) {
+   .expand{
+       width:100%;
+   }
+    .truncated {
+        width: 300px;
     }
 }
 
@@ -181,7 +223,7 @@ body {
 }
 
 /* Make the modal overlay responsive */
-.modal-container {
+/*.modal-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -195,7 +237,7 @@ body {
 }
     .modal-container.hide {
         display: none;
-    }
+    }*/
 /* Update connections page container styles for responsiveness */
 .connections-container {
     text-align: center;

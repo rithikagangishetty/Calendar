@@ -16,6 +16,11 @@ function Login() {
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [valid, setValid] = useState<boolean>(true);
     const baseUrl = process.env.REACT_APP_URL;
+    const [allEmails, setAllEmailIds] = useState<Array<string>>([]);
+    useEffect(() => {
+       
+        GetAll();
+    }, [currentTaskType]);
     /// <summary>
     /// This function handles the close of the modal and pushes the page into home page when valid email is entered.
     /// </summary>
@@ -34,12 +39,28 @@ function Login() {
         return pattern.test(email);
     };
     /// <summary>
+    /// This function will get all the email Ids that are present in the database
+    /// </summary>
+    function GetAll() {
+        var emails;
+        axios.get(`${baseUrl}/Connection/Get/`,).then((response) => {
+            emails = response.data;
+            if (emails.length > 0) {
+                setAllEmailIds(emails)
+
+            }
+        }).catch((error) => {
+            alert(error)
+        });
+    }
+    /// <summary>
     /// This function handles the submission of the Email Id after all the checks are done
     ///If the email is valid and present already it wont store again, else it creates a new document in the collection.
     /// </summary>
     const handleFormSubmit = (event: FormEvent) => {
         event.preventDefault();
-        
+      
+        var contain = allEmails.includes(EmailId);
         if (validateEmail(EmailId)) {
             axios.post(`${baseUrl}/Login/Login`, {
                 Id: "",
@@ -48,22 +69,16 @@ function Login() {
             }).then((response) => {
 
                 setId(response.data.id);
-                setCurrentTaskType('login');
+                if (contain) {
+                    setCurrentTaskType('login');
+                }
+                else {
+                    setCurrentTaskType("signup");
+                }
                 setShowModal(true);
-            }).catch(() => {
-                
-                axios.post(`${baseUrl}/Login/Signup`, {
-                    Id: "",
-                    EmailId: EmailId,
-                    Connection: []
-                }).then((response) => {
-
-                    setId(response.data.id);
-                    setCurrentTaskType('signup');
-                    setShowModal(true);
-                }).catch((error) => {
-                    alert(error);
-                });
+            }).catch((error) => {
+                alert(error)
+              
             });
         }
         else {
@@ -83,14 +98,17 @@ function Login() {
                 </div>
                 <br />
                 <div className="text-center">
-                    <h5>Sign up/Login With Your EmailId to Enter</h5>
+                    <h5>Sign up/Login</h5>
+                    
                 </div>
-                <br/>
+                <br />
+                <h6>Enter your EmailId</h6>
+                <br />
                 <div className="form-group">
                     <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter your Email"
+                        placeholder="EmailId"
                         value={EmailId}
                        
                         onChange={(event) => setEmailId(event.target.value)}

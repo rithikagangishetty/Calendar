@@ -33,16 +33,24 @@ namespace Calenderwebapp.Controllers
         /// <returns></returns>
         [HttpPost]
        
-        public IActionResult Login(ConnectionDetails userData)
+        public ActionResult<ConnectionDetails> Login(ConnectionDetails userData)
         {
-           
-            var user = _loginSupervisor.login(userData);
-            if (user != null)
-            { return Ok(user); }
-            else
-            {
-                return NotFound();
+            var valid = IsValidEmail(userData.EmailId);
+            if (userData == null&& !valid) 
+            { return BadRequest("invalid data"); 
             }
+            var user = _loginSupervisor.login(userData);
+            if (user == null)
+            {
+                var final = _loginSupervisor.Signup(userData);
+
+               
+                return final;
+
+            }
+            return  user; 
+           
+            
         }
         /// <summary>
         /// If the email is not present it will create a new document with the given user data.
@@ -50,16 +58,17 @@ namespace Calenderwebapp.Controllers
         /// <param name="userData"></param>
         /// <returns></returns>
         [HttpPost]
-       
-        public  ActionResult<ConnectionDetails> Signup(ConnectionDetails userData)
+
+        public ActionResult<ConnectionDetails> Signup(ConnectionDetails userData)
         {
             var valid = IsValidEmail(userData.EmailId);
-            if (userData == null||!valid)
+            if (userData == null || !valid)
             {
                 return NotFound();
 
             }
-           var user= _loginSupervisor.Signup(userData);
+            var user = _loginSupervisor.Signup(userData);
+            if (user == null) { return BadRequest(); }
 
             return user;
         }

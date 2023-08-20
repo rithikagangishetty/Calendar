@@ -44,6 +44,7 @@ namespace Calenderwebapp.Controllers
             }
 
             var result = await _userSupervisor.GetEvents(id);
+          
             if (!result.Any())
             {
                
@@ -121,6 +122,7 @@ namespace Calenderwebapp.Controllers
             }
 
             var id = await _userSupervisor.Post(newUser);
+            if(id == null) { return BadRequest(); }
 
             return id;
         }
@@ -137,7 +139,8 @@ namespace Calenderwebapp.Controllers
                 return BadRequest("Invalid email data.");
             }
 
-            await _userSupervisor.SendMail(emailDetails);
+           var details= await _userSupervisor.SendMail(emailDetails);
+            if(details == null) { return BadRequest(); }
             return Ok();
         }
         /// <summary>
@@ -158,7 +161,7 @@ namespace Calenderwebapp.Controllers
                 return BadRequest("Invalid End Date/Time of the event");
             }
             var user = await _userSupervisor.Update(newUser);
-          
+          if(user == null) { return BadRequest(); } 
            
 
             return user;
@@ -170,14 +173,14 @@ namespace Calenderwebapp.Controllers
         /// <param name="userId"></param>
         /// <returns>returns the details of the event</returns>
         [HttpDelete]
-        public async Task<ActionResult<UserDetails>> Delete(string id, string userId)
+        public  ActionResult<UserDetails> Delete(string id, string userId)
         {
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(userId))
             {
                 return BadRequest("Invalid id or userId parameters.");
             }
 
-            var user = await _userSupervisor.Delete(id, userId);
+            var user =  _userSupervisor.Delete(id, userId);
             if (user == null)
             {
                 return NotFound();

@@ -10,7 +10,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 function Connections() {
     const [showModal, setShowModal] = useState(false);
-    const [expandedEmail, setExpandedEmail] = useState<string | null>(null);
+    const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [connection, setConnection] = useState<string>("");
     const [emailIds, setEmailIds] = useState<Array<string>>([]);
@@ -23,7 +23,13 @@ function Connections() {
     const navigate = useNavigate();
     const baseUrl = process.env.REACT_APP_URL;
    
-    
+    const toggleExpand = (index: number) => {
+        if (expandedEmail === index) {
+            setExpandedEmail(null);
+        } else {
+            setExpandedEmail(index);
+        }
+    };
   
     function goBack() {
         navigate(-1);
@@ -309,12 +315,11 @@ function Connections() {
                                     <tbody>
                                         {emailIds.map((email, index) => (
                                             <tr key={email}>
-
                                                 <td
-                                                    className="customTableCell"
-                                                    onClick={() => setExpandedEmail(expandedEmail == email ? null : email)}
+                                                    className={`customTableCell ${expandedEmail === index ? 'expanded' : ''}`}
+                                                    onClick={() => toggleExpand(index)}
                                                 >
-                                                    {expandedEmail == email ? email : (email.length > 50 ? `${email.slice(0, 50)}...` : email)}
+                                                    {email}
                                                 </td>
                                                 <td className="customTableCell" style={{ textAlign: "center" }}>
                                                     <button

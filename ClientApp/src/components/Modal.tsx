@@ -32,7 +32,7 @@ interface SelectEmailModalProps {
     onSaveSelectedConnections: () => void;
     validationError: string;
     connections: string[];
-   renderEmailCheckbox: (connection: string) => JSX.Element;
+   renderEmailCheckbox: (connection: string,index:number) => JSX.Element;
     
 }
 interface EventModalProps {
@@ -355,9 +355,17 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
    
     const minDate = currentTime.toDate();
 
-    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
+   // const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
 
-    
+    const [expandedModerator, setExpandedModerator] = useState<number | null>(null);
+
+    const toggleExpand = (index: number) => {
+        if (expandedModerator === index) {
+            setExpandedModerator(null);
+        } else {
+            setExpandedModerator(index);
+        }
+    };
     const endOfDay = moment(currentTime).endOf('day').toDate();
     const maxTime = new Date(
         endOfDay.getFullYear(),
@@ -372,7 +380,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     };
     const timeInterval = 15;
     return (
-        <Modal show={show} onHide={OnCloseFunc} >
+        <Modal show={show} onHide={OnCloseFunc} className="expand" >
             <Modal.Header style={{
                 display: "flex",
                 justifyContent: "center",
@@ -380,7 +388,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
             }}>
                 <Modal.Title>Edit Event</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="expand">
 
                 <Form.Group controlId="eventTitle" className="form-inline">
                     <Form.Label className="form-label" ><strong>Title : </strong></Form.Label>
@@ -389,7 +397,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                         value={titleInput}
                         onChange={(e) => onTitleInputChange(e.target.value)}
                         isInvalid={validationError !== ''}
-                        style={{ width: '70%' }}
+                        style={{ width: '70%', textAlign:"left" }}
                     />
                     <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
                 </Form.Group>
@@ -433,7 +441,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
                 </Form.Group>
                 {(!startDateValidity || !endDateValidity) && (    <FormGroup>
                    
-                    <div style={{ color: 'red' }}>Invalid Start/End date and time</div>
+                    <div style={{ color: 'red' }}>Start Date/Time should be earlier than End Date/Time</div>
                     
                 </FormGroup>  )}
               
@@ -474,22 +482,26 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
                 </Form.Group>
                
-                <Form.Group controlId="eventEmails">
-                    <Form.Label><strong>Select the Moderators</strong></Form.Label>
-                    <div>
+                <Form.Group controlId="eventEmails" className="expand">
+                    <Form.Label className="expand"><strong>Select the Moderators</strong></Form.Label>
+                    <div >
                         {connections.length > 0 &&
-                            connections.map((moderator) => (
+                            connections.map((moderator,index) => (
                                 <Form.Check
                                     key={moderator}
                                     type="checkbox"
-                                    //label={ moderator}
+                                    className="expand"
                                     label={
+                                       
                                         <span
-                                            className="truncate"
-                                            onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                            className={`truncated ${expandedModerator === index ? 'expanded' : ''}`}
+                                            onClick={() => toggleExpand(index)}
+                                           
                                         >
-                                            {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                            {moderator}
                                         </span>
+
+
                                     }
                                     value={selectedModerators}
                                     checked={selectedModerators.includes(moderator)}
@@ -548,10 +560,19 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     if (Timezone == "") {
         Timezone = defaultTimeZone;
     }
-    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
+    //const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
+    const [expandedModerator, setExpandedModerator] = useState<number | null>(null);
+
+    const toggleExpand = (index: number) => {
+        if (expandedModerator === index) {
+            setExpandedModerator(null);
+        } else {
+            setExpandedModerator(index);
+        }
+    };
 
     return (
-        <Modal show={show} onHide={onClose}>
+        <Modal show={show} onHide={onClose} className="expand">
             <Modal.Header style={{
                 display: "flex",
                 justifyContent: "center",
@@ -559,7 +580,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
             }} >
                 <Modal.Title>Create Event</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="expand">
                 <Form.Group controlId="eventTitle" className="form-inline">
                     <Form.Label className="form-label" ><strong>Title : </strong></Form.Label>
                     <Form.Control
@@ -567,7 +588,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                         value={titleInput}
                         onChange={(e) => onTitleInputChange(e.target.value)}
                         isInvalid={validationError !== ''}
-                        style={{ width: '70%' }}
+                        style={{ width: '70%', textAlign:"left" }}
                     />
                     <Form.Control.Feedback type="invalid">{validationError}</Form.Control.Feedback>
                 </Form.Group>
@@ -586,22 +607,29 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                     })}</p>
               
                
-                <Form.Group controlId="eventEmails">
-                    <Form.Label><strong>Select the Moderators</strong></Form.Label>
+                <Form.Group controlId="eventEmails" className="expand">
+                    <Form.Label className="expand"><strong>Select the Moderators</strong></Form.Label>
                     <div >
                         {connections.length > 0 &&
-                            connections.map((moderator) => (
+                            connections.map((moderator,index) => (
                                 <Form.Check 
-                               
+                                    className="expand"
                                     key={moderator}
                                     type="checkbox"
                                 
                                     label={
+                                        //<span
+                                        //    className="truncate"
+                                        //    onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                        //>
+                                        //    {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                        //</span>
                                         <span
-                                            className="truncate"
-                                            onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                            className={`truncated ${expandedModerator === index ? 'expanded' : ''}`}
+                                            onClick={() => toggleExpand(index)}
+
                                         >
-                                            {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
+                                            {moderator}
                                         </span>
                                     }
                                     checked={selectedModerators.includes(moderator)}
@@ -661,7 +689,7 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
             </Modal.Header>
             <Modal.Body>
                 <Form>
-                    {connections.length > 0 && connections.map((connection) => renderEmailCheckbox(connection))}
+                    {connections.length > 0 && connections.map((connection,index) => renderEmailCheckbox(connection,index))}
                 </Form>
                 {validationError && <div className="text-danger">{validationError}</div>}
             </Modal.Body>
@@ -679,8 +707,14 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
 };
 
 export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators, connections }) => {
-    const [expandedConnection, setExpandedConnection] = useState<string | null>(null);
-    const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
+    const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
+    const toggleExpand = (index: number) => {
+        if (expandedEmail === index) {
+            setExpandedEmail(null);
+        } else {
+            setExpandedEmail(index);
+        }
+    };
     return (
         <div>
             <Modal show={show} onHide={onHide}>
@@ -699,10 +733,11 @@ export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators
                                 {moderators.map((moderator: any, index: any) => (
                                     <li key={index}>
                                         <span
-                                            className="truncate"
-                                            onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
+                                            className={`truncated ${expandedEmail === index ? 'expanded' : ''}`}
+                                            onClick={() => toggleExpand(index)}
+
                                         >
-                                            {expandedModerator === moderator ? moderator : (moderator.length > 70 ? `${moderator.slice(0, 70)}...` : moderator)}
+                                            {moderator}
                                         </span>
                                     </li>
                                 ))}
@@ -714,11 +749,12 @@ export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators
                             <p><strong>Connections:</strong></p>
                             <ul>
                                 {connections.map((connection: any, index: any) => (
-                                    <li key={index}> <span
-                                        className="truncate"
-                                        onClick={() => setExpandedConnection(expandedConnection === connection ? null : connection)}
+                                    <li key={index}><span
+                                        className={`truncated ${expandedEmail === index ? 'expanded' : ''}`}
+                                        onClick={() => toggleExpand(index)}
+
                                     >
-                                        {expandedConnection === connection ? connection : (connection.length > 50 ? `${connection.slice(0, 50)}...` : connection)}
+                                        {connection}
                                     </span></li>
                                 ))}
                             </ul>

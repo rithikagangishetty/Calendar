@@ -4,9 +4,6 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import styled from 'styled-components';
 
 
-interface RouteParams {
-    id: string;
-}
 const StyledDiv = styled.div`
   text-align: center;
  
@@ -91,8 +88,8 @@ function Home() {
     return (
         <div >
             <ConnectionContainer className="connections-container">
-            <StyledDiv>
-            <h2>Welcome to the Home Page, {EmailId}!</h2>
+                <StyledDiv>
+                    <h2>Welcome to the Home Page, {EmailId}!</h2>
             </StyledDiv>
             <br />
            

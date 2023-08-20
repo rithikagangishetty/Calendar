@@ -50,11 +50,6 @@ namespace Calenderwebapp.Controllers
         public async Task<ActionResult<List<string>>> Get()
         {
             var res = await _connectionSupervisor.Get();
-            if (res is null)
-            {
-                return NotFound();
-            }
-
             return res;
         }
         /// <summary>
@@ -110,7 +105,11 @@ namespace Calenderwebapp.Controllers
             {
                 return BadRequest("Invalid user data.");
             }
-            await _connectionSupervisor.Post(user);
+          var result=  await _connectionSupervisor.Post(user);
+            if (result is null)
+            {
+                return BadRequest("Invalid user data.");
+            }
 
             return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
 
@@ -127,7 +126,11 @@ namespace Calenderwebapp.Controllers
             {
                 return BadRequest("Invalid user data.");
             }
-            await  _connectionSupervisor.Update(user);
+           var res= await  _connectionSupervisor.Update(user);
+            if (res is null)
+            {
+                return BadRequest();
+            }
             return Ok();
             
         }
@@ -146,7 +149,11 @@ namespace Calenderwebapp.Controllers
                 return BadRequest("Invalid id or emailId parameters.");
             }
             
-            await _connectionSupervisor.Delete(emailId,id);
+            var final= await _connectionSupervisor.Delete(emailId,id);
+            if (final is null)
+            {
+                return BadRequest();
+            }
         return Ok();
              
         }
