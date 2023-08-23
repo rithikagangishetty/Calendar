@@ -26,7 +26,8 @@ namespace Calenderwebapp.Controllers
         /// Takes object Id and returns email Id of the user
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
+        /// <returns>Email Id of the user</returns>
+        
         [HttpGet]
         public async Task<ActionResult<ConnectionDetails>> GetUser(string id)
         {
@@ -42,6 +43,7 @@ namespace Calenderwebapp.Controllers
 
             return connection;
         }
+
         /// <summary>
         /// All the documents in the database are called
         /// </summary>
@@ -52,6 +54,7 @@ namespace Calenderwebapp.Controllers
             var res = await _connectionSupervisor.Get();
             return res;
         }
+
         /// <summary>
         /// This function obtains the document from the database based on the email Id provided.
         /// </summary>
@@ -72,6 +75,7 @@ namespace Calenderwebapp.Controllers
 
             return connection;
         }
+
         /// <summary>
         /// This function takes the id of the user and converts the connections from objectid to emailId 
         /// which is further used for displaying in user connections page
@@ -94,6 +98,7 @@ namespace Calenderwebapp.Controllers
             }
             return user;
         }
+
         /// <summary>
         /// API call for the new user that needs to be added
         /// </summary>
@@ -114,12 +119,13 @@ namespace Calenderwebapp.Controllers
             return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
 
         }
+
         [HttpPut]
         /// <summary>
        ///Updates the user's connections
         /// </summary>
         /// <param name="user"></param>
-        /// <returns></returns>
+        /// <returns>if the update is succesfully done then ok else a badRequest will be sent</returns>
         public async Task<IActionResult> Update(ConnectionDetails user)
         {
             if (user == null)
@@ -139,7 +145,7 @@ namespace Calenderwebapp.Controllers
         /// </summary>
         /// <param name="emailId">The emailId of the connection user wants to remove</param>
         /// <param name="id">Object id of the user document</param>
-        /// <returns></returns>
+        /// <returns>if the delete is succesfully done then ok else a badRequest will be sent</returns>
         [HttpDelete]
        
         public async Task<IActionResult> Delete(string emailId, string id)

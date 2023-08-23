@@ -55,6 +55,7 @@ namespace Calenderwebapp.Controllers
 
             return result;
         }
+
         /// <summary>
         /// It gets all the events  where id is a part of in the connection Id events and vice versa.
         /// </summary>
@@ -79,6 +80,7 @@ namespace Calenderwebapp.Controllers
 
             return result;
         }
+
         /// <summary>
         /// Gets the document with the event id 
         /// It will change the moderator and connection from objectId to email Ids
@@ -102,6 +104,7 @@ namespace Calenderwebapp.Controllers
 
             return events;
         }
+
         /// <summary>
         /// API call for adding a new event.
         /// </summary>
@@ -126,11 +129,12 @@ namespace Calenderwebapp.Controllers
 
             return id;
         }
+
         /// <summary>
         /// This will send emails after edit/create/delete is done.
         /// </summary>
         /// <param name="emailDetails"></param>
-        /// <returns></returns>
+        /// <returns>if mail is not sent properly bad Request or else ok();</returns>
         [HttpPost]
         public async Task<ActionResult> SendMail(EmailDetails emailDetails)
         {
@@ -143,6 +147,7 @@ namespace Calenderwebapp.Controllers
             if(details == null) { return BadRequest(); }
             return Ok();
         }
+
         /// <summary>
         /// API call to update the existing document/event.
         /// </summary>
@@ -166,6 +171,7 @@ namespace Calenderwebapp.Controllers
 
             return user;
         }
+
         /// <summary>
         /// This deletes the existing event if the user is moderator/creator or else just removes the user as part of the event.
         /// </summary>

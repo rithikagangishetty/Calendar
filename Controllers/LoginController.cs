@@ -16,6 +16,7 @@ namespace Calenderwebapp.Controllers
         {
             _loginSupervisor = loginSupervisor;
         }
+
         /// <summary>
         /// To check whether the entered email Id is valid or not.
         /// </summary>
@@ -26,11 +27,12 @@ namespace Calenderwebapp.Controllers
             string pattern = @"^[\w\.-]+@[\w\.-]+\.\w+$";
             return Regex.IsMatch(email, pattern);
         }
+
         /// <summary>
         /// This API call is to check whether the entered emailId is present in the Database or not
         /// </summary>
         /// <param name="userData"></param>
-        /// <returns></returns>
+        /// <returns>if userData is not found badRequest is sent or else the user details will be sent</returns>
         [HttpPost]
        
         public ActionResult<ConnectionDetails> Login(ConnectionDetails userData)
@@ -52,11 +54,12 @@ namespace Calenderwebapp.Controllers
            
             
         }
+
         /// <summary>
         /// If the email is not present it will create a new document with the given user data.
         /// </summary>
         /// <param name="userData"></param>
-        /// <returns></returns>
+        /// <returns>Details of the user if it success, else badRequest</returns>
         [HttpPost]
 
         public ActionResult<ConnectionDetails> Signup(ConnectionDetails userData)
