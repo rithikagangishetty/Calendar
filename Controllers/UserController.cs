@@ -45,7 +45,7 @@ namespace Calenderwebapp.Controllers
 
             var result = await _userSupervisor.GetEvents(id);
           
-            if (!result.Any())
+            if (!result.Any() || result==null)
             {
                
                 return new List<UserDetails>();

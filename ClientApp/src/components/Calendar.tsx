@@ -29,7 +29,6 @@ const CalendarApp: FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [creator, setCreator] = useState<boolean>(true);
     const [connections, setConnections] = useState<Array<string>>([]);
-    /*  const { id } = useParams<RouteParams>();*/
     const params = useParams();
     const id = params.id;
     const [showModal, setShowModal] = useState(false);
@@ -137,7 +136,7 @@ const CalendarApp: FC = () => {
             
           
         }).catch((err) => {
-            alert(err)
+            alert(err+"get Events based on userId")
         });
 
 
@@ -225,7 +224,7 @@ const CalendarApp: FC = () => {
                 }).then(() => {
                     // alert("email sent");
                 }).catch((error) => {
-                    // alert("error in mail " + error)
+                     alert("error in mail " + error)
                 });
         }
 
@@ -245,7 +244,7 @@ const CalendarApp: FC = () => {
                 navigate(`/Home/Connections/${id}`);
             }
         }).catch((error) => {
-            alert(error)
+            alert(error+"to get all connections")
         });
 
     }
@@ -280,7 +279,7 @@ const CalendarApp: FC = () => {
 
          
          onClose();
-        }).catch((error) => { alert(error); });
+        }).catch((error) => { alert(error+"deleting"); });
         axios.post(`${baseUrl}/User/SendMail`,
             {
                 Id: deleteEventId,
@@ -340,7 +339,7 @@ const CalendarApp: FC = () => {
                 
             })
             .catch((error) => {
-                alert(error);
+                alert(error+"show email error");
 
 
             });
@@ -430,7 +429,7 @@ const CalendarApp: FC = () => {
                 setEdit(false);
 
             }
-        }).catch((error) => { alert(error); });
+        }).catch((error) => { alert(error+"in edit"); });
         if (eventId != "noevent" && eventId != "eventclash" && eventId != "someevent") {
             await axios.post(`${baseUrl}/User/SendMail`,
                 {
@@ -448,7 +447,7 @@ const CalendarApp: FC = () => {
                 }).then(() => {
                     //   alert("email sent");
                 }).catch((error) => {
-                    //  alert("error in mail " + error)
+                      alert("error in mail " + error)
                 });
         }
     };

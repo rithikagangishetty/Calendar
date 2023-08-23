@@ -11,8 +11,10 @@ body {
 .left-aligned-input {
     text-align: left;
 }
-.btn-success{
-    width:100%;
+.signup-button {
+    color: blue; /* or any color you prefer */
+    cursor: pointer;
+    text-decoration: underline;
 }
 /*.customTableCell {
     padding: 10px;

@@ -1,6 +1,6 @@
 ﻿
 import {FC, useState, useEffect } from 'react';
-import { Calendar, Event, momentLocalizer } from 'react-big-calendar';
+import { Calendar, Event, momentLocalizer, View } from 'react-big-calendar';
 import moment from 'moment';
 import { useParams, useNavigate } from 'react-router-dom';
 import React from 'react';
@@ -52,6 +52,7 @@ const CalendarPage: React.FC = () => {
     const [validationError, setValidationError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const currentDate = moment();
+    const [currentView, setCurrentView] = useState<View>('month');
     const baseUrl = process.env.REACT_APP_URL;
     const [isPast, setIsPast] = useState<boolean>(false);
     const [isDelete, setIsDelete] = useState<boolean>(false);
@@ -79,8 +80,11 @@ const CalendarPage: React.FC = () => {
         getEvents();
         GetEmail();
         GetConnections()
-        moment.tz.setDefault();
-    }, [ showModal, selectedTimezone]);
+        if (selectedTimezone) {
+            moment.tz.setDefault(selectedTimezone);
+            setCurrentView(currentView);
+        }
+    }, [showModal, selectedTimezone,currentView]);
 
     /// <summary>
     /// Will get the Email Id of the user
@@ -170,7 +174,7 @@ const CalendarPage: React.FC = () => {
      var dateStart;
      var deleteId;
         var dateEnd;
-     axios.delete(`${baseUrl}/User/Delete`, { params: { id: deleteEventId, userId: connectionId } }).then((response) => {
+     await axios.delete(`${baseUrl}/User/Delete`, { params: { id: deleteEventId, userId: connectionId } }).then((response) => {
             eventName = response.data.eventName;
             Moderator = response.data.moderator;
             Connection = response.data.connections;
@@ -180,22 +184,26 @@ const CalendarPage: React.FC = () => {
             setCurrentTaskType('eventdeleted');
             setShowModal(true);
          setConfirmationModal(false);
-            setShowDeleteModal(false);
-        }).catch((error) => { alert(error); });
+         setShowDeleteModal(false);
+         onClose();
+     }).catch((error) => {
+         alert(error);
+     });
      axios.post(`${baseUrl}/User/SendMail`,
             {
                 Id: deleteEventId,
-                UserEmail: deleteId,
+                UserEmail: id,
                 EventName: eventName,
                 Moderator: Moderator,
                 Connections: Connection,
                 StartDate: dateStart,
                 Delete: true,
                 EndDate: dateEnd,
+                priv:priv,
                 Subject: "Event is Deleted",
                 Body: `An event titled '${eventName}' has been deleted.`,
             }).then(() => {
-                //  alert("email sent");
+                 //alert("email sent");
             }).catch((error) => {
                 alert("error in mail " + error)
             });
@@ -221,6 +229,7 @@ const CalendarPage: React.FC = () => {
                     Reminder: response.data.reminder,
                 };
                 setDeleteEvent(newEvent);
+                setDeleteEventId(newEvent.Id);
                 setTitleInput(newEvent.title);
                 setStart(new Date(newEvent.start));
                 setEnd(new Date(newEvent.end));
@@ -587,9 +596,30 @@ const CalendarPage: React.FC = () => {
                 <div >
                     <br />
                     <strong>
-                        <StyledDiv>
-                            Click an event to edit/delete.
-                        </StyledDiv>
+                    <StyledDiv>
+                        {currentView != 'agenda' && (
+                            <span>
+                                Click an event to edit or delete
+                            </span>
+                        )}
+                        {currentView === 'agenda' && (
+                            <span>
+                                All events spanning the month are displayed here.
+                            </span>
+                        )}
+
+                        <br />
+                        {currentView === 'month' && (
+                            <span>
+                                The event will be created for the entire day i.e., 24 hours.
+                            </span>
+                        )}
+                        {(currentView === 'week' || currentView === "day") && (
+                            <span>
+                                To create an event, drag the mouse over the preferred time range on the calendar.
+                            </span>
+                        )}
+                    </StyledDiv>
                     </strong>
                 </div>
                 <br />
@@ -603,7 +633,7 @@ const CalendarPage: React.FC = () => {
                     endAccessor="end"
                     tooltipAccessor={tooltipAccessor}
                    formats={eventFormats}
-                   
+                    onView={newView => setCurrentView(newView)}
                     titleAccessor="title"
                     onSelectEvent={handleDelete}
                     components={{
