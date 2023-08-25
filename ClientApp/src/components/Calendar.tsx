@@ -32,7 +32,7 @@ const CalendarApp: FC = () => {
     const params = useParams();
     const id = params.id;
     const [showModal, setShowModal] = useState(false);
- 
+    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(defaultTimeZone);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteEventId, setDeleteEventId] = useState<string>('');
@@ -77,7 +77,7 @@ const CalendarApp: FC = () => {
         }
        
         
-    }, [selectedTimezone, showModal, currentView, showEditModal]);
+    }, [selectedTimezone, showModal, currentView]);
     
 
    
@@ -88,24 +88,26 @@ const CalendarApp: FC = () => {
     // Handles timezone selection change
     const handleTimezoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setDeleteTimezone(event.target.value);
-    };
+    }
    
-
+    //onClose function sets all the form variables to empty so that the past information will not be shown.
     const onClose = () => {
         setTitleInput("");
-        //setCancel(true);
         setSelectedConnections([]);
         setSelectedModerators([]);
         setPrevSelectedTimezone(defaultTimeZone);
         setPrivate(false);
     }
+
+    //This function is to handle the state of Delete and Delete Confirmation Modal.
     const DeleteEventConfirm = () => {
         setConfirmationModal(true);
         setShowDeleteModal(false);
     }
+   
     //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(defaultTimeZone);
+    
         /// <summary>
         /// getEvents will get all the events of the user based on the User id.
         ///Once all the events are obtained using setEvents all the events will be updated and will be shown in calendar page
@@ -229,6 +231,7 @@ const CalendarApp: FC = () => {
         }
 
     };
+
         /// <summary>
         /// GetConnections will get all the connections of the user based on the User id.
         ///this function will be called everytime when the variables in the useEffect block changes
@@ -507,7 +510,7 @@ const CalendarApp: FC = () => {
             // Event is in the past, disable edit and delete options
             return;
         }
-        // const isSameDay = selectedDate.isSame(currentDate, 'day');
+      
 
 
         else if (!isPastEvent) {
@@ -563,11 +566,13 @@ const CalendarApp: FC = () => {
     const tooltipAccessor = (event: any) => {
         return `Title: ${event.title}\nStart: ${event.start.toLocaleString()}\nEnd: ${event.end.toLocaleString()}`;
 
-    };
+    }
+
     // Override the time format to empty string which is shown in calendar
     const eventFormats = {
         eventTimeRangeFormat: () => '', 
-    };
+    }
+
      ///<summary>
     ///handlePost when the user creates a public post this function is called
     ///All the basic checks like empty title is taken care of,
@@ -598,6 +603,7 @@ const CalendarApp: FC = () => {
             }
         }
     }
+
     ///<summary>
     ///The functioning is same as handlePost but this is called when the user creates a private post
     ///In the private post the user is allowed to choose the connections, so new modal will pop up where all the connections will be displayed
@@ -654,33 +660,52 @@ const CalendarApp: FC = () => {
 
         setShowDeleteModal(true);
     };
+
+    //This handleClose function is used to handle the state of create modal and sets all the form variables to empty; 
     const handleClose = () => {
         setShowCreateModal(false);
         onClose();
       
     }
+
+    //This function is used to handle the state of create modal when the user else it will show the
+    // private connections modal when it is not an edit action and sets all the form variables to empty it is to remove the
+    //consective modal pop ups
+
     const onCloseEdit = () => {
         setShowEmailModal(false);
         if (!edit) {
             
             setShowCreateModal(true);
 }
-        onClose();
+       // onClose();
 
     }
+
+    //This handleClose function is used to handle the state of create modal and sets all the form variables to empty; 
     const onCloseConfirm = () => {
         setConfirmationModal(false);
         setShowDeleteModal(true);
 
     }
+
+     //This function is to handle the state of Delete and Delete Confirmation modal and makes the form variables empty.
     const onCloseDelete = () => {
         setShowEditModal(false);
-        
           onClose();
        
         
 
     }
+
+     //This function is to handle the state of Delete modal and also makes the form variables empty.
+    const onDelete = () => {
+        onClose();
+        setShowDeleteModal(false);
+    }
+
+    ///This is used for ellipses when the emailId is more than the width of the container it and ellipses are used
+    ///It sets the expanded email if it is equal to index then the email is already expanded so it changes to null and viceversa.
     const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
     const toggleExpand = (index: number) => {
         if (expandedEmail === index) {
@@ -749,7 +774,8 @@ const CalendarApp: FC = () => {
 
         }
     };
-    
+
+    ///This is the range of all the events in the database the earliest start date to the last end date.
     const allEventsRange = {
         start: moment.min(events.map(event => moment(event.start))).toDate(),
         end: moment.max(events.map(event => moment(event.end))).toDate(),
@@ -766,7 +792,7 @@ const CalendarApp: FC = () => {
             date = allEventsRange.end;
         }
 
-        // Update the view along with the date checks
+       
         
     };
    
@@ -797,7 +823,7 @@ const CalendarApp: FC = () => {
         }
     };
 
-  
+  //stylesheet of the calendar container
 
     const calendarContainerStyle = {
         height: "80vh",
@@ -898,9 +924,9 @@ const CalendarApp: FC = () => {
             {currentTaskType && (
                 <MyModal show={showModal} onClose={()=>setShowModal(false)} taskType={currentTaskType} />
             )}
-            
+          
             {deleteEvent && (
-                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} className="expand" >
+                <Modal show={showDeleteModal} onHide={onDelete} className="expand" >
                     <Modal.Header style={{
                         display: "flex",
                         justifyContent: "center",
@@ -992,7 +1018,7 @@ const CalendarApp: FC = () => {
                         <Button variant="danger" onClick={DeleteEventConfirm}>
                             Delete
                         </Button>
-                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                                <Button variant="secondary" onClick={onDelete}>
                             Cancel
                         </Button>
                     </div>

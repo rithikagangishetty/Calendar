@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './loginStyles.css';
 import styled from 'styled-components';
-type TaskType = 'login' | 'signup' | 'valid' | "newaccount";
+type TaskType = 'login' | 'signup' | 'valid' | "newaccount" | "exists";
 
 function Login() {
     const [EmailId, setEmailId] = useState<string>('');
@@ -68,6 +68,14 @@ function Login() {
             setCurrentTaskType('newaccount');
             setShowModal(true);
             setSignUp(true);
+            setValid(false);
+            setEmailId("");
+            return;
+        }
+        if (contain && validateEmail(EmailId) && signUp) {
+            setCurrentTaskType('exists');
+            setShowModal(true);
+            setSignUp(false);
             setValid(false);
             setEmailId("");
             return;

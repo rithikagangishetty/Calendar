@@ -7,7 +7,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 
-type TaskType = 'login' | 'monthpast' | 'signup' | "noemail" | 'noevent' | 'connectionadded' | 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast' | "newaccount";
+type TaskType = 'login' | 'monthpast' | 'signup' | "noemail" | 'noevent' | 'connectionadded' |"exists"| 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast' | "newaccount";
 interface MyModalProps {
     show: boolean;
     onClose: () => void;
@@ -111,7 +111,7 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
         message = 'Please enter a valid Email.';
     }
     else if (taskType === 'noevent') {
-        message = "The event could not be created because the all the Moderators and Connections are not available at the scheduled time.";
+        message = "The event can not be created because the all the Moderators and Connections are not available at the scheduled time.";
     }
     else if (taskType === 'eventclash') {
         message = 'The event cannot be edited to the selected time as it clashes with other events.';
@@ -125,6 +125,9 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     
     else if (taskType === 'noedit') {
         message = 'You can not Delete/Edit this event.';
+    }
+    else if (taskType === 'exists') {
+        message = 'An account already exists with this Email!';
     }
     else if (taskType === 'monthpast') {
         message = "Event creation is not permitted in the month view after 00:00 as it spans the whole day. To create an event on the same day, kindly switch to the week/day view.";

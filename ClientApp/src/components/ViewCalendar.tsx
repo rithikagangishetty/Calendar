@@ -609,16 +609,7 @@ const CalendarPage: React.FC = () => {
                         )}
 
                         <br />
-                        {currentView === 'month' && (
-                            <span>
-                                The event will be created for the entire day i.e., 24 hours.
-                            </span>
-                        )}
-                        {(currentView === 'week' || currentView === "day") && (
-                            <span>
-                                To create an event, drag the mouse over the preferred time range on the calendar.
-                            </span>
-                        )}
+                       
                     </StyledDiv>
                     </strong>
                 </div>
