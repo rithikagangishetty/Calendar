@@ -32,7 +32,6 @@ const CalendarApp: FC = () => {
     const params = useParams();
     const id = params.id;
     const [showModal, setShowModal] = useState(false);
-    const [prevSelectedTimezone, setPrevSelectedTimezone] = useState(defaultTimeZone);
     const [currentTaskType, setCurrentTaskType] = useState<TaskType | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteEventId, setDeleteEventId] = useState<string>('');
@@ -95,7 +94,7 @@ const CalendarApp: FC = () => {
         setTitleInput("");
         setSelectedConnections([]);
         setSelectedModerators([]);
-        setPrevSelectedTimezone(defaultTimeZone);
+       
         setPrivate(false);
     }
 
