@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-
+import { useNavigate } from 'react-router-dom';
 
 type TaskType = 'login' | 'monthpast' | 'signup' | "noemail" | 'noevent' | 'connectionadded' |"exists"| 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast' | "newaccount";
 interface MyModalProps {
@@ -102,6 +102,9 @@ interface EditEventModalProps {
    
 }
 
+
+ 
+
 const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
     let message = '';
     if (taskType === 'login') {
@@ -195,6 +198,25 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
         </Modal>
     );
 }; export default MyModal;
+
+
+
+export function Logout() {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        
+        
+            navigate('/', { replace: true });
+        
+    };
+
+    return (
+        <div>
+            <button className="logout-button" onClick={handleLogout}>Logout</button>
+        </div>
+    );
+};
 
 export const EditEventModal: React.FC<EditEventModalProps> = ({
     show,

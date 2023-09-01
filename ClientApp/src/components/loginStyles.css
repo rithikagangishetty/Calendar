@@ -267,6 +267,18 @@ body {
     cursor: pointer;
 }
 
+.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #e74c3c;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 /* Update button styles for responsiveness */
 .button-container {
     display: flex;

@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as React from 'react';
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styled from 'styled-components';
-
+import { Logout } from './Modal';
 
 const StyledDiv = styled.div`
   text-align: center;
@@ -59,6 +59,7 @@ function Home() {
     function goBack() {
         navigate(-1);
     }
+   
     /// <summary>
     /// Once the user clicks on connection page button it takes to the connection page.
     /// </summary>
@@ -87,6 +88,7 @@ function Home() {
 
     return (
         <div >
+            <Logout />
             <ConnectionContainer className="connections-container">
                 <StyledDiv>
                     <h2>Welcome to the Home Page, {EmailId}!</h2>
@@ -107,6 +109,7 @@ function Home() {
                 <button className="back-button" onClick={goBack}>
                     Back
                 </button>
+               
 
             </ConnectionContainer>
         

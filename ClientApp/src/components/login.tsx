@@ -56,6 +56,11 @@ function Login() {
             alert(error)
         });
     }
+    function handleSignUp() {
+        setEmailId("");
+        setSignUp(!signUp);
+    }
+
     /// <summary>
     /// This function handles the submission of the Email Id after all the checks are done
     ///If the email is valid and present already it wont store again, else it creates a new document in the collection.
@@ -145,12 +150,12 @@ function Login() {
                 <br/>
                 {!signUp&&
                     <div>
-                        Don't have an account? <span className="signup-button" onClick={() => setSignUp(true)}>SignUp</span>
+                        Don't have an account? <span className="signup-button" onClick={handleSignUp}>SignUp</span>
                     </div>
                 }
                 {signUp &&
                     <div>
-                        Go Back to Login! <span className="signup-button" onClick={() => setSignUp(false)}>Login</span>
+                        Go Back to Login! <span className="signup-button" onClick={handleSignUp}>Login</span>
                     </div>}
             </form>
             {currentTaskType && (

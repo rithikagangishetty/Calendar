@@ -9,7 +9,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button, Form } from 'react-bootstrap';
-import MyModal, { EventModal, EditEventModal, SelectEmailModal, DeleteConfirmModal } from './Modal';
+import MyModal, { EventModal, EditEventModal, SelectEmailModal, DeleteConfirmModal, Logout } from './Modal';
 import styled from 'styled-components';
 
 
@@ -88,7 +88,6 @@ const CalendarPage: React.FC = () => {
 
     /// <summary>
     /// Will get the Email Id of the user
-    
     /// </summary>
     function GetEmail() {
         axios.get(`${baseUrl}/Connection/GetUser/`, { params: { id: connectionId } }).then((response) => {
@@ -108,7 +107,6 @@ const CalendarPage: React.FC = () => {
     };
     /// <summary>
     /// Gets all the events that connectionId and id are part in together.
-
     /// </summary>
     
     const getEvents = () => {
@@ -208,7 +206,7 @@ const CalendarPage: React.FC = () => {
                 alert("error in mail " + error)
             });
     };
-    /// <summary>
+        /// <summary>
         ///Takes the event and returns the moderators and connections array with emailIds instead of object Id.
         /// </summary>
     function showEmails(event: any) {
@@ -470,12 +468,7 @@ const CalendarPage: React.FC = () => {
         setEnd(currentDate.toDate());
          setPrivate(false);
     }
-    const handleClose = () => {
-        
-        setShowEditModal(false);
-        onClose();
-
-    }
+    
     const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
     const toggleExpand = (index: number) => {
         if (expandedEmail === index) {
@@ -636,7 +629,7 @@ const CalendarPage: React.FC = () => {
                 />
                 </div>
 
-           
+            <Logout />
 
             {deleteEvent && (
                 <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>

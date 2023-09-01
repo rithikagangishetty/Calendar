@@ -1,8 +1,8 @@
 ﻿import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-type TaskType = 'connectionadded' |"noemail"| 'connectiondeleted' |"valid"|'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
-import MyModal from './Modal';
+type TaskType = 'connectionadded' | "noemail" | 'connectiondeleted' | "valid" | 'noconnections' | 'connectionexist' | 'sameemail'; // Define the possible task types
+import MyModal, { Logout } from './Modal';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -32,7 +32,7 @@ function Connections() {
     };
   
     function goBack() {
-        navigate(-1);
+        navigate(`/Home/${id}`);
     }
    
         /// <summary>
@@ -256,6 +256,7 @@ function Connections() {
     return (
        
         <>
+            <Logout />
             <div style={styles.main }>
             <div>
                

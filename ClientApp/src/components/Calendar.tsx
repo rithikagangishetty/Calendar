@@ -11,7 +11,7 @@ import './NavMenu.css';
 import { Form } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, EventModal, DeleteConfirmModal } from './Modal';
+import MyModal, { EditEventModal, CreateEventModal, SelectEmailModal, EventModal, DeleteConfirmModal, Logout } from './Modal';
 
 
 
@@ -63,7 +63,7 @@ const CalendarApp: FC = () => {
 
    const currentDate = moment();
     function goBack() {
-        navigate(-1);
+        navigate(`/Home/${id}`);
     }
     
     useEffect(() => {
@@ -919,7 +919,7 @@ const CalendarApp: FC = () => {
                 step={15}
                 />
             </div>
-          
+            <Logout />
             {currentTaskType && (
                 <MyModal show={showModal} onClose={()=>setShowModal(false)} taskType={currentTaskType} />
             )}
