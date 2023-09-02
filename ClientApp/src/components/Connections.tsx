@@ -6,6 +6,7 @@ import MyModal, { Logout } from './Modal';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import 'react-datepicker/dist/react-datepicker.css';
+import { FaPlus } from 'react-icons/fa';
 
 
 function Connections() {
@@ -22,6 +23,19 @@ function Connections() {
     const [confirmationModal, setConfirmationModal] = useState(false);
     const navigate = useNavigate();
     const baseUrl = process.env.REACT_APP_URL;
+
+
+
+    //UseEffect renders the Get() and GetAll() function whenever a change is occured which can be obtained by currentTaskType.
+    useEffect(() => {
+                Get();
+             GetAll();
+        
+    }, [currentTaskType]);
+    const handleCloseModal = () => {
+        setConnection("");
+        setShowModal(false);
+    };
    
     const toggleExpand = (index: number) => {
         if (expandedEmail === index) {
@@ -62,25 +76,14 @@ function Connections() {
         
     }
 
-    //UseEffect renders the Get() and GetAll() function whenever a change is occured which can be obtained by currentTaskType.
-    useEffect(() => {
-        Get();
-        GetAll();
-    }, [currentTaskType]);
-    const handleCloseModal = () => {
-        setConnection("");
-        setShowModal(false);
-    };
-
-    
         /// <summary>
         /// This function takes the object Id of the user and gets all the connections of the user.
         /// If user has no connections the modal no connections will pop up.This function re-renders everytime currentTaskType updates.
         /// </summary>
         
-    function Get() {
+     function Get() {
         var emails: any;
-        axios.get(`${baseUrl}/Connection/GetEmail/`, { params: { id: id } }).then((response) => {
+          axios.get(`${baseUrl}/Connection/GetEmail/`, { params: { id: id } }).then((response) => {
 
             emails = response.data.connection;
             setUserEmail(response.data.emailId);
@@ -92,10 +95,12 @@ function Connections() {
                 setCurrentTaskType('noconnections');
                 setShowModal(true);
             }
+            
+          
         }).catch((error) => {
             alert(error)
         });
-
+      
     }
         /// <summary>
         /// Checks whether the entered email Id is valid or not and returns true if it is valid.
@@ -113,12 +118,17 @@ function Connections() {
             emails = response.data;
             if (emails.length > 0) {
                 setAllEmailIds(emails)
-
+              
+               
             }
+           
         }).catch((error) => {
             alert(error)
         });
+       
     }
+
+
         /// <summary>
         /// This function takes the emailId of the connection the user wants to delete.
         /// After deleting the connection modal pops up.
@@ -170,24 +180,30 @@ function Connections() {
             setConnection('');
             return;
         }
+       
+       
+        handleUpdate(connection);
+    }
+   async function handleUpdate(connect:string)
+    {
         var newConnections;
         var Id;
         var Emailid;
 
         await axios.get(`${baseUrl}/Connection/GetUser/`, { params: { id: id } }).then((response) => {
-           
+
             Id = response.data.id;
             Emailid = response.data.emailId;
-          newConnections = response.data.connection;
+            newConnections = response.data.connection;
             if (response.data.connection != null) {
-                newConnections = [...newConnections, connection];
+                newConnections = [...newConnections, connect];
             }
             if (response.data.connection == null) {
-                newConnections = [connection];
+                newConnections = [connect];
             }
         }).catch((error) => {
             alert("error in getting the Id  " + error);
-           
+
 
         });
         await axios.put(`${baseUrl}/Connection/Update`,
@@ -198,20 +214,20 @@ function Connections() {
                 Connection: newConnections,
 
 
-            }).then((response) => {
+            }).then(() => {
 
-                setEmailIds(prevEmailIds => [...prevEmailIds, connection]);
+                setEmailIds(prevEmailIds => [...prevEmailIds, connect]);
                 setCurrentTaskType('connectionadded');
                 setShowModal(true);
-                
+
 
             }).catch((error) => {
                 alert("error in update " + error);
-                
+
             });
 
         setConnection('');
-       
+
 
     }
 
@@ -251,7 +267,7 @@ function Connections() {
 
     };
   
-    // Merge responsive styles into main styles
+
    
     return (
        
@@ -302,7 +318,41 @@ function Connections() {
                         <button className="btn btnPrimary mt-4" onClick={Update}>
                             Add Connection
                             </button>
-                        </div>
+                            </div>
+                            {/*<div>*/}
+                            {/*    {allEmails*/}
+                            {/*        .filter(email => (!emailIds.includes(email) && email != userEmail)) // Filter out emails that are in emailIds*/}
+                            {/*        .map((email, index) => (*/}
+                                       
+                            {/*            <button*/}
+                            {/*                key={index}*/}
+                            {/*                className="btn"*/}
+                            {/*                type="button"*/}
+                            {/*                onClick={() => handleUpdate(email)}*/}
+                            {/*                >*/}
+                            {/*                    <div className="tag">*/}
+                            {/*                        {email}*/}
+                            {/*                </div>*/}
+                            {/*                </button>*/}
+                                       
+                            {/*        ))}*/}
+                            {/*</div>*/}
+                            <div>
+                                {allEmails
+                                    .filter(email => (!emailIds.includes(email) && email !== userEmail))
+                                    .map((email, index) => (
+                                        
+                                            <div className="tag">
+                                            <span> {email}</span>  
+                                                <FaPlus className="add-icon"
+                                                    
+                                                    type="button"
+                                                    onClick={() => handleUpdate(email)}
+                                                    style={{ cursor: 'pointer' }}  />                                              
+                                            </div>
+                                           
+                                    ))}
+                            </div>
                         </form>
                         {emailIds.length > 0 && (
                        <><hr style={{ borderTop: "1px solid black", margin: "20px 0" }} /><div style={{ textAlign: "center", paddingTop: "10px", paddingBottom: "10px" }}> {/* Centered container for the label */}

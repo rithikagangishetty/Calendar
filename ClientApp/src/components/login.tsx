@@ -5,7 +5,7 @@ import './NavMenu.css';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './loginStyles.css';
-import styled from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
 type TaskType = 'login' | 'signup' | 'valid' | "newaccount" | "exists";
 
 function Login() {
@@ -27,6 +27,8 @@ function Login() {
     /// </summary>
     const handleCloseModal = () => {
         if (valid) {
+            const uniqueToken = uuidv4();
+            sessionStorage.setItem('authToken', uniqueToken);
             navigate(`/Home/${Id}`);
             setShowModal(false);
         } else {

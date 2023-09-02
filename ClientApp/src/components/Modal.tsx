@@ -6,6 +6,8 @@ import Modal from 'react-bootstrap/Modal';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
+import  browserHistory  from 'react-router'
+
 
 type TaskType = 'login' | 'monthpast' | 'signup' | "noemail" | 'noevent' | 'connectionadded' |"exists"| 'eventclash' | 'valid' | 'eventedited' | 'noedit' | 'connectiondeleted' | 'eventadded' | 'eventdeleted' | 'overlap' | 'noconnections' | 'past' | 'connectionexist' | 'sameemail' | 'editpast' | "newaccount";
 interface MyModalProps {
@@ -201,22 +203,33 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
 
 
 
+
+
 export function Logout() {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        
-        
-            navigate('/', { replace: true });
-        
+        // Clear the token or relevant data from session storage
+        sessionStorage.removeItem('authToken');
+
+        // Redirect the user to the login page
+        navigate('/', { replace: true });
     };
+
 
     return (
         <div>
-            <button className="logout-button" onClick={handleLogout}>Logout</button>
+            <button className="logout-button" onClick={handleLogout}>
+                Logout
+            </button>
         </div>
     );
-};
+}
+
+
+
+
+
 
 export const EditEventModal: React.FC<EditEventModalProps> = ({
     show,

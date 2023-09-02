@@ -9,6 +9,7 @@ body {
     
 }
 .left-aligned-input {
+
     text-align: left;
 }
 .signup-button {
@@ -259,9 +260,9 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
-    background-color: #e74c3c;
+    background-color: dodgerblue;
     border: none;
-    color:white;
+    color: white;
     padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
@@ -271,7 +272,7 @@ body {
     position: absolute;
     top: 20px;
     right: 20px;
-    background-color: #e74c3c;
+    background-color: indianred;
     border: none;
     color: white;
     padding: 10px 15px;
@@ -279,7 +280,43 @@ body {
     cursor: pointer;
 }
 
-/* Update button styles for responsiveness */
+
+tagcontainer {
+    
+    
+    margin-top: 10px;
+    width: 100%;
+   
+}
+
+.tag {
+    margin: 20px;
+    display: inline-block;
+    align-items: center;
+    background-color: white;
+    padding: 4px 8px;
+    border-radius: 16px;
+    color: black;
+}
+
+    .tag span {
+        margin-right: 8px;
+    }
+
+    .tag .add-icon {
+        cursor: pointer;
+        color: #28a745;
+        border-radius: 50%;
+      
+        font-size:15px;
+       
+        align-items: center;
+        justify-content: center;
+        background-color:white;
+       
+    }
+
+
 .button-container {
     display: flex;
     justify-content: center;
