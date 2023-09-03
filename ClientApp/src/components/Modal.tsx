@@ -15,19 +15,6 @@ interface MyModalProps {
     onClose: () => void;
     taskType: TaskType; 
 }
-interface DeleteModalProps {
-    show: boolean;
-    onHide: () => void;
-    onEdit: (event:any) => void;
-    onDelete: (event: any) => void;
-    isPast: boolean;
-    title: any;
-    event:any;
-    start: any;
-    end: any;
-    connections: any;
-    moderator: any;
-}
 interface SelectEmailModalProps {
     show: boolean;
     onClose: () => void;
@@ -104,7 +91,14 @@ interface EditEventModalProps {
    
 }
 
-
+/**
+ * MyModal component displays a modal dialog with a message based on the task type.
+ *
+ * @param {object} props - Component properties.
+ * @param {boolean} props.show - Whether the modal should be displayed.
+ * @param {function} props.onClose - Callback function when the modal is closed.
+ * @param {string} props.taskType - Task type that determines the message to be displayed.
+ */
  
 
 const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
@@ -203,16 +197,21 @@ const MyModal: React.FC<MyModalProps> = ({ show, onClose, taskType }) => {
 
 
 
-
+/**
+ * Logout component to handle user logout.
+ */
 
 export function Logout() {
     const navigate = useNavigate();
 
+    /**
+     * Function to handle user logout:
+     * - Clears the authentication token or relevant data from session storage.
+     * - Redirects the user to the login page.
+     */
     const handleLogout = () => {
-        // Clear the token or relevant data from session storage
+        
         sessionStorage.removeItem('authToken');
-
-        // Redirect the user to the login page
         navigate('/', { replace: true });
     };
 
@@ -228,6 +227,35 @@ export function Logout() {
 
 
 
+
+/**
+ * Edit Event Modal component for editing existing events.
+ *
+ * @param {object} props - Component properties.
+ * @param {boolean} props.show - Whether the modal should be displayed.
+ * @param {function} props.onClose - Callback function when the modal is closed.
+ * @param {string} props.creator - Creator of the event.
+ * @param {string} props.initialTimezone - Initial selected timezone for the event.
+ * @param {function} props.onPost - Callback function when updating a public event.
+ * @param {function} props.onPrivatePost - Callback function when updating a private event.
+ * @param {string} props.validationError - Validation error message (if any).
+ * @param {string} props.titleInput - Input value for the event title.
+ * @param {Date} props.start - Start date and time of the event.
+ * @param {string} props.userId - User ID.
+ * @param {Date} props.end - End date and time of the event.
+ * @param {function} props.setStart - Callback function to set the start date and time.
+ * @param {function} props.setCreator - Callback function to set the creator.
+ * @param {function} props.setEnd - Callback function to set the end date and time.
+ * @param {function} props.onTitleInputChange - Callback function when the event title input changes.
+ * @param {string[]} props.connections - List of available connections (moderators).
+ * @param {string[]} props.selectedModerators - List of selected moderators for the event.
+ * @param {function} props.handleUserSelection - Callback function when a user (moderator) is selected or deselected.
+ * @param {function} props.handleTimezoneChange - Callback function when the selected timezone changes.
+ * @param {string} props.selectedTimezone - Selected timezone for the event.
+ * @param {string} props.defaultTimeZone - Default time zone.
+ * @param {string[]} props.timezones - List of available timezones.
+ * @param {boolean} props.priv - Whether the event is private.
+ */
 
 
 
@@ -577,7 +605,25 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
 
 
 
-
+/**
+ * Create Event Modal component for creating new events.
+ *
+ * @param {object} props - Component properties.
+ * @param {boolean} props.show - Whether the modal should be displayed.
+ * @param {function} props.onClose - Callback function when the modal is closed.
+ * @param {function} props.onPost - Callback function when creating a public event.
+ * @param {function} props.onPrivatePost - Callback function when creating a private event.
+ * @param {string} props.validationError - Validation error message (if any).
+ * @param {string} props.titleInput - Input value for the event title.
+ * @param {function} props.onTitleInputChange - Callback function when the event title input changes.
+ * @param {string[]} props.connections - List of available connections (moderators).
+ * @param {string[]} props.selectedModerators - List of selected moderators for the event.
+ * @param {function} props.handleUserSelection - Callback function when a user (moderator) is selected or deselected.
+ * @param {string} props.start - Start date and time of the event.
+ * @param {string} props.end - End date and time of the event.
+ * @param {string} props.defaultTimeZone - Default time zone.
+ * @param {string} props.Timezone - Selected time zone for the event.
+ */
 
 
 
@@ -601,9 +647,13 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     if (Timezone == "") {
         Timezone = defaultTimeZone;
     }
-    //const [expandedModerator, setExpandedModerator] = useState<string | null>(null);
+    
     const [expandedModerator, setExpandedModerator] = useState<number | null>(null);
 
+    /**
+     * Function to toggle the expansion of email entries.
+     * @param {number} index - The index of the email entry.
+     */
     const toggleExpand = (index: number) => {
         if (expandedModerator === index) {
             setExpandedModerator(null);
@@ -659,12 +709,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
                                     type="checkbox"
                                 
                                     label={
-                                        //<span
-                                        //    className="truncate"
-                                        //    onClick={() => setExpandedModerator(expandedModerator === moderator ? null : moderator)}
-                                        //>
-                                        //    {expandedModerator === moderator ? moderator : (moderator.length > 50 ? `${moderator.slice(0, 50)}...` : moderator)}
-                                        //</span>
+                                       
                                         <span
                                             className={`truncated ${expandedModerator === index ? 'expanded' : ''}`}
                                             onClick={() => toggleExpand(index)}
@@ -697,9 +742,17 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({
     );
 };
 
-
-
-
+/**
+ * Select Email Modal component to display a list of connections to select from.
+ *
+ * @param {object} props - Component properties.
+ * @param {boolean} props.show - Whether the modal should be displayed.
+ * @param {function} props.onClose - Callback function when the modal is closed.
+ * @param {function} props.onSaveSelectedConnections - Callback function when the selected connections are saved.
+ * @param {string} props.validationError - Validation error message (if any).
+ * @param {string[]} props.connections - List of available connections to select from.
+ * @param {function} props.renderEmailCheckbox - Function to render email checkboxes based on connections.
+ */
 
 export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
     show,
@@ -747,8 +800,23 @@ export const SelectEmailModal: React.FC<SelectEmailModalProps> = ({
     );
 };
 
+/**
+ * Event modal component to display errors related to event creation/editing.
+ *
+ * @param {object} props - Component properties.
+ * @param {boolean} props.show - Whether the modal should be displayed.
+ * @param {function} props.onHide - Callback function when the modal is closed.
+ * @param {string[]} props.moderators - List of moderators who are unavailable.
+ * @param {string[]} props.connections - List of connections who are unavailable.
+ */
+
 export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators, connections }) => {
     const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
+    /**
+     * Function to toggle the expansion of email entries.
+     * @param {number} index - The index of the email entry.
+     */
+
     const toggleExpand = (index: number) => {
         if (expandedEmail === index) {
             setExpandedEmail(null);
@@ -814,69 +882,14 @@ export const EventModal: React.FC<EventModalProps> = ({ show, onHide, moderators
 }
 
 
-export const DeleteModal: React.FC<DeleteModalProps> = ({ show, onHide, onEdit, onDelete, isPast, start, end, moderator, title, connections, event }) => {
-    
-    return (
-        
-        <Modal show={show} onHide={onHide}>
-          
-            <Modal.Header style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-            }} >
-                <Modal.Title>Delete Event</Modal.Title>
-            </Modal.Header>
-            {event && (
-            <Modal.Body>
-
-                    {title&&(<p>Title: {title}</p>)}
-                    {start && (<p>Start : {start}</p>)}
-                    {end && (<p>End: {end}</p>)}
-
-                {connections && connections.length > 0 && (
-                    <div>
-                        <p>Connections:</p>
-                        <ul>
-                            {connections.map((connection:any, index:any) => (
-                                <li key={index}>{connection}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-                {moderator && moderator.length > 0 && (
-                    <div>
-                            <p><strong>Moderators:</strong></p>
-                        <ul>
-                            {moderator.map((moderator:any, index:any) => (
-                                <li key={index}>{moderator}</li>
-                            ))}
-                        </ul>
-                    </div>
-                    )}
-
-               
-                    <p><strong>Are you sure you want to delete/edit this event?</strong></p>
-            </Modal.Body>
-            )}
-            <Modal.Footer>
-                <Button variant="success" onClick={onEdit} disabled={isPast} >
-                    Edit
-                </Button>
-                <Button variant="danger" onClick={onDelete}>
-                    Delete
-                </Button>
-                <Button variant="secondary" onClick={onHide}>
-                    Cancel
-                </Button>
-                </Modal.Footer>
-          
-            </Modal>
-
-      
-    );
-};
-
+/**
+ * Delete confirmation modal component.
+ *
+ * @param {object} props - Component properties.
+ * @param {boolean} props.show - Whether the modal should be displayed.
+ * @param {function} props.onClose - Callback function when the modal is closed.
+ * @param {function} props.onDelete - Callback function when the delete action is confirmed.
+ */
 
 export const DeleteConfirmModal: React.FC<DeleteConfirmProps> = ({ show, onClose,onDelete}) => {
 

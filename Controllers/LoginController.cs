@@ -2,8 +2,6 @@
 using Main.Supervisor;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
 namespace Calenderwebapp.Controllers
     
 {
@@ -37,16 +35,21 @@ namespace Calenderwebapp.Controllers
        
         public ActionResult<ConnectionDetails> Login(ConnectionDetails userData)
         {
+            
             var valid = IsValidEmail(userData.EmailId);
             if (userData == null&& !valid) 
-            { return BadRequest("invalid data"); 
+
+            {
+                
+                return BadRequest("invalid data");
+             
             }
             var user = _loginSupervisor.login(userData);
             if (user == null)
             {
                 var final = _loginSupervisor.Signup(userData);
 
-               
+              
                 return final;
 
             }

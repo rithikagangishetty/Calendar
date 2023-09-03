@@ -15,18 +15,30 @@ import CalendarPage from './components/ViewCalendar';
 interface ProtectedRouteProps {
     element: React.ReactNode;
 }
+/**
+ * A custom protected route component.
+ * It checks for the presence of an authentication token and navigates to the login page
+ * if the token is not present, otherwise, it renders the provided element.
+ * @param {object} element - The element to be rendered when the route is accessed.
+ */
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
     const authToken = sessionStorage.getItem('authToken');
 
     if (!authToken) {
-        // If the token is not present, navigate to the login page
+        
         return <Navigate to="/" />;
     }
 
-    // Render the protected content if the token is present
+   
     return <>{element}</>;
 };
+
+/**
+ * The root component of your React application.
+ * It sets up the routing for different pages and includes protected routes
+ * that require authentication to access.
+ */
 function App() {
 
     return (

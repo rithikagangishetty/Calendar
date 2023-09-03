@@ -1,36 +1,17 @@
-//import 'bootstrap/dist/css/bootstrap.css';
-//import * as React from 'react';
-//import * as ReactDOM from 'react-dom';
-//import { Provider } from 'react-redux';
 
-//import { ConnectedRouter } from 'connected-react-router';
-//import { createBrowserHistory } from 'history';
-//import configureStore from './store/configureStore';
-//import App from './App';
-//import registerServiceWorker from './registerServiceWorker';
-
-//// Create browser history to use in the Redux store
-//const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href') as string;
-//const history = createBrowserHistory({ basename: baseUrl });
-
-//// Get the application-wide store instance, prepopulating with state from the server where available.
-//const store = configureStore(history);
-
-//ReactDOM.render(
-//    <Provider store={store}>
-//        {/*<ConnectedRouter history={history}>*/}
-//            <App/>
-//        {/*</ConnectedRouter>*/}
-//    </Provider>,
-//    document.getElementById('root'));
-
-//registerServiceWorker();
 import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
 import * as reactdomclient from 'react-dom/client'; // Import createRoot from react-dom
-import { BrowserRouter as Router } from 'react-router-dom';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
+
+
+/**
+ * The entry point of the React application.
+ * It sets up the root element and uses React's createRoot to render the application.
+ * The application is wrapped in a BrowserRouter to enable client-side routing.
+ * Finally, it registers a service worker for caching assets.
+ */
 
 const rootElement = document.getElementById('root') as Element; // Use type assertion
 

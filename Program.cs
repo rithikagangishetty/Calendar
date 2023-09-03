@@ -18,8 +18,15 @@ builder.Services.AddSpaStaticFiles(configuration =>
     configuration.RootPath = "ClientApp/build";
 });
 
+var logDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
+var logFilePath = Path.Combine(logDirectory, "Log-.log");
+
+var logger = new LoggerConfiguration().MinimumLevel.Information()
+    .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 
+builder.Logging.AddSerilog(logger);
 builder.Services.AddScoped<ILoginSupervisor, LoginSupervisor>();
 builder.Services.AddScoped<IUserSupervisor, UserSupervisor>();
 builder.Services.AddScoped<IConnectionSupervisor, ConnectionSupervisor>();
@@ -29,6 +36,7 @@ builder.Services.AddScoped<IUser, User>();
 builder.Services.AddSingleton<User>();
 builder.Services.AddScoped<ILogin, Login>();
 builder.Services.AddSingleton<Login>();
+
 var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseStaticFiles();

@@ -61,35 +61,41 @@ const CalendarApp: FC = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [currentView, setCurrentView] = useState<View>('month');
 
-   const currentDate = moment();
-    function goBack() {
-        navigate(`/Home/${id}`);
-    }
-    
+    const currentDate = moment();
     useEffect(() => {
 
         getEvents();
         GetConnections();
         if (selectedTimezone) {
             moment.tz.setDefault(selectedTimezone);
-            setCurrentView(currentView); 
+            setCurrentView(currentView);
         }
-       
-        
+
+
     }, [selectedTimezone, showModal, currentView]);
+
+ /**
+ * Navigates back to the home page.
+ */
+    function goBack() {
+        navigate(`/Home/${id}`);
+    }
     
-
-   
-
-
     moment.tz.setDefault(selectedTimezone);
 
-    // Handles timezone selection change
+    /**
+ * Handles the change event for the timezone selection.
+ *
+ * @param {React.ChangeEvent<HTMLSelectElement>} event - The change event containing the selected timezone value.
+ */
+
     const handleTimezoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setDeleteTimezone(event.target.value);
     }
    
-    //onClose function sets all the form variables to empty so that the past information will not be shown.
+    /**
+  * Resets form variables to empty to clear past information.
+  */
     const onClose = () => {
         setTitleInput("");
         setSelectedConnections([]);
@@ -98,7 +104,9 @@ const CalendarApp: FC = () => {
         setPrivate(false);
     }
 
-    //This function is to handle the state of Delete and Delete Confirmation Modal.
+    /**
+ * Sets the state for the delete and delete confirmation modal.
+ */
     const DeleteEventConfirm = () => {
         setConfirmationModal(true);
         setShowDeleteModal(false);
@@ -107,11 +115,11 @@ const CalendarApp: FC = () => {
     //Gets the defaultTimeZone of the client
     const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     
-        /// <summary>
-        /// getEvents will get all the events of the user based on the User id.
-        ///Once all the events are obtained using setEvents all the events will be updated and will be shown in calendar page
-        ///this function will be called everytime when the variables in the useEffect block changes
-        /// </summary>
+    /**
+     * getEvents will get all the events of the user based on the User id.
+     * Once all the events are obtained using setEvents, all the events will be updated and will be shown in the calendar page.
+     * This function will be called every time when the variables in the useEffect block change.
+     */
        
     const getEvents = () => {
         axios.get(`${baseUrl}/User/GetEvents`, { params: { id: id } }).then((response) => {
@@ -142,15 +150,9 @@ const CalendarApp: FC = () => {
 
 
     }
-    /// <summary>
-        ///Post function is used to add new events in the database
-        ///Firstly, it obtains the data of the user who created the event using get request
-        ///After that with all the proper information the post request will be sent
-        ///Post request returns the event id which is used for sending emails
-        ///After the post request is done, with the obtained event id ,subject and body , sendemail function will be called.
-        ///Once all the events are obtained using setEvents all the events will be updated and will be shown in calendar page
-        ///this function will be called everytime when the variables in the useEffect block changes
-        /// </summary>
+    /**
+     * Posts a new event to the database, sends email notifications on success.
+     */
    
 
 
@@ -231,10 +233,10 @@ const CalendarApp: FC = () => {
 
     };
 
-        /// <summary>
-        /// GetConnections will get all the connections of the user based on the User id.
-        ///this function will be called everytime when the variables in the useEffect block changes
-        /// </summary>
+    /**
+       * GetConnections will get all the connections of the user based on the User id.
+       * This function will be called every time when the variables in the useEffect block change.
+       */
     function GetConnections() {
         axios.get(`${baseUrl}/Connection/GetEmail`, { params: { id: id } }).then((response) => {
             setUserEmail(response.data.emailId);
@@ -251,12 +253,11 @@ const CalendarApp: FC = () => {
 
     }
    
-         /// <summary>
-        /// DeleteEvent will delete the event based on the userId and event Id
-        ///after axios delete api call the response is the details of the events
-        ///Which are then used to send email after the deletion.
-        ///this function will be called everytime when the variables in the useEffect block changes
-        /// </summary>
+    /**
+   * Deletes an event, sends a deletion email, and handles modal state changes.
+   *
+   * @param {React.MouseEvent<HTMLButtonElement>} event - The click event triggering the delete action.
+   */
     async function DeleteEvent(event: React.MouseEvent<HTMLButtonElement>) {
        event.preventDefault();
        
@@ -303,11 +304,13 @@ const CalendarApp: FC = () => {
      
 
     };
-         /// <summary>
-        ///Takes the event and returns the moderators and connections array with emailIds instead of object Id.
-        /// </summary>
-    
-   async function  showEmails(event: any) {
+/**
+ * Fetches event details for editing and updates state variables.
+ *
+ * @param {Object} event - The event object containing event details.
+ */
+
+    async function showEmails(event: any) {
        
         await axios
             .get(`${baseUrl}/User/GetEvent`, { params: { id: event.Id } })
@@ -348,16 +351,13 @@ const CalendarApp: FC = () => {
         
 
      
-    }
+    };
 
-        /// <summary>
-        /// EditEvent will edit the event after few checks
-        ///After the user enters the start and end time it checks whether any existing event overlaps with the entered data
-        ///If yes, a modal pops up with the suitable message
-        ///Else, using the event id the document gets updated 
-        ///After updating a email will be sent 
-        ///this function will be called everytime when the variables in the useEffect block changes
-        /// </summary>
+    /**
+    * Edits an event, checks for event clashes, and handles modal state changes.
+    *
+    * @param {boolean} Priv - A boolean indicating event privacy.
+    */
     async function EditEvent(Priv:boolean) {
        
         var users;
@@ -453,10 +453,12 @@ const CalendarApp: FC = () => {
                 });
         }
     };
-        /// <summary>
-        ///This function checks if there are any overlaps with the provided start and end times with all the events.
-        ///If there are events which overlap they add into eventsInSlot, so when the length of eventsInSlot is zero, no overlap occurs
-        /// </summary>
+    /**
+     * Checks if there are any events within the selected slot.
+     * Prevents selection if events are present.
+     *
+     * @param {Object} slotInfo - Information about the selected time slot.
+     */
     const overlap = (slotInfo: any) => {
         // Check if there are any events within the selected slot
         const eventsInSlot = events.filter
@@ -481,11 +483,12 @@ const CalendarApp: FC = () => {
 
 
     };
-    ///<summary>
-    ///handleSelectSlot when the user drags the time for event creation this function gets called
-    ///All the basic checks are taken care of , like creation of event in the past,overlapping event creation
-    ///Once all the checks are passed a new event will be added to the setEvents function which will help show in the calendar 
-    ///</summary>
+    /**
+     * Handles the selection of a time slot on the calendar, checks for overlapping events and past events,
+     * and manages the display of appropriate notifications and modals.
+     *
+     * @param {any} event - The selected time slot event object.
+     */
     const handleSelectSlot = (event: any) => {
         const selectedDate = moment(event.start);
        
@@ -555,13 +558,22 @@ const CalendarApp: FC = () => {
       
 
     };
-    ///This function is for the displaying of the title, start and end times when scrolled over an event.
+    /**
+    * Customizes the content to be displayed for each event on the calendar.
+    * @param {any} event - The event for which content is customized.
+    */
     const CustomEventContent = ({ event }: any) => (
         <div>
             <div style={{ fontSize: '13px', fontWeight: 'bold', textAlign: 'center' }}>{event.title}</div>
             <div style={{ fontSize: '13px' }}>{moment(event.start).format('LT')} - {moment(event.end).format('LT')}</div>
         </div>
     );
+    /**
+ * Generates the tooltip content for event hover information.
+ *
+ * @param {any} event - The event for which tooltip information is generated.
+ * @returns {string} - The tooltip content.
+ */
     const tooltipAccessor = (event: any) => {
         return `Title: ${event.title}\nStart: ${event.start.toLocaleString()}\nEnd: ${event.end.toLocaleString()}`;
 
@@ -572,13 +584,12 @@ const CalendarApp: FC = () => {
         eventTimeRangeFormat: () => '', 
     }
 
-     ///<summary>
-    ///handlePost when the user creates a public post this function is called
-    ///All the basic checks like empty title is taken care of,
-    ///With the help of Edit boolean variable the function seperates it from an edit/post request.
-    ///If it is a edit, EditEvent() is called else Post() is called.
-    
-    ///</summary>
+    /**
+    * Handles the post action when creating or editing an event.
+    * Validates the title input and triggers the corresponding action (Post or EditEvent).
+    *
+    * @param {React.MouseEvent<HTMLButtonElement>} event - The click event triggering the post action.
+    */
     function handlePost(event: React.MouseEvent<HTMLButtonElement>):void {
         event.preventDefault();
         
@@ -603,11 +614,12 @@ const CalendarApp: FC = () => {
         }
     }
 
-    ///<summary>
-    ///The functioning is same as handlePost but this is called when the user creates a private post
-    ///In the private post the user is allowed to choose the connections, so new modal will pop up where all the connections will be displayed
-    ///That is done by the modal setShowEmailModal
-    ///</summary>
+    /**
+     * Handles the post action for private events.
+     * Validates the title input and displays the email modal for private events.
+     *
+     * @param {React.MouseEvent<HTMLButtonElement>} event - The click event triggering the post action.
+     */
     function handlePrivatePost(event: React.MouseEvent<HTMLButtonElement>):void {
         event.preventDefault();
        
@@ -628,20 +640,23 @@ const CalendarApp: FC = () => {
             setShowEmailModal(true);
         }
     }
-        ///<summary>
-        ///When the user wants to edit the function this will be called, it enables the edit modal pop up and makes edit variable true.
-        ///</summary>
+    /**
+   * Enables the edit mode for events and opens the edit modal.
+   *
+   * @param {React.MouseEvent<HTMLButtonElement>} event - The click event triggering the edit action.
+   */
  function handleEditEvent(event: React.MouseEvent<HTMLButtonElement>) {
      //check this
      setShowDeleteModal(false);
      setEdit(true);
      setShowEditModal(true);
        }
-        ///<summary>
-        ///When the user clicks on any event this function is called.
-        ///All the basic checks are done if the event is past ispast is set to true which disables the edit option.
-        ///And the delete modal becomes true
-        ///</summary>
+    /**
+    * Handles the deletion of an event.
+    * Checks if the event is in the past or if the user has permissions to delete it.
+    *
+    * @param {any} event - The event object to be deleted.
+    */
    async function handleDelete(event: any) {
        setPrivate(event.priv);
        const eventStart = moment(event.start);
@@ -660,16 +675,18 @@ const CalendarApp: FC = () => {
         setShowDeleteModal(true);
     };
 
-    //This handleClose function is used to handle the state of create modal and sets all the form variables to empty; 
+    /**
+ * Closes the create modal and resets form variables.
+ */
     const handleClose = () => {
         setShowCreateModal(false);
         onClose();
       
     }
-
-    //This function is used to handle the state of create modal when the user else it will show the
-    // private connections modal when it is not an edit action and sets all the form variables to empty it is to remove the
-    //consective modal pop ups
+    /**
+     * Handles the state of the create modal when closing it.
+     * It either shows the private connections modal or resets form variables for consecutive modals.
+     */
 
     const onCloseEdit = () => {
         setShowEmailModal(false);
@@ -681,14 +698,20 @@ const CalendarApp: FC = () => {
 
     }
 
-    //This handleClose function is used to handle the state of create modal and sets all the form variables to empty; 
+    /**
+ * Handles the state when closing the confirmation modal.
+ * It shows the delete modal and clears form variables.
+ */
     const onCloseConfirm = () => {
         setConfirmationModal(false);
         setShowDeleteModal(true);
 
     }
 
-     //This function is to handle the state of Delete and Delete Confirmation modal and makes the form variables empty.
+    /**
+ * Handles the state of Delete and Delete Confirmation modals when closing them.
+ * It closes the edit modal and resets form variables.
+ */
     const onCloseDelete = () => {
         setShowEditModal(false);
           onClose();
@@ -697,14 +720,20 @@ const CalendarApp: FC = () => {
 
     }
 
-     //This function is to handle the state of Delete modal and also makes the form variables empty.
+    /**
+ * Handles the state when closing a modal.
+ * It closes the modal and resets form variables.
+ */
     const onDelete = () => {
         onClose();
         setShowDeleteModal(false);
     }
 
-    ///This is used for ellipses when the emailId is more than the width of the container it and ellipses are used
-    ///It sets the expanded email if it is equal to index then the email is already expanded so it changes to null and viceversa.
+    /**
+   * Toggles the expansion of an email element based on its index.
+   * If the email is already expanded, it collapses it, and vice versa.
+   * @param {number} index - Index of the email element.
+   */
     const [expandedEmail, setExpandedEmail] = useState<number | null>(null);
     const toggleExpand = (index: number) => {
         if (expandedEmail === index) {
@@ -714,11 +743,14 @@ const CalendarApp: FC = () => {
         }
     };
 
-   ///<summary>
-    ///This is the checkbox for the connections in the event details
-    ///To avoid adding the same user twice as connection and moderator this function is used.
-    ///It checks the selectedModerators array, all the users present in the array are disabled to select in the connections pop up
-    ///</summary>
+    /**
+     * Renders a checkbox for selecting connections in the event details.
+     * It checks if a user can be selected as a connection or not based on certain conditions.
+     * @param {string} connection - The email of the connection.
+     * @param {number} index - Index of the connection element.
+     * @returns {JSX.Element} - Checkbox element for the connection.
+     */
+
     const renderEmailCheckbox = (connection: string,index:number) => {
         const isDisabled = selectedModerators.includes(connection) || (connection == deleteUserEmail && creator);
 
@@ -746,11 +778,13 @@ const CalendarApp: FC = () => {
     };
     
 
-        ///<summary>
-       ///For the private post the user needs to select connection/moderator which is done using this function
-       ///The user selected connection/moderators is the input,it checks if the connection is already present, if yes it will not update the array of selected
-       ///else the new connection is added to the selected array
-        ///</summary>
+    /**
+    * Handles user selection of connections or moderators.
+    * If a user is selected, it adds them to the corresponding array; otherwise, it removes them.
+    * @param {string} user - The user to be selected or deselected.
+    * @param {boolean} connect - Indicates whether the user is a connection (true) or a moderator (false).
+    */
+
     const handleUserSelection = (user: string, connect: boolean) => {
         if (!connect) {
             if (selectedModerators.includes(user)) {
@@ -774,7 +808,11 @@ const CalendarApp: FC = () => {
         }
     };
 
-    ///This is the range of all the events in the database the earliest start date to the last end date.
+    /**
+ * Handles date navigation within the allEventsRange.
+ * Ensures that the provided date stays within the range of all events.
+ * @param {Date} date - The date to navigate to.
+ */
     const allEventsRange = {
         start: moment.min(events.map(event => moment(event.start))).toDate(),
         end: moment.max(events.map(event => moment(event.end))).toDate(),
@@ -796,10 +834,11 @@ const CalendarApp: FC = () => {
     };
    
     
-        ///<summary>
-        ///This is for the private post to make sure the user selects alteast one other user as connection/moderator.
-        ///If the edit is true editevent is called else post is called
-    ///</summary>
+    /**
+     * Handles saving selected connections for a private post.
+     * Checks if at least one moderator or connection is selected.
+     * Calls EditEvent if editing, or Post if creating a new event.
+     */
    
     const handleSaveSelectedConnections = () => {
         if (selectedModerators.length === 0 && selectedConnections.length === 0) {

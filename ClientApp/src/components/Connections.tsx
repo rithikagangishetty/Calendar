@@ -32,11 +32,18 @@ function Connections() {
              GetAll();
         
     }, [currentTaskType]);
+    /**
+ * Function to handle closing the modal and resetting the connection state.
+ */
     const handleCloseModal = () => {
         setConnection("");
         setShowModal(false);
     };
-   
+
+    /**
+ * Function to toggle the expanded state of an email.
+ * @param {number} index - The index of the email to toggle.
+ */
     const toggleExpand = (index: number) => {
         if (expandedEmail === index) {
             setExpandedEmail(null);
@@ -44,112 +51,104 @@ function Connections() {
             setExpandedEmail(index);
         }
     };
+
+    /**
+ * Function to navigate back to the home page.
+ */
   
     function goBack() {
         navigate(`/Home/${id}`);
     }
    
-        /// <summary>
-        /// This function takes the emailId of the connection and gets the object Id of the user
-        /// After getting the object Id of the connection it shows the connectionId calendar
-        /// </summary>
-        /// <param name="email">Email Id</param>
-
-    const handleViewCalendar = (email: string) =>
-    {
+    /**
+   * This function takes the emailId of the connection and gets the object Id of the user.
+   * After getting the object Id of the connection, it shows the connectionId calendar.
+   * @param {string} email - Email Id of the connection.
+   */
+    const handleViewCalendar = (email: string) => {
         var connectionId: string;
-        axios.get(`${baseUrl}/Connection/GetId/`, { params: { email: email } }).then((response) =>
-        {
+        axios.get(`${baseUrl}/Connection/GetId/`, { params: { email: email } }).then((response) => {
             connectionId = response.data.id;
             navigate(`/Home/Connections/calendar/${id}/${connectionId}`);
-           
-
         }).catch((error) => {
-            alert(error)
-            return;
+            alert(error);
         });
-      
     };
+
+    /**
+ * Function to show the confirmation modal before deleting an email.
+ * @param {string} email - The email to be deleted.
+ */
     const DeleteEventConfirm = (email: any) => {
         setConfirmationModal(true);
         setEmail(email);
         
     }
 
-        /// <summary>
-        /// This function takes the object Id of the user and gets all the connections of the user.
-        /// If user has no connections the modal no connections will pop up.This function re-renders everytime currentTaskType updates.
-        /// </summary>
-        
-     function Get() {
+    /**
+    * This function takes the object Id of the user and gets all the connections of the user.
+    * If the user has no connections, the modal 'no connections' will pop up. This function re-renders every time currentTaskType updates.
+    */
+    function Get() {
         var emails: any;
-          axios.get(`${baseUrl}/Connection/GetEmail/`, { params: { id: id } }).then((response) => {
-
+        axios.get(`${baseUrl}/Connection/GetEmail/`, { params: { id: id } }).then((response) => {
             emails = response.data.connection;
             setUserEmail(response.data.emailId);
             if (emails.length > 0) {
-                setEmailIds(emails)
-
+                setEmailIds(emails);
             }
-            if (emails.length == 0) {
+            if (emails.length === 0) {
                 setCurrentTaskType('noconnections');
                 setShowModal(true);
             }
-            
-          
         }).catch((error) => {
-            alert(error)
+            alert(error);
         });
-      
     }
-        /// <summary>
-        /// Checks whether the entered email Id is valid or not and returns true if it is valid.
-        /// </summary>
+    /**
+    * Checks whether the entered email Id is valid or not and returns true if it is valid.
+    * @param {string} email - The email to validate.
+    * @returns {boolean} - True if the email is valid, false otherwise.
+    */
     const validateEmail = (email: string) => {
         const pattern = /^[\w\.-]+@[\w\.-]+\.\w+$/;
         return pattern.test(email);
     };
-         /// <summary>
-        /// This function will get all the email Ids that are present in the database
-        /// </summary>
+
+    /**
+      * This function will get all the email Ids that are present in the database.
+      */
     function GetAll() {
         var emails;
-        axios.get(`${baseUrl}/Connection/Get/`, ).then((response) => {
+        axios.get(`${baseUrl}/Connection/Get/`).then((response) => {
             emails = response.data;
             if (emails.length > 0) {
-                setAllEmailIds(emails)
-              
-               
+                setAllEmailIds(emails);
             }
-           
         }).catch((error) => {
-            alert(error)
+            alert(error);
         });
-       
     }
-
-
-        /// <summary>
-        /// This function takes the emailId of the connection the user wants to delete.
-        /// After deleting the connection modal pops up.
-        /// </summary>
-        /// <param name="email">Email Id of the connection</param>
-
+    /**
+    * This function takes the emailId of the connection the user wants to delete.
+    * After deleting the connection, a modal pops up.
+    * @param {string} emailId - Email Id of the connection.
+    */
     async function Delete(emailId: string) {
-        setConfirmationModal(false)
+        setConfirmationModal(false);
         await axios.delete(`${baseUrl}/Connection/Delete/`, { params: { emailId: emailId, id: id } }).then((response) => {
-           
             setCurrentTaskType('connectiondeleted');
             setShowModal(true);
             setConnection('');
             setEmailIds(prevEmailIds => prevEmailIds.filter(email => email !== emailId));
-        }).catch((error) => { alert(error); })
+        }).catch((error) => { alert(error); });
     }
-        /// <summary>
-        /// This function is used to update the connection list of the user
-        ///First few checks are done. If the user adds already existing connection again or their own emailId or nothing, a modal pops up with the appropriate message
-        ///After all the checks are done the connection array is updated and post request will be sent.
-        /// </summary>
+
+    /**
+     * This function is used to update the connection list of the user.
+     * First, a few checks are done. If the user adds an already existing connection again or their own emailId or nothing, a modal pops up with the appropriate message.
+     * After all the checks are done, the connection array is updated, and a post request will be sent.
+     */
     async function Update(event: React.MouseEvent<HTMLButtonElement>) {
 
         event.preventDefault();
@@ -184,6 +183,11 @@ function Connections() {
        
         handleUpdate(connection);
     }
+
+    /**
+ * Function to handle updating user connections.
+ * @param {string} connect - The email to be added as a connection.
+ */
    async function handleUpdate(connect:string)
     {
         var newConnections;
@@ -239,11 +243,11 @@ function Connections() {
             alignItems: "center",
             justifyContent: "flex-start",
             minHeight: "500vh",
-           // background: "white",
+          
             marginBottom: "20px",
         },
         content: {
-         //  background: "white",
+        
             padding: "20px",
             borderRadius: "0px",
            
@@ -319,24 +323,7 @@ function Connections() {
                             Add Connection
                             </button>
                             </div>
-                            {/*<div>*/}
-                            {/*    {allEmails*/}
-                            {/*        .filter(email => (!emailIds.includes(email) && email != userEmail)) // Filter out emails that are in emailIds*/}
-                            {/*        .map((email, index) => (*/}
-                                       
-                            {/*            <button*/}
-                            {/*                key={index}*/}
-                            {/*                className="btn"*/}
-                            {/*                type="button"*/}
-                            {/*                onClick={() => handleUpdate(email)}*/}
-                            {/*                >*/}
-                            {/*                    <div className="tag">*/}
-                            {/*                        {email}*/}
-                            {/*                </div>*/}
-                            {/*                </button>*/}
-                                       
-                            {/*        ))}*/}
-                            {/*</div>*/}
+                           
                             <div>
                                 {allEmails
                                     .filter(email => (!emailIds.includes(email) && email !== userEmail))
